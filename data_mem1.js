@@ -1,7 +1,32 @@
-// Extracted from C:\Users\Hien Minh Pham\Downloads\game\final\js\data.js
+/**
+ * STRIVE & THRIVE — Game Data Constants (data.js)
+ * ============================================================
+ * All fixed game constants: salaries, side jobs, stocks,
+ * and scoring thresholds.
+ *
+ * All constants live on the global `GAME_DATA` object.
+ * ============================================================
+ */
+
 // This file is a responsibility slice, not a standalone module.
 
-// --- warning text, score labels, archetypes, lose conditions (source lines 267-364) ---
+  /* ──────────────────────────────────────────────────────────
+     HEALTH WARNING THRESHOLDS
+     ────────────────────────────────────────────────────────── */
+
+  /**
+   * Thresholds that trigger in-game health events.
+   * Checked after each round calculation.
+   */
+  const HEALTH_THRESHOLDS = [
+    { min: 50, max: 60, type: 'warning',   penalty: 0,   canWork: true,  label: 'Feeling tired' },
+    { min: 40, max: 49, type: 'event',     penalty: -2,  canWork: true,  label: 'Moderate issue' },
+    { min: 30, max: 39, type: 'event',     penalty: -5,  canWork: true,  label: 'Significant issue' },
+    { min: 20, max: 29, type: 'event',     penalty: -7,  canWork: true,  label: 'Serious issue' },
+    { min:  1, max: 19, type: 'critical',  penalty: -10, canWork: false, label: 'Critical — cannot work' },
+    { min:  0, max:  0, type: 'lose',      penalty: 0,   canWork: false, label: 'Game Over' },
+  ];
+
   const HEALTH_WARNING_EVENTS = {
     mental: [
       { min: 50, max: 60, text: "You’ve been feeling quite stressed lately, and you keep wishing you could leave work just a little earlier. Maybe it’s time to slow down and give yourself some space to heal.", penalty: 0 },
@@ -21,8 +46,15 @@
 
   /** Get health threshold info for a value */
   function getHealthThreshold(value) {
+    if (!Number.isFinite(value)) return null;
+
+    if (value <= 0) {
+      return HEALTH_THRESHOLDS.find(t => t.type === 'lose') || null;
+    }
+
+    const normalizedValue = Math.max(1, Math.floor(value));
     for (const t of HEALTH_THRESHOLDS) {
-      if (value >= t.min && value <= t.max) return t;
+      if (normalizedValue >= t.min && normalizedValue <= t.max) return t;
     }
     return null;
   }
@@ -81,9 +113,8 @@
     },
   ];
 
-  /**
-   * Lose conditions and corresponding badge files.
-   */
+  /**life events and market scenarios*/ 
+
   const LOSE_CONDITIONS = {
     cash:     {
       label: 'Bankruptcy',
@@ -99,9 +130,6 @@
     },
   };
 
-  /* ──────────────────────────────────────────────────────────
-
-// --- life events and market scenarios (source lines 437-740) ---
   const LIFE_EVENTS = [
     // Round 1
     {
