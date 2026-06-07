@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STRIVE & THRIVE - Life Balance Simulator</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poltawski+Nowy:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/base.css?v=13">
+  <link rel="stylesheet" href="css/layout.css?v=13">
+  <link rel="stylesheet" href="css/components.css?v=13">
+  <link rel="stylesheet" href="css/animations.css?v=13">
+  <link rel="stylesheet" href="css/starting.css?v=13">
+</head>
+<body>
+
+  <!-- ==========================================
+       GLOBAL UI CONTAINERS
+       ========================================== -->
+  <div id="toast-container" class="toast-container"></div>
+  <div id="modal-container" class="modal-overlay" style="display: none;"></div>
+
+  <!-- ==========================================
+       SCREEN 0: STARTING PAGE
+       ========================================== -->
+  <section id="screen-starting" class="screen screen--active">
+    <div class="graphic-area" aria-label="Illustration">
+      <svg class="illustration-svg" viewBox="0 0 850 1024" preserveAspectRatio="xMinYMin meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <g id="illustration">
+          <!-- Clock outer rings -->
+          <path d="M496.995 140C437.351 140 389 189.924 389 251.5C389 313.081 437.351 363 496.995 363C556.644 363 605 313.081 605 251.5C604.995 189.919 556.644 140 496.995 140ZM505.059 340.594C460.987 340.594 425.259 303.293 425.259 257.282C425.259 211.271 460.987 173.97 505.059 173.97C549.127 173.97 584.859 211.271 584.859 257.282C584.859 303.293 549.127 340.594 505.059 340.594Z" fill="black"/>
+          <path d="M504.502 179C463.358 179 430 213.696 430 256.498C430 299.299 463.353 334 504.502 334C545.646 334 579 299.299 579 256.498C579 213.701 545.646 179 504.502 179ZM503.31 328.62C464.422 328.62 432.899 295.823 432.899 255.372C432.899 214.92 464.422 182.124 503.31 182.124C542.194 182.124 573.722 214.92 573.722 255.372C573.722 295.828 542.194 328.62 503.31 328.62Z" fill="black"/>
+          <!-- Clock tick marks -->
+          <path d="M510.003 207C513.31 207 516 203.644 516 199.498C516 195.356 513.315 192 510.003 192C506.69 192 504 195.356 504 199.498C504 203.644 506.685 207 510.003 207Z" fill="black"/>
+          <path d="M510.003 303C506.69 303 504 306.355 504 310.5C504 314.645 506.685 318 510.003 318C513.31 318 516 314.645 516 310.5C516 306.355 513.31 303 510.003 303Z" fill="black"/>
+          <path d="M557 263C560.314 263 563 259.642 563 255.5C563 251.358 560.314 248 557 248C553.686 248 551 251.358 551 255.5C551 259.642 553.686 263 557 263Z" fill="black"/>
+          <path d="M448.002 248C444.69 248 442 251.36 442 255.5C442 259.64 444.685 263 448.002 263C451.31 263 454 259.645 454 255.5C454 251.36 451.315 248 448.002 248Z" fill="black"/>
+          <!-- Clock hands -->
+          <path d="M539.607 229.636L514.058 248.879C512.878 247.111 511.233 246.009 509.41 246.009C506.352 246.009 503.808 249.093 503.112 253.237L476.318 254.164L476.545 249.635L470 255.357L476.545 261.079V257.42L503.368 258.959C504.312 262.491 506.658 265 509.415 265C512.571 265 515.2 261.721 515.792 257.367L542.813 232.677L546.716 237.363L548 226.157L536.278 226L539.607 229.636Z" fill="black"/>
+          <!-- Ground / desk base fill -->
+          <path d="M85.9742 813.929C102.189 853.292 139.659 956.654 125.217 1041H727.27C727.27 1041 716.919 881.74 758.619 815.921C360.082 774.819 147.964 802.841 85.9742 813.929Z" fill="black"/>
+          <!-- Jacket / upper body details -->
+          <path d="M226.694 412.518C227.583 412.518 228.488 412.401 229.409 412.174C232.101 411.501 234.2 409.9 235.516 407.544C240.611 398.401 232.519 378.698 231.576 376.48L225.5 378.582C228.656 386.015 232.58 399.768 229.713 404.906C229.219 405.793 228.595 406.287 227.667 406.514C221.537 408.355 213.453 392.932 209.977 382.216L203.733 383.857C205.369 388.886 213.696 412.518 226.694 412.518Z" fill="black"/>
+          <path d="M270.835 398.744C270.34 399.637 269.717 400.125 268.789 400.352C262.659 402.193 254.575 386.777 251.107 376.047L244.863 377.696C246.483 382.717 254.81 406.356 267.808 406.356C268.698 406.356 269.61 406.239 270.53 406.012C273.223 405.346 275.322 403.732 276.637 401.382C281.74 392.246 273.641 372.536 272.698 370.317L266.621 372.42C269.777 379.866 273.702 393.606 270.835 398.744Z" fill="black"/>
+          <path d="M207.125 347.256L198.379 338.813L175.183 358.474L183.93 366.924L207.125 347.256Z" fill="black"/>
+          <path d="M267.815 341.863L237.547 333.042L233.592 344.034L263.861 352.868L267.815 341.863Z" fill="black"/>
+          <!-- Hand / fingers on desk -->
+          <path d="M492.063 712.841C498.854 713.734 512.422 715.953 527.024 720.803C534.219 723.194 536.888 723.468 538.265 723.468C541.178 723.468 542.052 721.909 542.296 721.236C542.585 720.446 543.056 719.106 539.801 715.898C544.273 717.052 548.79 718.007 551.422 718.007C554.319 718.007 555.384 716.825 555.764 715.829C556.685 713.418 554.038 711.288 551.483 709.475C549.285 707.915 547.163 706.576 545.163 705.415C547.399 705.58 549.589 705.683 551.513 705.683C554.114 705.669 558.966 705.628 559.369 702.495C559.643 700.427 559.894 698.456 539.923 693.64C547.368 690.267 546.965 688.337 546.729 687.189C546.098 684.112 541.436 684.112 538.934 684.112C533.413 684.112 523.701 685.129 510.011 687.128C509.928 687.148 501.638 688.454 493.941 688.934L491.652 689.085L489.614 712.532L492.063 712.841ZM496.588 693.558C503.798 692.987 510.605 691.916 510.886 691.868C523.769 689.978 532.994 688.982 538.333 688.914C536.257 689.896 533.496 691.03 530.758 691.985L531.078 696.56C539.162 698.36 544.478 699.74 547.954 700.778C540.425 700.386 530.393 698.902 530.279 698.882L529.093 703.567C529.176 703.587 537.443 705.861 547.383 712.69C541.421 711.536 532.226 708.76 528.401 707.531L525.952 711.742C529.002 713.706 532.34 716.131 534.591 718.014C533.192 717.656 531.329 717.114 528.849 716.296C515.396 711.831 502.802 709.523 495.288 708.424L496.588 693.558Z" fill="black"/>
+          <!-- Body / figure / legs -->
+          <path d="M166.78 503.198L169.191 616.5L172.681 616.39L165.274 725.831C233.843 721.751 297.765 719.608 356.652 718.845L356.135 716.963L275.124 713.7L217.469 665.577C206.198 656.173 204.867 640.503 214.419 629.656L214.586 629.463L284.904 686.736L348.484 688.962L343.388 670.317L324.322 611.636L331.03 611.43L295.354 456.12L378.198 453.132L264.91 320.237C285.71 313.766 303.841 300.452 313.933 275.866C313.933 275.866 268.659 305.474 229.743 281.63C189.884 257.215 142.99 298.254 142.466 309.081C142.466 309.081 148.976 311.657 159.524 314.755L136.351 311.973C125.156 449.23 136.351 496.191 136.351 496.191L166.78 503.198ZM274.082 651.206C273.337 647.187 274.987 643.587 277.77 643.161C280.554 642.736 283.421 645.655 284.166 649.688C284.919 653.713 283.261 657.306 280.478 657.732C277.694 658.165 274.827 655.245 274.082 651.206ZM285.687 680.519C282.904 680.945 280.037 678.018 279.291 673.993C278.546 669.96 280.196 666.36 282.98 665.928C285.763 665.515 288.631 668.435 289.376 672.461C290.121 676.486 288.471 680.093 285.687 680.519ZM165.319 434.467C167.913 435.25 170.559 436.493 172.993 437.902C178.682 441.192 183.222 445.156 183.222 445.156L171.153 351.117L170.461 318.595L172.78 318.307C195.786 323.919 228.245 328.852 257.099 322.312L363.215 446.798L286.098 449.587L297.597 499.626C269.945 500.581 244.315 468.63 244.049 468.3L233.599 474.984C234.839 476.557 262.453 511.304 296.335 511.304C297.605 511.304 298.913 511.105 300.206 510.995L321.767 604.849L176.651 609.397L174.431 504.964L186.561 507.76L175.48 475.225C175.001 475.287 174.423 475.17 173.799 474.984C171.738 474.352 168.985 472.477 166.088 469.921C158.779 463.478 150.626 452.884 150.778 447.794C151.166 433.917 158.018 432.248 165.319 434.467Z" fill="black"/>
+          <!-- Chair back / desk chair -->
+          <path d="M508.68 647.565C508.68 647.565 560.913 640.475 623.816 642.687C621.207 631.476 617.389 624.689 617.389 624.689L659.964 621.625C662.367 630.26 663.888 638.181 664.778 645.518C694.324 648.623 724.25 654.297 750.77 664.1C750.77 664.1 832.085 586.013 800.257 467.592C800.257 467.592 647.613 423.867 498.003 465.992C498.01 465.978 517.913 543.778 508.68 647.565Z" fill="black"/>
+          <path d="M652.83 696.285C658.382 686.832 664.017 668.47 661.287 646.019C660.557 640.043 659.317 633.571 657.355 626.53L622.622 629.031C622.622 629.031 625.733 634.575 627.862 643.718C630.547 655.239 630.897 675.738 622.173 695.275L652.83 696.285Z" fill="black"/>
+          <path d="M568.412 695.783C568.412 695.783 567.066 711.776 566.366 720.15C566.351 720.274 566.343 720.418 566.336 720.542L692.21 729.136C692.21 729.136 692.324 728.902 692.514 728.456C693.86 725.378 699.29 712.223 699.405 700.118L568.412 695.783Z" fill="black"/>
+          <!-- Lower body legs -->
+          <path d="M216.305 633.304C206.966 642.33 209.285 658.412 219.773 666.759L277.147 712.147L349.929 714.167L389.484 716.681L390.427 693.105L283.17 689.464L216.305 633.304Z" fill="black"/>
+          <!-- Desk / floor terrain -->
+          <path d="M808.943 746.509C807.46 746.303 805.923 746.132 804.433 745.925C789.945 743.672 753.219 738.389 696.613 733.278C696.416 733.725 696.309 733.965 696.294 733.979C665.934 731.368 634.95 729.266 603.35 727.659L561.773 724.822C561.788 724.684 561.795 724.533 561.811 724.396C525.518 722.816 485.53 721.682 442.18 721.277C442.218 721.208 442.317 721.188 442.355 721.126C442.819 720.315 443.078 718.976 441.709 717.258C441.222 716.654 440.5 715.98 439.648 715.273C443.709 716.022 447.801 716.619 450.455 716.619C451.535 716.619 454.805 716.619 455.619 714.201C456.227 712.374 454.858 710.842 453.01 709.495L488.177 713.404L488.359 711.24L490.428 687.368L388.351 676.534L331.41 614.687H328.391L346.879 671.575L366.501 690.727L392.092 691.62V715.603L394.526 715.788C402.139 716.372 413.881 717.725 426.574 720.879L427.434 721.078C432.415 722.349 435.906 722.953 438.089 722.953C438.804 722.953 439.328 722.781 439.884 722.637C439.23 723.455 436.035 723.338 428.156 721.346C427.86 721.263 427.578 721.201 427.282 721.133C404.633 721.009 381.08 721.091 356.667 721.407C297.78 722.163 233.858 724.313 165.289 728.394C123.24 730.888 79.4489 734.109 34 738.183L64.0178 814.547L67.2729 813.75C67.3413 813.736 73.897 812.143 86.7195 809.848C127.636 802.532 219.142 790.249 372.235 790.249C489.15 790.249 619.002 797.531 758.185 811.888L765.783 812.658C769.601 813.042 773.426 813.427 777.343 813.846L780.043 814.142L814 747.217L808.943 746.509ZM458.014 700.826C459.627 701.726 458.851 702.378 456.706 702.791C457.406 702.317 457.893 701.685 458.014 700.826ZM444.249 687.505C446.941 688.337 442.355 691.105 438.302 693.166C438.165 693.146 438.051 693.118 437.914 693.097C442.842 690.398 444.044 688.667 444.249 687.505ZM434.651 717.76C433.229 717.505 431.35 717.093 428.871 716.468L427.989 716.262L427.981 716.255C416.186 713.329 405.204 711.907 397.408 711.22V695.667C403.477 694.643 408.626 693.455 408.831 693.4C423.814 690.102 431.738 688.879 435.921 688.522C433.944 689.642 431.297 690.961 428.658 692.101L429.373 696.642C437.594 697.865 443.009 698.868 446.569 699.658C445.96 699.672 445.336 699.679 444.698 699.679C437.45 699.679 428.856 699.019 428.772 699.012L427.989 703.759C428.057 703.766 434.879 705.126 443.853 709.832C444.873 710.368 445.914 710.938 446.979 711.556C440.857 710.821 431.411 708.678 427.639 707.75L425.563 712.133C428.126 713.521 431.951 715.795 434.651 717.76ZM775.533 806.75C772.536 806.434 769.578 806.138 766.627 805.836L759.052 805.067C619.58 790.682 489.439 783.393 372.235 783.393C218.488 783.393 126.426 795.751 85.2364 803.123C77.2966 804.538 71.76 805.685 68.5582 806.386L45.7729 748.804C92.6439 743.645 233.729 729.967 412.566 729.967C552.585 729.967 683.935 738.362 803.087 754.925L775.533 806.75Z" fill="black"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="content-area" aria-label="Game title and call to action">
+      <div class="content-inner">
+        <div class="title-group">
+          <div class="title-words">
+            <span class="word-strive">STRIVE</span>
+            <span class="word-thrive">THRIVE</span>
+          </div>
+          <span class="ampersand" aria-hidden="true">&amp;</span>
+        </div>
+        <p class="subtitle" id="subtitle">A Life-Balance Simulation Game</p>
+        <button class="btn-get-started" id="btn-start-game" type="button">
+          Get Started
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SCREEN 1: TUTORIAL (How to Play)
+       ========================================== -->
+  <section id="screen-tutorial" class="screen" style="display: none;">
+    <div class="tutorial-layout">
+      <div class="tutorial-content">
+        <h1 class="tutorial-title text-hero text-upper" style="font-family: var(--font-display); margin-bottom: var(--space-4);">How to Play<span style="font-style: italic;">?</span></h1>
+        
+        <div class="tutorial-card tutorial-card--amber animate-fade-up">
+          <h2 class="tutorial-card__heading">Start Your Journey</h2>
+          <p class="tutorial-card__body">
+            You play as a young fresh graduate who must manage life after university. Each round represents one year, and you will make decisions about work, spending, lifestyle, and investment.
+          </p>
+        </div>
+
+        <div class="tutorial-card tutorial-card--red animate-fade-up">
+          <h2 class="tutorial-card__heading">Make Choice and Face Trade-Off</h2>
+          <p class="tutorial-card__body">
+            Every decision affects your money, physical health, and mental health. Working overtime may increase your income, but it can reduce your well-being. Spending more on experiences may improve your life balance, but it can slow down your financial growth.
+          </p>
+        </div>
+
+        <div class="tutorial-card tutorial-card--green animate-fade-up">
+          <h2 class="tutorial-card__heading">Review Your Result</h2>
+          <p class="tutorial-card__body">
+            At the end of each round, you will receive a summary of your income, expenses, investment portfolio, net worth, and life indicators. Use this feedback to adjust your strategy in the next round and try to reach the best life balance by the end of the game.
+          </p>
+        </div>
+
+        <div class="mt-4 flex-row items-center">
+          <button class="btn btn--primary btn--arrow btn--lg" id="btn-tutorial-next" type="button">
+            Next
+          </button>
+        </div>
+      </div>
+
+      <div class="tutorial-illustration">
+        <img src="assets/tutorials/character_tutorial.svg" alt="How to Play character illustration">
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SCREEN 3: NAME INPUT
+       ========================================== -->
+  <section id="screen-name-input" class="screen name-input-screen" style="display: none;">
+    <div class="name-input-card--compact animate-fade-up">
+      <div class="name-input-header">
+        <span class="name-input-label">Name</span><span class="name-input-asterisk">*</span>
+      </div>
+      <div class="name-input-field">
+        <input class="name-input-el" id="player-name-input" type="text" maxlength="20" placeholder="Enter your character’s name" autocomplete="off">
+      </div>
+      <button class="btn-compact-confirm" id="btn-name-confirm">
+        <svg class="icon-check" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9.27 17.47L3.74 11.94L5.12 10.56L9.27 14.71L18.18 5.8L19.56 7.18L9.27 17.47Z" fill="currentColor"/>
+        </svg>
+        Confirm
+      </button>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SCREEN 4: MAIN GAME LOOP (Rounds 1-5)
+       ========================================== -->
+  <section id="screen-main-game" class="screen" style="display: none; position: relative;">
+    <div class="game-layout">
+      <!-- 1. TOP NAVIGATION BAR -->
+      <div class="nav-bar" id="game-nav">
+        <div class="nav-bar__tabs">
+          <button class="nav-tab nav-tab--active" data-tab="information">Information</button>
+          <button class="nav-tab nav-tab--inactive" data-tab="decisions">Decisions</button>
+          <button class="nav-tab nav-tab--inactive" data-tab="result" id="nav-result-tab" style="display: none;">Result</button>
+          <span class="nav-round-label" id="nav-round-display">Round 1</span>
+        </div>
+        <button class="nav-restart-btn" title="Restart game" id="btn-restart-game-nav">↺</button>
+      </div>
+
+      <!-- 2. INFORMATION TAB VIEW -->
+      <div id="tab-information" class="game-content">
+        <!-- Left Panel: Character Profile & Stats -->
+        <div class="left-panel">
+          <div class="char-info-card">
+            <div class="char-info-card__title">Character's Information</div>
+            <div class="avatar-circle">
+              <span style="font-size: 3.5rem;">🧑‍💼</span>
+            </div>
+            <div class="char-meta">
+              <div class="char-meta-row char-meta-row--split">
+                <span class="char-meta-label">Name:</span>
+                <span class="char-meta-value" id="char-name-val">Alex</span>
+                <span class="char-meta-label" style="margin-left: var(--space-3);">Age:</span>
+                <span class="char-meta-value" id="char-age-val">22</span>
+              </div>
+              <div class="char-meta-row">
+                <span class="char-meta-label">Main job:</span>
+                <span class="char-meta-value" id="char-job-val">Analyst Executive</span>
+              </div>
+              <div class="char-meta-row">
+                <span class="char-meta-label">Yearly salary:</span>
+                <span class="char-meta-value" id="char-salary-val">180,000,000 VND</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="char-stats-card" id="char-stats-card-el">
+            <div class="char-stats-card__title">Character's Stats</div>
+            <div class="stat-row">
+              <span class="stat-row__icon">💰</span>
+              <span class="stat-row__label">Cash</span>
+              <span class="stat-row__value" id="char-cash-val">0 VND</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-row__icon">📊</span>
+              <span class="stat-row__label">Investment</span>
+              <span class="stat-row__value" id="char-invest-val">0 VND</span>
+            </div>
+            <div class="stat-row stat-row--bar">
+              <div class="stat-bar-header">
+                <span class="stat-row__label" style="color: var(--color-green);">🫀 Physical health</span>
+                <span class="stat-row__value" id="char-phys-val">70%</span>
+              </div>
+              <div class="stat-bar-track">
+                <div class="stat-bar-fill stat-bar-fill--physical" id="char-phys-fill" style="width: 70%;"></div>
+              </div>
+            </div>
+            <div class="stat-row stat-row--bar">
+              <div class="stat-bar-header">
+                <span class="stat-row__label" style="color: var(--color-red);">😊 Mental health</span>
+                <span class="stat-row__value" id="char-ment-val">70%</span>
+              </div>
+              <div class="stat-bar-track">
+                <div class="stat-bar-fill stat-bar-fill--mental" id="char-ment-fill" style="width: 70%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel: Events & News -->
+        <div class="right-panel">
+          <div class="panel-section panel-section--scrollable" id="panel-personal-info">
+            <div class="panel-section__header">
+              <span class="panel-section__title">Personal Information</span>
+            </div>
+            <div class="panel-section__body scrollable" id="personal-events-list">
+              <div class="event-card event-card--neutral">
+                <div class="event-card__title">Graduation</div>
+                <div class="event-card__description">You graduated from university and are ready to face the real world!</div>
+                <div class="event-card__impact">Impact: None</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-section panel-section--scrollable" id="panel-market-info">
+            <div class="panel-section__header">
+              <span class="panel-section__title">Market Information</span>
+              <button class="panel-zoom-btn" id="btn-zoom-market" title="View historical records">⤢</button>
+            </div>
+            <div class="panel-section__body scrollable" id="market-events-list">
+              <div class="market-text">
+                <p class="market-year-title">Year 1 (Age 22) Economy Event</p>
+                <div class="market-event-item">
+                  <strong>Stable Growth:</strong> The economy is growing steadily. Interest rates are stable.
+                  <div class="market-event-impact">Savings rate: 6.0% &nbsp;·&nbsp; Stock trend: Flat</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. DECISIONS TAB VIEW -->
+      <div id="tab-decisions" class="game-content game-content--with-stat-bar" style="display: none;">
+        <div class="decision-panel scrollable">
+          <!-- Income Choices -->
+          <div class="decision-section income-section" id="income-decisions-el">
+            <h2 class="decision-section__title">Income choices</h2>
+            <p class="decision-section__subtitle" style="font-size: var(--fs-small); color: var(--color-text-secondary); margin-bottom: var(--space-2); line-height: 1.4;">
+              You can select at most one side job to work alongside your main job. Overtime (OT) can be worked concurrently.
+            </p>
+            <div class="decision-container">
+              <div class="income-grid">
+                <div class="income-row income-row--full">
+                  <input type="checkbox" class="income-row__checkbox" id="job-waiter-check" checked disabled>
+                  <label class="income-row__label" for="job-waiter-check">Waiter (Main Job)</label>
+                  <span class="income-row__rate">38,299 VND/hour</span>
+                  <div class="hours-selector">
+                    <button type="button" class="hours-btn hours-btn--dec" id="job-main-dec-btn" disabled>-</button>
+                    <span class="hours-display" id="job-main-hours-display">40 hours</span>
+                    <button type="button" class="hours-btn hours-btn--inc" id="job-main-inc-btn" disabled>+</button>
+                  </div>
+                </div>
+                
+                <div class="income-row">
+                  <input type="checkbox" class="income-row__checkbox" id="job-tutor-check">
+                  <label class="income-row__label" for="job-tutor-check">Tutor</label>
+                  <span class="income-row__rate">137,924 VND/hour</span>
+                  <div class="hours-selector">
+                    <button type="button" class="hours-btn hours-btn--dec" id="job-tutor-dec-btn" disabled>-</button>
+                    <span class="hours-display" id="job-tutor-hours-display">0 hours</span>
+                    <button type="button" class="hours-btn hours-btn--inc" id="job-tutor-inc-btn" disabled>+</button>
+                  </div>
+                </div>
+
+                <div class="income-row">
+                  <input type="checkbox" class="income-row__checkbox" id="job-freelancer-check">
+                  <label class="income-row__label" for="job-freelancer-check">Freelancer</label>
+                  <span class="income-row__rate">157,785 VND/hour</span>
+                  <div class="hours-selector">
+                    <button type="button" class="hours-btn hours-btn--dec" id="job-freelancer-dec-btn" disabled>-</button>
+                    <span class="hours-display" id="job-freelancer-hours-display">0 hours</span>
+                    <button type="button" class="hours-btn hours-btn--inc" id="job-freelancer-inc-btn" disabled>+</button>
+                  </div>
+                </div>
+
+                <div class="income-row">
+                  <input type="checkbox" class="income-row__checkbox" id="job-shipper-check">
+                  <label class="income-row__label" for="job-shipper-check">Shipper</label>
+                  <span class="income-row__rate">59,226 VND/hour</span>
+                  <div class="hours-selector">
+                    <button type="button" class="hours-btn hours-btn--dec" id="job-shipper-dec-btn" disabled>-</button>
+                    <span class="hours-display" id="job-shipper-hours-display">0 hours</span>
+                    <button type="button" class="hours-btn hours-btn--inc" id="job-shipper-inc-btn" disabled>+</button>
+                  </div>
+                </div>
+
+                <div class="income-row">
+                  <input type="checkbox" class="income-row__checkbox" id="job-ot-check">
+                  <label class="income-row__label" for="job-ot-check">Overtime (OT)</label>
+                  <span class="income-row__rate">108,256 VND/hour</span>
+                  <div class="hours-selector">
+                    <button type="button" class="hours-btn hours-btn--dec" id="job-ot-dec-btn" disabled>-</button>
+                    <span class="hours-display" id="job-ot-hours-display">0 hours</span>
+                    <button type="button" class="hours-btn hours-btn--inc" id="job-ot-inc-btn" disabled>+</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="summary-box" id="income-summary-box">
+                <div class="summary-box__main" id="income-summary-title">Summary: -30 Physical health, -25 Mental health</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Expense Choices -->
+          <div class="decision-section expense-section" id="expense-decisions-el">
+            <h2 class="decision-section__title">Expense choices</h2>
+            <div class="decision-container">
+              <table class="expense-table">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th class="cell-base">Base Cost</th>
+                    <th class="cell-input">Your Budget</th>
+                    <th class="cell-action">Confirm</th>
+                  </tr>
+                </thead>
+                <tbody id="expense-tbody">
+                  <tr data-category="housing">
+                    <td class="cell-category"><span class="category-badge">Housing</span></td>
+                    <td class="cell-desc">Rent, mortgage, utilities</td>
+                    <td class="cell-base">5,000,000 VND</td>
+                    <td class="cell-input"><input type="text" class="amount-input" id="exp-housing-input" placeholder="Amount..."></td>
+                    <td class="cell-action"><button class="btn btn--success btn--sm" id="exp-housing-btn">Enter</button></td>
+                  </tr>
+                  <tr data-category="utility">
+                    <td class="cell-category"><span class="category-badge">Utility</span></td>
+                    <td class="cell-desc">Electricity, water, internet, phone bills</td>
+                    <td class="cell-base">800,000 VND</td>
+                    <td class="cell-input"><input type="text" class="amount-input" id="exp-utility-input" placeholder="Amount..."></td>
+                    <td class="cell-action"><button class="btn btn--success btn--sm" id="exp-utility-btn">Enter</button></td>
+                  </tr>
+                  <tr data-category="food">
+                    <td class="cell-category"><span class="category-badge">Food</span></td>
+                    <td class="cell-desc">Groceries and eating out</td>
+                    <td class="cell-base">2,000,000 VND</td>
+                    <td class="cell-input"><input type="text" class="amount-input" id="exp-food-input" placeholder="Amount..."></td>
+                    <td class="cell-action"><button class="btn btn--success btn--sm" id="exp-food-btn">Enter</button></td>
+                  </tr>
+                  <tr data-category="transport">
+                    <td class="cell-category"><span class="category-badge">Transport</span></td>
+                    <td class="cell-desc">Travel and commuting expenses</td>
+                    <td class="cell-base">1,500,000 VND</td>
+                    <td class="cell-input"><input type="text" class="amount-input" id="exp-transport-input" placeholder="Amount..."></td>
+                    <td class="cell-action"><button class="btn btn--success btn--sm" id="exp-transport-btn">Enter</button></td>
+                  </tr>
+                  <tr data-category="healthcare">
+                    <td class="cell-category"><span class="category-badge">Healthcare</span></td>
+                    <td class="cell-desc">Medicine, exercises, dental care</td>
+                    <td class="cell-base">500,000 VND</td>
+                    <td class="cell-input"><input type="text" class="amount-input" id="exp-healthcare-input" placeholder="Amount..."></td>
+                    <td class="cell-action"><button class="btn btn--success btn--sm" id="exp-healthcare-btn">Enter</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Investment Choices -->
+          <div class="decision-section investment-section">
+            <h2 class="decision-section__title">Investment choices</h2>
+            <div class="spendable-cash-banner" style="background-color: var(--color-bg-panel); border: 1px dashed var(--color-navy); padding: var(--space-2) var(--space-4); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-2);">
+              <span style="font-weight: var(--fw-bold); color: var(--color-text-navy); font-size: var(--fs-body);">💰 Spendable Cash (Actual Current Cash):</span>
+              <strong id="decisions-spendable-cash-val" style="color: var(--color-navy); font-size: 1.1rem;">0 VND</strong>
+            </div>
+            <div class="decision-container" style="gap: var(--space-6);">
+              <div class="savings-row">
+                <div class="savings-row__bank">
+                  <div class="savings-row__bank-name">Savings Account</div>
+                  <div class="savings-row__rate" id="savings-rate-label">Interest rate: 6.0% / year</div>
+                </div>
+                <div class="savings-row__balance" style="display: flex; gap: var(--space-2); align-items: center;">
+                  <span>Amount:</span>
+                  <input type="text" class="amount-input" id="invest-savings-input" style="width: 170px;" placeholder="Amount...">
+                  <button class="btn btn--success btn--sm" id="invest-savings-btn">Deposit</button>
+                  <button class="btn btn--danger btn--sm" id="invest-savings-withdraw-btn">Withdraw</button>
+                </div>
+              </div>
+
+              <div class="insurance-row">
+                <input type="checkbox" class="insurance-row__checkbox" id="invest-insurance-check">
+                <div class="insurance-row__info">
+                  <div class="insurance-row__name">Health Insurance</div>
+                  <div class="insurance-row__fee">Fee: 2,000,000 VND / year</div>
+                </div>
+                <div class="insurance-row__note">Reduces physical health risk impact by 80%</div>
+              </div>
+
+              <div>
+                <div class="stock-sector-header">
+                  <span class="stock-sector-icon">📈</span>
+                  <span>Stock Market Portfolio</span>
+                </div>
+                <table class="data-table" id="stock-market-table">
+                  <thead>
+                    <tr>
+                      <th>Code</th>
+                      <th>Price</th>
+                      <th>Owned</th>
+                      <th style="width: 120px; text-align: center;">Quantity</th>
+                      <th style="text-align: right;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr data-code="BNK">
+                      <td class="stock-row__code">BNK</td>
+                      <td class="stock-row__price">10,000 VND/share</td>
+                      <td class="stock-row__owned" id="stock-bnk-owned">0 shares</td>
+                      <td style="text-align: center;"><input type="number" class="amount-input" id="stock-bnk-qty" min="1" value="1" style="width: 80px; text-align: center;"></td>
+                      <td style="text-align: right;">
+                        <div class="stock-row__actions" style="justify-content: flex-end;">
+                          <button class="btn btn--success btn--sm" id="stock-bnk-buy">Buy</button>
+                          <button class="btn btn--danger btn--sm" id="stock-bnk-sell">Sell</button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr data-code="TEC">
+                      <td class="stock-row__code">TEC</td>
+                      <td class="stock-row__price">25,000 VND/share</td>
+                      <td class="stock-row__owned" id="stock-tec-owned">0 shares</td>
+                      <td style="text-align: center;"><input type="number" class="amount-input" id="stock-tec-qty" min="1" value="1" style="width: 80px; text-align: center;"></td>
+                      <td style="text-align: right;">
+                        <div class="stock-row__actions" style="justify-content: flex-end;">
+                          <button class="btn btn--success btn--sm" id="stock-tec-buy">Buy</button>
+                          <button class="btn btn--danger btn--sm" id="stock-tec-sell">Sell</button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Stat Bar (Frozen) -->
+        <div class="stat-bar">
+          <div class="stat-bar__item">
+            <span class="stat-bar__icon">💰</span>
+            <span class="stat-bar__label">Projected Cash:</span>
+            <span class="stat-bar__value" id="bar-cash-val">0 VND</span>
+          </div>
+          <div class="stat-bar__item">
+            <span class="stat-bar__icon">📊</span>
+            <span class="stat-bar__label">Projected Invest:</span>
+            <span class="stat-bar__value" id="bar-invest-val">0 VND</span>
+          </div>
+          <div class="stat-bar__item">
+            <span class="stat-bar__icon">🫀</span>
+            <span class="stat-bar__label">Projected Phys:</span>
+            <span class="stat-bar__value" id="bar-phys-val">70%</span>
+          </div>
+          <div class="stat-bar__item">
+            <span class="stat-bar__icon">😊</span>
+            <span class="stat-bar__label">Projected Ment:</span>
+            <span class="stat-bar__value" id="bar-ment-val">70%</span>
+          </div>
+          <button class="btn btn--primary btn--lg btn--arrow" id="btn-confirm-decisions">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onboarding Tour Overlay wrapper -->
+    <div id="tutorial-tour-overlay" class="tutorial-tour-overlay" style="display: none;">
+      <div id="tutorial-highlight-box" class="tutorial-highlight-box"></div>
+      <div id="tutorial-callout" class="tutorial-callout">
+        <h3 class="tutorial-callout__title" id="tour-title">Title</h3>
+        <p class="tutorial-callout__body" id="tour-text">Text</p>
+      </div>
+      <div id="tutorial-slide-hint" class="tutorial-slide-hint">
+        <span class="hint-icon">💡</span> <span id="tutorial-hint-text">Click anywhere to continue</span>
+      </div>
+      <button class="btn btn--primary btn--xl" id="tutorial-start-btn" style="display: none; position: absolute; z-index: var(--z-modal); transform: translate(-50%, -50%); left: 50%; top: 50%;">
+        Game Start
+      </button>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SCREEN 5: ROUND RESULT
+       ========================================== -->
+  <section id="screen-round-result" class="screen" style="display: none;">
+    <div class="result-screen">
+      <!-- Header -->
+      <div class="result-header">
+        <div class="result-header__avatar" id="result-avatar-el">
+          <!-- Dynamically inserted image -->
+        </div>
+        <div>
+          <h1 class="result-header__title" id="result-round-title">ROUND 1 RESULT<span style="font-style: italic;">!</span></h1>
+          <p class="result-header__subtitle" id="result-round-subtitle">Year 1 (Age 22) Summary</p>
+        </div>
+      </div>
+
+      <!-- Grid -->
+      <div class="result-grid">
+        <!-- Left Column: Investments & Savings -->
+        <div class="flex-col gap-4">
+          <!-- Investment Portfolio -->
+          <div class="result-card">
+            <h2 class="result-card__title">Investment Portfolio</h2>
+            <div class="flex-row justify-between text-small" style="padding: 4px 0;">
+              <span>Total Capital:</span>
+              <strong id="result-portfolio-capital">0 VND</strong>
+            </div>
+            <div class="flex-row justify-between text-small" style="padding: 4px 0;">
+              <span>Total Market Value:</span>
+              <strong id="result-portfolio-market">0 VND</strong>
+            </div>
+            <div class="flex-row justify-between text-small" style="padding: 4px 0;">
+              <span>Round Return:</span>
+              <strong id="result-portfolio-round-return">0 VND</strong>
+            </div>
+            <div class="flex-row justify-between text-small" style="padding: 4px 0; margin-bottom: 8px;">
+              <span>Cumulative Return:</span>
+              <strong id="result-portfolio-cumulative-return">0 VND</strong>
+            </div>
+            
+            <table class="data-table" id="result-stock-table">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Shares</th>
+                  <th>Avg Cost</th>
+                  <th>Price</th>
+                  <th>Market Value</th>
+                  <th>Gain/Loss</th>
+                </tr>
+              </thead>
+              <tbody id="result-stock-tbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Savings Account -->
+          <div class="result-card">
+            <h2 class="result-card__title">Savings Account</h2>
+            <table class="data-table" id="result-savings-table">
+              <tbody>
+                <tr>
+                  <td>Savings Balance</td>
+                  <td id="result-savings-balance" class="text-right">0 VND</td>
+                </tr>
+                <tr>
+                  <td>Interest Rate</td>
+                  <td id="result-savings-rate" class="text-right">0.00% / year</td>
+                </tr>
+                <tr class="row-total">
+                  <td>Interest Earned (This Year)</td>
+                  <td id="result-savings-interest" class="text-right num-gain">+0 VND</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right Column: Financial Statements & Stats -->
+        <div class="flex-col gap-4">
+          <!-- Financial Statements -->
+          <div class="result-card flex-1">
+            <h2 class="result-card__title">Financial Statements</h2>
+            <div style="flex: 1; overflow-y: auto; max-height: 380px;">
+              <table class="data-table" id="result-financial-table">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th class="text-right">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Income Section -->
+                  <tr class="row-section-header">
+                    <td colspan="2">Income</td>
+                  </tr>
+                  <tr>
+                    <td>Main Job Salary</td>
+                    <td id="result-income-main" class="text-right">0 VND</td>
+                  </tr>
+                  <tr>
+                    <td>Side Job Wages</td>
+                    <td id="result-income-side" class="text-right">0 VND</td>
+                  </tr>
+                  <tr>
+                    <td>Overtime (OT) Wages</td>
+                    <td id="result-income-ot" class="text-right">0 VND</td>
+                  </tr>
+                  <tr>
+                    <td>Bank Savings Interest</td>
+                    <td id="result-income-interest" class="text-right">0 VND</td>
+                  </tr>
+                  <tr>
+                    <td>Personal Events Cash</td>
+                    <td id="result-income-events" class="text-right">0 VND</td>
+                  </tr>
+                  <tr class="row-total">
+                    <td>Total Income</td>
+                    <td id="result-income-total" class="text-right">0 VND</td>
+                  </tr>
+
+                  <!-- Expense Section -->
+                  <tr class="row-section-header">
+                    <td colspan="2">Expenses</td>
+                  </tr>
+                  <tr>
+                    <td>Housing Expense</td>
+                    <td id="result-expense-housing" class="text-right">0 VND</td>
+                  </tr>
+                  <tr>
+                    <td>Utility Expense</td>
+                    <td id="result-expense-utility" class="text-right">0 VND</td>
+                  </tr>
+                  <tr>
+                    <td>Food Expense</td>
+                    <td id="result-expense-food" class="text-right">0 VND</td>
+                  </tr>
+                  <tr>
+                    <td>Transport Expense</td>
+                    <td id="result-expense-transport" class="text-right">0 VND</td>
+                  </tr>
+                  <tr>
+                    <td>Healthcare Expense</td>
+                    <td id="result-expense-healthcare" class="text-right">0 VND</td>
+                  </tr>
+                  <tr>
+                    <td>Entertainment Expense</td>
+                    <td id="result-expense-entertainment" class="text-right">0 VND</td>
+                  </tr>
+                  <tr>
+                    <td>Health Insurance Fee</td>
+                    <td id="result-expense-insurance" class="text-right">0 VND</td>
+                  </tr>
+                  <tr class="row-total">
+                    <td>Total Expenses</td>
+                    <td id="result-expense-total" class="text-right">0 VND</td>
+                  </tr>
+
+                  <!-- Summary Section -->
+                  <tr class="row-section-header">
+                    <td colspan="2">Summary</td>
+                  </tr>
+                  <tr class="row-highlight">
+                    <td>Net Annual Income</td>
+                    <td id="result-net-income" class="text-right">0 VND</td>
+                  </tr>
+                  <tr class="row-highlight">
+                    <td>Cash Balance</td>
+                    <td id="result-cash-balance" class="text-right">0 VND</td>
+                  </tr>
+                  <tr class="row-highlight" style="background-color: rgba(46,57,95,0.06);">
+                    <td>Net Worth (Cash + Invest)</td>
+                    <td id="result-net-worth" class="text-right" style="color: var(--color-navy); font-size: 1.1rem;">0 VND</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Stats & Well-being -->
+          <div class="result-card">
+            <h2 class="result-card__title">Well-being Summary</h2>
+            <div class="flex-col gap-3" style="padding: 8px 0;">
+              <!-- Physical health -->
+              <div class="stat-row flex-col items-stretch gap-1">
+                <div class="flex-row justify-between items-center">
+                  <span class="fw-bold" style="color: var(--color-green);">🫀 Physical Health</span>
+                  <div class="flex-row gap-2 items-center">
+                    <span id="result-phys-val" class="fw-bold">0%</span>
+                    <span id="result-phys-change" class="text-small"></span>
+                  </div>
+                </div>
+                <div class="stat-bar-track">
+                  <div class="stat-bar-fill stat-bar-fill--physical" id="result-phys-fill" style="width: 0%;"></div>
+                </div>
+              </div>
+              
+              <!-- Mental health -->
+              <div class="stat-row flex-col items-stretch gap-1">
+                <div class="flex-row justify-between items-center">
+                  <span class="fw-bold" style="color: var(--color-red);">😊 Mental Health</span>
+                  <div class="flex-row gap-2 items-center">
+                    <span id="result-ment-val" class="fw-bold">0%</span>
+                    <span id="result-ment-change" class="text-small"></span>
+                  </div>
+                </div>
+                <div class="stat-bar-track">
+                  <div class="stat-bar-fill stat-bar-fill--mental" id="result-ment-fill" style="width: 0%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Events Occurred -->
+          <div class="result-card" id="result-events-card" style="margin-top: 12px; display: none;">
+            <h2 class="result-card__title">Events Occurred</h2>
+            <div id="result-events-list" class="flex-col gap-2" style="max-height: 180px; overflow-y: auto; overflow-x: hidden; padding: 4px 4px;">
+              <!-- Dynamically populated event cards -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer with Next button -->
+      <div class="result-footer">
+        <button class="btn btn--primary btn--lg btn--arrow" id="btn-result-next">Next Round</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SCREEN 6: GAME WIN
+       ========================================== -->
+  <section id="screen-game-win" class="screen outcome-screen outcome-screen--win" style="display: none;">
+    <div class="win-layout animate-fade-up">
+      <h1 class="win-title-main">GAME COMPLETE<span style="font-style: italic;">!</span></h1>
+      
+      <div class="win-columns">
+        <!-- Left Column -->
+        <div class="win-col-left">
+          <!-- Rosette badge with overlaid score -->
+          <div class="rosette-badge-wrapper">
+            <img class="rosette-badge-img" src="assets/Badge.svg?v=8" alt="Rosette Badge">
+            <span class="rosette-score-display" id="win-total-score">0</span>
+          </div>
+          
+          <!-- Stats card (Cash, Investment, Health progress bars) -->
+          <div class="win-stats-card-left">
+            <div class="win-stat-row-left">
+              <span class="win-stat-icon">💰</span>
+              <span class="win-stat-label">Ending Cash</span>
+              <span class="win-stat-val" id="win-cash-val">0 VND</span>
+            </div>
+            
+            <div class="win-stat-row-left">
+              <span class="win-stat-icon">📊</span>
+              <span class="win-stat-label">Ending Investment</span>
+              <span class="win-stat-val" id="win-invest-val">0 VND</span>
+            </div>
+            
+            <div class="win-health-bar-row-left mt-2">
+              <div class="win-health-header-left">
+                <span class="win-stat-label" style="color: var(--color-green); font-weight: var(--fw-bold);">🫀 Physical Health</span>
+                <span class="win-health-val-left" id="win-phys-val">0%</span>
+              </div>
+              <div class="stat-bar-track">
+                <div class="stat-bar-fill stat-bar-fill--physical" id="win-phys-fill" style="width: 0%;"></div>
+              </div>
+            </div>
+            
+            <div class="win-health-bar-row-left mt-2">
+              <div class="win-health-header-left">
+                <span class="win-stat-label" style="color: var(--color-red); font-weight: var(--fw-bold);">😊 Mental Health</span>
+                <span class="win-health-val-left" id="win-ment-val">0%</span>
+              </div>
+              <div class="stat-bar-track">
+                <div class="stat-bar-fill stat-bar-fill--mental" id="win-ment-fill" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Score comparison text -->
+          <div class="score-comparison-text-left" id="win-score-comparison">
+            <!-- Text generated dynamically -->
+          </div>
+        </div>
+        
+        <!-- Right Column -->
+        <div class="win-col-right outcome-card" style="padding: var(--space-6); text-align: left; align-items: stretch; margin: 0;">
+          <h2 class="win-section-header" style="text-align: center; margin-bottom: var(--space-4);">Stats Analysis</h2>
+          
+          <!-- Stats Analysis subcards (Net worth and well-being scores) -->
+          <div class="win-detail-score-grid">
+            <div class="win-detail-score-card">
+              <span class="win-detail-score-label">Net Worth Score</span>
+              <span class="win-detail-score-val" id="win-fin-score">0/100</span>
+            </div>
+            <div class="win-detail-score-card">
+              <span class="win-detail-score-label">Well-being Score</span>
+              <span class="win-detail-score-val" id="win-wb-score">0/100</span>
+            </div>
+          </div>
+          
+          <!-- Large Archetype illustration badge -->
+          <div class="win-archetype-illustration-container">
+            <img id="win-badge-img" class="win-archetype-illustration" src="" alt="Archetype Illustration">
+          </div>
+          
+          <!-- Classification Pills -->
+          <div class="badge-pill-row mt-2" style="justify-content: center;">
+            <span class="badge-pill badge-pill--gold" id="win-pill-archetype">Balanced Achiever</span>
+            <span class="badge-pill badge-pill--navy" id="win-pill-style">Aligned</span>
+            <span class="badge-pill badge-pill--slate" id="win-pill-balance">Health Aligned</span>
+          </div>
+          
+          <!-- Detailed descriptions card -->
+          <div class="outcome-descriptions-card mt-4">
+            <p class="outcome-desc-item" id="win-desc-archetype" style="font-size: var(--fs-body); line-height: 1.5; color: var(--color-text-primary); margin: 0;"></p>
+            <p class="outcome-desc-item" id="win-desc-style" style="font-size: var(--fs-body); line-height: 1.5; color: var(--color-text-primary); margin: 0;"></p>
+            <p class="outcome-desc-item" id="win-desc-balance" style="font-size: var(--fs-body); line-height: 1.5; color: var(--color-text-primary); margin: 0;"></p>
+          </div>
+          
+          <div class="outcome-actions mt-4" style="justify-content: center;">
+            <button class="btn-capsule" id="btn-win-restart">Restart Simulation</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SCREEN 7: GAME LOSE
+       ========================================== -->
+  <section id="screen-game-lose" class="screen outcome-screen outcome-screen--lose" style="display: none;">
+    <div class="outcome-card animate-fade-up" style="background: transparent; border: none; box-shadow: none; padding: 0; max-width: 900px; margin: auto;">
+      <h1 class="outcome-title text-hero text-upper" id="lose-title" style="font-family: var(--font-display); font-size: clamp(3rem, 10vw, 6.25rem); font-weight: bold; margin-bottom: var(--space-4); color: var(--color-text-primary);">GAME OVER</h1>
+      
+      <div class="outcome-badge-container mt-4">
+        <img id="lose-badge-img" class="outcome-badge-img" src="" alt="Collapse Badge">
+      </div>
+      
+      <p class="outcome-description" id="lose-desc" style="font-size: 1.15rem; color: var(--color-text-secondary); max-width: 600px; margin: var(--space-6) 0 var(--space-8) 0; line-height: 1.6; text-align: center;">
+        Collapse details.
+      </p>
+
+      <div class="outcome-actions" style="justify-content: center; width: 100%;">
+        <button class="btn-capsule" id="btn-lose-restart">Replay</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SCRIPTS
+       ========================================== -->
+  <script src="js/ui.js?v=14"></script>
+  <script src="js/data.js?v=14"></script>
+  <script src="js/health.js?v=14"></script>
+  <script src="js/game.js?v=14"></script>
+
+</body>
+</html>
