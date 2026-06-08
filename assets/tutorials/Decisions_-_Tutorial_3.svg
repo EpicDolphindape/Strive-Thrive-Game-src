@@ -1,0 +1,430 @@
+<svg width="1440" height="1024" viewBox="0 0 1440 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Decisions - Tutorial" clip-path="url(#clip0_260_853)">
+<rect width="1440" height="1024" fill="white"/>
+<rect id="Rectangle 2" opacity="0.3" width="1440" height="89" fill="#99BBE0"/>
+<rect id="Rectangle 5" opacity="0.3" y="933" width="1440" height="91" fill="#99BBE0"/>
+<text id="Cash" opacity="0.3" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="176" y="970.336">Cash</tspan></text>
+<text id="100,000,000,000 VND" opacity="0.3" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="109.066" y="1001.34">100,000,000,000 VND</tspan></text>
+<g id="Group 20" opacity="0.3">
+<text id="Investment" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="466" y="970.336">Investment</tspan></text>
+<text id="100,000,000,000 VND_2" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="424.066" y="1001.34">100,000,000,000 VND</tspan></text>
+</g>
+<g id="Group 21" opacity="0.3">
+<text id="Physical health" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="752" y="970.336">Physical health</tspan></text>
+<text id="50%" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="905.891" y="971.336"> 50%</tspan></text>
+<rect id="Rectangle 6" x="752" y="990" width="196" height="11" rx="5.5" fill="white"/>
+<rect id="Rectangle 7" x="752" y="990" width="100" height="11" rx="5.5" fill="#008BFF"/>
+</g>
+<g id="Group 22" opacity="0.3">
+<text id="Mental health" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="1104" y="971.336">Mental health</tspan></text>
+<text id="50%_2" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="1262.85" y="972.336">50%</tspan></text>
+<rect id="Rectangle 14" x="1104" y="991" width="196" height="11" rx="5.5" fill="white"/>
+<rect id="Rectangle 15" x="1104" y="991" width="100" height="11" rx="5.5" fill="#F45B26"/>
+</g>
+<g id="Group 3" opacity="0.3">
+<rect id="Rectangle 14_2" x="70" y="26" width="134" height="36" rx="11" fill="#2E395F"/>
+<text id="Information" fill="white" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="84.2754" y="51.3359">Information</tspan></text>
+</g>
+<g id="Group 4" opacity="0.3">
+<rect id="Rectangle 14_3" x="304" y="26" width="134" height="36" rx="11" fill="#2E395F"/>
+<text id="Decisions" fill="white" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="327.064" y="51.3359">Decisions</tspan></text>
+</g>
+<g id="Rotate ccw">
+<path id="Icon" d="M1374 39.9999H1362V27.9999M1362 39.9999L1371.28 31.2799C1374.04 28.5227 1377.62 26.7378 1381.49 26.1941C1385.35 25.6504 1389.29 26.3774 1392.71 28.2654C1396.12 30.1535 1398.83 33.1004 1400.43 36.6621C1402.02 40.2238 1402.41 44.2074 1401.55 48.0126C1400.68 51.8178 1398.6 55.2386 1395.62 57.7594C1392.65 60.2802 1388.93 61.7646 1385.03 61.9888C1381.14 62.2131 1377.27 61.165 1374.02 59.0027C1370.77 56.8403 1368.32 53.6807 1367.02 49.9999" stroke="#1E1E1E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g id="Decision Window" opacity="0.3" clip-path="url(#clip1_260_853)">
+<rect width="1440" height="844" transform="translate(-1 89)" fill="#FFF8E7"/>
+<g id="Maximize 2">
+<path id="Icon_2" d="M1402.12 124.625V116.875H1394.37M1402.12 116.875L1393.08 125.917M1378.88 132.375V140.125H1386.62M1378.88 140.125L1387.92 131.083" stroke="#1E1E1E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g id="Group 72">
+<rect id="Rectangle 18" x="70" y="565" width="1308" height="65" rx="5" fill="#E0EAF5"/>
+<rect id="Rectangle 19" x="70" y="719" width="1308" height="65" rx="5" fill="#E0EAF5"/>
+<rect id="Rectangle 20" x="70" y="881" width="1308" height="65" rx="5" fill="#E0EAF5"/>
+<text id="Income" fill="#2E395F" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="71" y="156.336">Income</tspan></text>
+<g id="Group 10">
+<g id="Waiter (38,299 VND/hour)">
+<text fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="184.066" y="220.336">(38,299 </tspan><tspan x="256.078" y="220.336">VND/hour)</tspan></text>
+<text fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="121" y="220.336">Waiter </tspan></text>
+</g>
+<g id="Checkbox">
+<g id="Checked">
+<rect x="72" y="200" width="28" height="28" rx="3" fill="#2E395F"/>
+<rect x="72" y="200" width="28" height="28" rx="3" stroke="#2E395F" stroke-width="2"/>
+<g id="check">
+<mask id="mask0_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="74" y="202" width="24" height="24">
+<rect id="Bounding box" x="74" y="202" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask0_260_853)">
+<path id="check_2" d="M83.5501 220L77.8501 214.3L79.2751 212.875L83.5501 217.15L92.7251 207.975L94.1501 209.4L83.5501 220Z" fill="white"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+<g id="Group 11">
+<g id="Shipper (59,226 VND/hour)">
+<text fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="190.453" y="291.336"> </tspan><tspan x="195.414" y="291.336">(59,226 </tspan><tspan x="267.426" y="291.336">VND/hour)</tspan></text>
+<text fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="121" y="291.336">Shipper</tspan></text>
+</g>
+<g id="Checkbox_2">
+<g id="Checked_2">
+<rect x="72" y="271" width="28" height="28" rx="3" fill="#2E395F"/>
+<rect x="72" y="271" width="28" height="28" rx="3" stroke="#2E395F" stroke-width="2"/>
+<g id="check_3">
+<mask id="mask1_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="74" y="273" width="24" height="24">
+<rect id="Bounding box_2" x="74" y="273" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask1_260_853)">
+<path id="check_4" d="M83.5501 291L77.8501 285.3L79.2751 283.875L83.5501 288.15L92.7251 278.975L94.1501 280.4L83.5501 291Z" fill="white"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+<g id="Group 62">
+<g id="OT (108,256 VND/hour)">
+<text fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="121" y="357.336">OT </tspan></text>
+<text fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="151" y="357.336">(108,256 </tspan><tspan x="234.262" y="357.336">VND/hour)</tspan></text>
+</g>
+<g id="Checkbox_3">
+<g id="Checked_3">
+<rect x="72" y="338" width="28" height="28" rx="3" fill="#2E395F"/>
+<rect x="72" y="338" width="28" height="28" rx="3" stroke="#2E395F" stroke-width="2"/>
+<g id="check_5">
+<mask id="mask2_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="74" y="340" width="24" height="24">
+<rect id="Bounding box_3" x="74" y="340" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask2_260_853)">
+<path id="check_6" d="M83.5501 358L77.8501 352.3L79.2751 350.875L83.5501 355.15L92.7251 345.975L94.1501 347.4L83.5501 358Z" fill="white"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+<g id="Group 12">
+<g id="Tutor (137,924 VND/hour)">
+<text fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="909.027" y="220.336"> </tspan><tspan x="913.988" y="220.336">(137,924 </tspan><tspan x="997.25" y="220.336">VND/hour)</tspan></text>
+<text fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="861" y="220.336">Tutor</tspan></text>
+</g>
+<g id="Checkbox_4">
+<g id="Checked_4">
+<rect x="812" y="200" width="28" height="28" rx="3" fill="#2E395F"/>
+<rect x="812" y="200" width="28" height="28" rx="3" stroke="#2E395F" stroke-width="2"/>
+<g id="check_7">
+<mask id="mask3_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="814" y="202" width="24" height="24">
+<rect id="Bounding box_4" x="814" y="202" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask3_260_853)">
+<path id="check_8" d="M823.55 220L817.85 214.3L819.275 212.875L823.55 217.15L832.725 207.975L834.15 209.4L823.55 220Z" fill="white"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+<g id="Group 13">
+<g id="Freelancer (157,785 VND/hour)">
+<text fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="956.234" y="288.336"> </tspan><tspan x="961.195" y="288.336">(157,785 </tspan><tspan x="1044.46" y="288.336">VND/hour)</tspan></text>
+<text fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="861" y="288.336">Freelancer</tspan></text>
+</g>
+<g id="Checkbox_5">
+<g id="Checked_5">
+<rect x="812" y="271" width="28" height="28" rx="3" fill="#2E395F"/>
+<rect x="812" y="271" width="28" height="28" rx="3" stroke="#2E395F" stroke-width="2"/>
+<g id="check_9">
+<mask id="mask4_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="814" y="273" width="24" height="24">
+<rect id="Bounding box_5" x="814" y="273" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask4_260_853)">
+<path id="check_10" d="M823.55 291L817.85 285.3L819.275 283.875L823.55 288.15L832.725 278.975L834.15 280.4L823.55 291Z" fill="white"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+<line id="Line 1" x1="74" y1="472.5" x2="1369" y2="472.5" stroke="black" stroke-opacity="0.2"/>
+<text id="Expense" fill="#2E395F" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="71" y="526.336">Expense</tspan></text>
+<text id="Housing" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="107" y="603.336">Housing</tspan></text>
+<text id="Food" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="107" y="757.336">Food</tspan></text>
+<text id="Healthcare" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="107" y="919.336">Healthcare</tspan></text>
+<text id="Rent, mortgage, and housing-related costs" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="303" y="603.336">Rent, </tspan><tspan x="352.434" y="603.336">mortgage, </tspan><tspan x="448.039" y="603.336">and </tspan><tspan x="486.223" y="603.336">housing-related </tspan><tspan x="629.035" y="603.336">costs</tspan></text>
+<text id="Groceries and eating out" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="303" y="757.336">Groceries </tspan><tspan x="393.234" y="757.336">and </tspan><tspan x="431.418" y="757.336">eating </tspan><tspan x="491.555" y="757.336">out</tspan></text>
+<text id="Medicine, healthcare, and exercises" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="303" y="919.336">Medicine, </tspan><tspan x="393.117" y="919.336">healthcare, </tspan><tspan x="495.5" y="919.336">and </tspan><tspan x="533.684" y="919.336">exercises</tspan></text>
+<text id="5,000,000 VND" fill="#726F6F" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="773" y="603.336">5,000,000 </tspan><tspan x="864.602" y="603.336">VND</tspan></text>
+<text id="2,000,000 VND" fill="#726F6F" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="773" y="757.336">2,000,000 </tspan><tspan x="864.602" y="757.336">VND</tspan></text>
+<text id="500,000 VND" fill="#726F6F" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="773" y="919.336">500,000 </tspan><tspan x="849.406" y="919.336">VND</tspan></text>
+<g id="Increase">
+<g id="Unchecked">
+<rect x="396" y="200" width="28" height="28" rx="3" fill="white"/>
+<rect x="396" y="200" width="28" height="28" rx="3" stroke="black" stroke-width="2"/>
+<g id="check_11">
+<mask id="mask5_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="398" y="202" width="24" height="24">
+<rect id="Bounding box_6" x="398" y="202" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask5_260_853)">
+<g id="add_2">
+<mask id="mask6_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="398" y="201" width="25" height="25">
+<rect id="Bounding box_7" x="398" y="201.987" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask6_260_853)">
+<path id="add_2_2" d="M409 222.987V214.987H401V212.987H409V204.987H411V212.987H419V214.987H411V222.987H409Z" fill="#1C1B1F"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<g id="Increase_2">
+<g id="Unchecked_2">
+<rect x="396" y="268" width="28" height="28" rx="3" fill="white"/>
+<rect x="396" y="268" width="28" height="28" rx="3" stroke="black" stroke-width="2"/>
+<g id="check_12">
+<mask id="mask7_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="398" y="270" width="24" height="24">
+<rect id="Bounding box_8" x="398" y="270" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask7_260_853)">
+<g id="add_2_3">
+<mask id="mask8_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="398" y="269" width="25" height="25">
+<rect id="Bounding box_9" x="398" y="269.987" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask8_260_853)">
+<path id="add_2_4" d="M409 290.987V282.987H401V280.987H409V272.987H411V280.987H419V282.987H411V290.987H409Z" fill="#1C1B1F"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<g id="Increase_3">
+<g id="Unchecked_3">
+<rect x="396" y="335" width="28" height="28" rx="3" fill="white"/>
+<rect x="396" y="335" width="28" height="28" rx="3" stroke="black" stroke-width="2"/>
+<g id="check_13">
+<mask id="mask9_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="398" y="337" width="24" height="24">
+<rect id="Bounding box_10" x="398" y="337" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask9_260_853)">
+<g id="add_2_5">
+<mask id="mask10_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="398" y="336" width="25" height="25">
+<rect id="Bounding box_11" x="398" y="336.987" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask10_260_853)">
+<path id="add_2_6" d="M409 357.987V349.987H401V347.987H409V339.987H411V347.987H419V349.987H411V357.987H409Z" fill="#1C1B1F"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<g id="Increase_4">
+<g id="Unchecked_4">
+<rect x="1176" y="200" width="28" height="28" rx="3" fill="white"/>
+<rect x="1176" y="200" width="28" height="28" rx="3" stroke="black" stroke-width="2"/>
+<g id="check_14">
+<mask id="mask11_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="1178" y="202" width="24" height="24">
+<rect id="Bounding box_12" x="1178" y="202" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask11_260_853)">
+<g id="add_2_7">
+<mask id="mask12_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="1178" y="201" width="25" height="25">
+<rect id="Bounding box_13" x="1178" y="201.987" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask12_260_853)">
+<path id="add_2_8" d="M1189 222.987V214.987H1181V212.987H1189V204.987H1191V212.987H1199V214.987H1191V222.987H1189Z" fill="#1C1B1F"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<g id="Increase_5">
+<g id="Unchecked_5">
+<rect x="1176" y="268" width="28" height="28" rx="3" fill="white"/>
+<rect x="1176" y="268" width="28" height="28" rx="3" stroke="black" stroke-width="2"/>
+<g id="check_15">
+<mask id="mask13_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="1178" y="270" width="24" height="24">
+<rect id="Bounding box_14" x="1178" y="270" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask13_260_853)">
+<g id="add_2_9">
+<mask id="mask14_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="1178" y="269" width="25" height="25">
+<rect id="Bounding box_15" x="1178" y="269.987" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask14_260_853)">
+<path id="add_2_10" d="M1189 290.987V282.987H1181V280.987H1189V272.987H1191V280.987H1199V282.987H1191V290.987H1189Z" fill="#1C1B1F"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<g id="Decrease">
+<g id="Unchecked_6">
+<rect x="444" y="200" width="28" height="28" rx="3" fill="white"/>
+<rect x="444" y="200" width="28" height="28" rx="3" stroke="black" stroke-width="2"/>
+<g id="check_16">
+<mask id="mask15_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="446" y="202" width="24" height="24">
+<rect id="Bounding box_16" x="446" y="202" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask15_260_853)">
+<g id="remove">
+<mask id="mask16_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="446" y="201" width="25" height="25">
+<rect id="Bounding box_17" x="446" y="201.987" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask16_260_853)">
+<path id="remove_2" d="M451 214.987V212.987H465V214.987H451Z" fill="#1C1B1F"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<g id="Decrease_2">
+<g id="Unchecked_7">
+<rect x="444" y="268" width="28" height="28" rx="3" fill="white"/>
+<rect x="444" y="268" width="28" height="28" rx="3" stroke="black" stroke-width="2"/>
+<g id="check_17">
+<mask id="mask17_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="446" y="270" width="24" height="24">
+<rect id="Bounding box_18" x="446" y="270" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask17_260_853)">
+<g id="remove_3">
+<mask id="mask18_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="446" y="269" width="25" height="25">
+<rect id="Bounding box_19" x="446" y="269.987" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask18_260_853)">
+<path id="remove_4" d="M451 282.987V280.987H465V282.987H451Z" fill="#1C1B1F"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<g id="Decrease_3">
+<g id="Unchecked_8">
+<rect x="444" y="335" width="28" height="28" rx="3" fill="white"/>
+<rect x="444" y="335" width="28" height="28" rx="3" stroke="black" stroke-width="2"/>
+<g id="check_18">
+<mask id="mask19_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="446" y="337" width="24" height="24">
+<rect id="Bounding box_20" x="446" y="337" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask19_260_853)">
+<g id="remove_5">
+<mask id="mask20_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="446" y="336" width="25" height="25">
+<rect id="Bounding box_21" x="446" y="336.987" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask20_260_853)">
+<path id="remove_6" d="M451 349.987V347.987H465V349.987H451Z" fill="#1C1B1F"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<g id="Decrease_4">
+<g id="Unchecked_9">
+<rect x="1224" y="200" width="28" height="28" rx="3" fill="white"/>
+<rect x="1224" y="200" width="28" height="28" rx="3" stroke="black" stroke-width="2"/>
+<g id="check_19">
+<mask id="mask21_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="1226" y="202" width="24" height="24">
+<rect id="Bounding box_22" x="1226" y="202" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask21_260_853)">
+<g id="remove_7">
+<mask id="mask22_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="1226" y="201" width="25" height="25">
+<rect id="Bounding box_23" x="1226" y="201.987" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask22_260_853)">
+<path id="remove_8" d="M1231 214.987V212.987H1245V214.987H1231Z" fill="#1C1B1F"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<g id="Decrease_5">
+<g id="Unchecked_10">
+<rect x="1224" y="268" width="28" height="28" rx="3" fill="white"/>
+<rect x="1224" y="268" width="28" height="28" rx="3" stroke="black" stroke-width="2"/>
+<g id="check_20">
+<mask id="mask23_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="1226" y="270" width="24" height="24">
+<rect id="Bounding box_24" x="1226" y="270" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask23_260_853)">
+<g id="remove_9">
+<mask id="mask24_260_853" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="1226" y="269" width="25" height="25">
+<rect id="Bounding box_25" x="1226" y="269.987" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask24_260_853)">
+<path id="remove_10" d="M1231 282.987V280.987H1245V282.987H1231Z" fill="#1C1B1F"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<text id="0 hours" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="493" y="221.336">0 </tspan><tspan x="509.211" y="221.336">hours</tspan></text>
+<text id="0 hours_2" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="493" y="289.336">0 </tspan><tspan x="509.211" y="289.336">hours</tspan></text>
+<text id="0 hours_3" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="493" y="356.336">0 </tspan><tspan x="509.211" y="356.336">hours</tspan></text>
+<text id="0 hours_4" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="1273" y="221.336">0 </tspan><tspan x="1289.21" y="221.336">hours</tspan></text>
+<text id="0 hours_5" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="1273" y="289.336">0 </tspan><tspan x="1289.21" y="289.336">hours</tspan></text>
+<text id="Utility" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="107" y="678.336">Utility</tspan></text>
+<text id="Transportation" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="107" y="833.336">Transportation</tspan></text>
+<text id="Electricity, water, internet, and phone bills" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="303" y="678.336">Electricity, </tspan><tspan x="397.707" y="678.336">water, </tspan><tspan x="455.266" y="678.336">internet, </tspan><tspan x="532.219" y="678.336">and </tspan><tspan x="570.402" y="678.336">phone </tspan><tspan x="630.676" y="678.336">bills</tspan></text>
+<text id="Travel and commuting expenses" fill="black" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="303" y="833.336">Travel </tspan><tspan x="361.34" y="833.336">and </tspan><tspan x="399.523" y="833.336">commuting </tspan><tspan x="506.164" y="833.336">expenses</tspan></text>
+<text id="800,000 VND" fill="#726F6F" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="773" y="682.336">800,000 </tspan><tspan x="849.406" y="682.336">VND</tspan></text>
+<text id="1,500,000 VND" fill="#726F6F" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="773" y="837.336">1,500,000 </tspan><tspan x="864.602" y="837.336">VND</tspan></text>
+<rect id="Rectangle 28" x="74" y="397" width="1308" height="45" rx="4" fill="#2E395F"/>
+<text id="Summary: -30 Physical health, -25 Mental health" fill="white" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="91" y="425.336">Summary: </tspan><tspan x="188.09" y="425.336">-30 </tspan><tspan x="223.93" y="425.336">Physical </tspan><tspan x="305.082" y="425.336">health, </tspan><tspan x="370.98" y="425.336">-25 </tspan><tspan x="406.82" y="425.336">Mental </tspan><tspan x="474.105" y="425.336">health</tspan></text>
+<g id="Group 66">
+<rect id="Rectangle 26" x="969" y="575" width="398" height="43" rx="4" fill="white"/>
+<text id="Amount" fill="#666565" fill-opacity="0.9" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="984" y="604.336">Amount</tspan></text>
+<rect id="Rectangle 34" x="1245" y="575" width="122" height="43" fill="#849E51"/>
+<text id="Enter" fill="white" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="1281.82" y="604.336">Enter</tspan></text>
+</g>
+<g id="Group 67">
+<rect id="Rectangle 26_2" x="969" y="651" width="398" height="43" rx="4" fill="white"/>
+<text id="Amount_2" fill="#666565" fill-opacity="0.9" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="984" y="680.336">Amount</tspan></text>
+<rect id="Rectangle 34_2" x="1245" y="651" width="122" height="43" fill="#849E51"/>
+<text id="Enter_2" fill="white" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="1281.82" y="680.336">Enter</tspan></text>
+</g>
+<g id="Group 68">
+<rect id="Rectangle 26_3" x="969" y="729" width="398" height="43" rx="4" fill="white"/>
+<text id="Amount_3" fill="#666565" fill-opacity="0.9" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="984" y="758.336">Amount</tspan></text>
+<rect id="Rectangle 34_3" x="1245" y="729" width="122" height="43" fill="#849E51"/>
+<text id="Enter_3" fill="white" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="1281.82" y="758.336">Enter</tspan></text>
+</g>
+<g id="Group 69">
+<rect id="Rectangle 26_4" x="969" y="809" width="398" height="43" rx="4" fill="white"/>
+<text id="Amount_4" fill="#666565" fill-opacity="0.9" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="984" y="838.336">Amount</tspan></text>
+<rect id="Rectangle 34_4" x="1245" y="809" width="122" height="43" fill="#849E51"/>
+<text id="Enter_4" fill="white" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="1281.82" y="838.336">Enter</tspan></text>
+</g>
+<g id="Group 70">
+<rect id="Rectangle 26_5" x="969" y="892" width="398" height="43" rx="4" fill="white"/>
+<text id="Amount_5" fill="#666565" fill-opacity="0.9" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="984" y="921.336">Amount</tspan></text>
+<rect id="Rectangle 34_5" x="1245" y="892" width="122" height="43" fill="#849E51"/>
+<text id="Enter_5" fill="white" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="1281.82" y="921.336">Enter</tspan></text>
+</g>
+</g>
+</g>
+<path id="Union" fill-rule="evenodd" clip-rule="evenodd" d="M1354.18 71.0469C1354.22 68.1849 1350.61 66.8993 1348.83 69.1416L1306.3 122.748L1306.8 122.893H762C755.373 122.893 750 128.265 750 134.893V231.893C750 238.52 755.373 243.892 762 243.893H1341C1347.63 243.893 1353 238.52 1353 231.893V136.162L1353.3 136.249L1354.18 71.0469Z" fill="#3C5227"/>
+<g id="Restart button: There will be a small restart button at the right upward corner of the screen in both information and decisions tab. This will allow you to start over the game.">
+<text fill="white" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="913.951" y="166.336">There </tspan><tspan x="970.942" y="166.336">will </tspan><tspan x="1006.8" y="166.336">be </tspan><tspan x="1034.87" y="166.336">a </tspan><tspan x="1051.97" y="166.336">small </tspan><tspan x="1106.68" y="166.336">restart </tspan><tspan x="1171.68" y="166.336">button </tspan><tspan x="1235.53" y="166.336">at </tspan><tspan x="1259.18" y="166.336">the </tspan><tspan x="1293.57" y="166.336">right </tspan><tspan x="772" y="189.336">upward </tspan><tspan x="844.158" y="189.336">corner </tspan><tspan x="907.332" y="189.336">of </tspan><tspan x="931.775" y="189.336">the </tspan><tspan x="966.023" y="189.336">screen </tspan><tspan x="1031.77" y="189.336">in </tspan><tspan x="1053.78" y="189.336">both </tspan><tspan x="1100.06" y="189.336">information </tspan><tspan x="1209.48" y="189.336">and </tspan><tspan x="1248.79" y="189.336">decisions </tspan><tspan x="772" y="212.336">tab. </tspan><tspan x="810.496" y="212.336">This </tspan><tspan x="853.602" y="212.336">will </tspan><tspan x="888.191" y="212.336">allow </tspan><tspan x="940.203" y="212.336">you </tspan><tspan x="976.941" y="212.336">to </tspan><tspan x="999.656" y="212.336">start </tspan><tspan x="1046.18" y="212.336">over </tspan><tspan x="1089.36" y="212.336">the </tspan><tspan x="1122.49" y="212.336">game.</tspan></text>
+<text fill="white" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" letter-spacing="0em"><tspan x="908.112" y="166.336"> </tspan></text>
+<text fill="white" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="772" y="166.336">Restart </tspan><tspan x="844.206" y="166.336">button:</tspan></text>
+</g>
+<g id="Button">
+<rect id="Rectangle 1" x="632" y="505" width="220" height="56" rx="22" fill="#2E395F"/>
+<text id="Game start" fill="white" style="white-space: pre" xml:space="preserve" font-family="Roboto" font-size="30" letter-spacing="0em"><tspan x="665" y="542.754">Game Start</tspan></text>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_260_853">
+<rect width="1440" height="1024" fill="white"/>
+</clipPath>
+<clipPath id="clip1_260_853">
+<rect width="1440" height="844" fill="white" transform="translate(-1 89)"/>
+</clipPath>
+</defs>
+</svg>
