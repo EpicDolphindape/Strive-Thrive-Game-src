@@ -34,23 +34,40 @@
 
     const dec = state.currentDecision;
 
-    // Main Job Row
+    // 1. Render Overtime row first with a health penalty note
+    const otHours = dec.otHours || 0;
+    const otChecked = otHours > 0;
+    const otDecDisabled = hasWorkBan || !otChecked || otHours <= 0;
+    const otIncDisabled = hasWorkBan || otHours >= 40;
+    const otCheckDisabled = hasWorkBan;
+
     let html = `
-      <!-- Main Job -->
-      <div class="income-row income-row--full">
-        <input type="checkbox" class="income-row__checkbox" id="job-main-check" checked disabled>
-        <label class="income-row__label" for="job-main-check">${meta.job} (Main Job)</label>
-        <span class="income-row__rate">${UI.formatVND(meta.monthlySalary)} / month</span>
-        <div class="hours-selector">
-          <button type="button" class="hours-btn" id="job-main-dec-btn" disabled>-</button>
-          <span class="hours-display" id="job-main-hours-display">40 hours</span>
-          <button type="button" class="hours-btn" id="job-main-inc-btn" disabled>+</button>
+      <div class="income-row income-row--full" style="display: flex; justify-content: space-between; gap: var(--space-4); align-items: center;">
+        <div style="display: flex; align-items: center; gap: var(--space-3); flex: 1;">
+          <input type="checkbox" class="income-row__checkbox" id="job-ot-check" ${otChecked ? 'checked' : ''} ${otCheckDisabled ? 'disabled' : ''}>
+          <label class="income-row__label" for="job-ot-check">Overtime (OT)</label>
+          <span class="income-row__rate">${UI.formatVND(Math.round(GAME_DATA.getOTWage(meta.monthlySalary)))} / hour</span>
+          <div class="hours-selector">
+            <button type="button" class="hours-btn" id="job-ot-dec-btn" ${otDecDisabled ? 'disabled' : ''}>-</button>
+            <span class="hours-display" id="job-ot-hours-display">${otHours} hours</span>
+            <button type="button" class="hours-btn" id="job-ot-inc-btn" ${otIncDisabled ? 'disabled' : ''}>+</button>
+          </div>
+        </div>
+        <div class="income-note" style="flex: 1.2; font-size: 0.8rem; color: var(--color-text-secondary); border-left: 2px solid var(--color-border); padding-left: var(--space-3); line-height: 1.3;">
+          <strong>Note:</strong> Overtime increases your income but also increases mental and physical health deterioration. The more overtime hours you work, the larger the health penalty you may experience.
         </div>
       </div>
     `;
 
-    // Render 4 side jobs
-    const sideJobsKeys = ['tutor', 'freelancer', 'shipper', 'waiter'];
+    // 2. Render side job section header
+    html += `
+      <div class="income-section-header" style="grid-column: 1 / -1; margin-top: var(--space-3); font-weight: var(--fw-bold); color: var(--color-navy); font-size: 1.1rem; border-bottom: 1.5px solid var(--color-navy); padding-bottom: 4px; margin-bottom: 4px;">
+        Side job
+      </div>
+    `;
+
+    // 3. Render 4 side jobs
+    const sideJobsKeys = ['tutor', 'blogger', 'adviser', 'bookkeeper'];
     sideJobsKeys.forEach(key => {
       const sj = GAME_DATA.SIDE_JOBS[key];
       const isActive = (dec.sideJob === sj.id);
@@ -75,23 +92,10 @@
       `;
     });
 
-    // Render Overtime row
-    const otHours = dec.otHours || 0;
-    const otChecked = otHours > 0;
-    const otDecDisabled = hasWorkBan || !otChecked || otHours <= 0;
-    const otIncDisabled = hasWorkBan || otHours >= 40;
-    const otCheckDisabled = hasWorkBan;
-
+    // 4. Render bottom side job note
     html += `
-      <div class="income-row">
-        <input type="checkbox" class="income-row__checkbox" id="job-ot-check" ${otChecked ? 'checked' : ''} ${otCheckDisabled ? 'disabled' : ''}>
-        <label class="income-row__label" for="job-ot-check">Overtime (OT)</label>
-        <span class="income-row__rate">${UI.formatVND(Math.round(GAME_DATA.getOTWage(meta.monthlySalary)))} / hour</span>
-        <div class="hours-selector">
-          <button type="button" class="hours-btn" id="job-ot-dec-btn" ${otDecDisabled ? 'disabled' : ''}>-</button>
-          <span class="hours-display" id="job-ot-hours-display">${otHours} hours</span>
-          <button type="button" class="hours-btn" id="job-ot-inc-btn" ${otIncDisabled ? 'disabled' : ''}>+</button>
-        </div>
+      <div class="income-row--full" style="font-size: 0.8rem; color: var(--color-text-secondary); line-height: 1.4; border: none; background: none; padding: var(--space-2) 0 0 0; grid-column: 1 / -1;">
+        <strong>Note:</strong> Taking a side job provides additional income but increases workload. Different side jobs are associated with different occupation-specific health penalties, meaning higher income opportunities may also carry higher health risks.
       </div>
     `;
 
@@ -114,12 +118,13 @@
 
     let html = '';
     const categories = ['housing', 'utility', 'food', 'transport', 'healthcare', 'entertainment'];
+    const metaRound = GAME_DATA.ROUNDS[round - 1];
 
     categories.forEach(cat => {
       const meta = EXPENSE_METADATA[cat];
       
-      // Get base cost: previous round's actual chosen expense, or default BASE_EXPENSES
-      let baseCost = GAME_DATA.BASE_EXPENSES[cat];
+      // Get base cost: previous round's actual chosen expense, or default BASE_EXPENSES scaled by salary
+      let baseCost = Math.round(GAME_DATA.BASE_EXPENSES[cat] * metaRound.monthlySalary);
       if (round > 1) {
         const prevDec = state.rounds[round - 2]?.decisions;
         if (prevDec && prevDec.expenses && prevDec.expenses[cat] !== undefined) {
@@ -128,13 +133,16 @@
       }
 
       const currentVal = state.currentDecision.expenses[cat];
+      const displayedBaseCost = (currentVal !== undefined && currentVal !== 0) ? currentVal : baseCost;
       const displayVal = currentVal !== undefined ? currentVal.toLocaleString('vi-VN') : '';
+      const minCost = GAME_DATA.MIN_EXPENSES[cat] || 0;
 
       html += `
         <tr data-category="${cat}">
           <td class="cell-category"><span class="category-badge">${meta.name}</span></td>
           <td class="cell-desc">${meta.desc}</td>
-          <td class="cell-base" style="text-align: right; white-space: nowrap;">${UI.formatVND(baseCost)}</td>
+          <td class="cell-min" style="text-align: right; white-space: nowrap;">${UI.formatVND(minCost)}</td>
+          <td class="cell-base" style="text-align: right; white-space: nowrap;">${UI.formatVND(displayedBaseCost)}</td>
           <td class="cell-input">
             <input type="text" class="amount-input expense-input" id="exp-${cat}-input" data-category="${cat}" value="${displayVal}" placeholder="Amount...">
           </td>
@@ -244,7 +252,8 @@
         input.value = val > 0 ? val.toLocaleString('vi-VN') : '';
         
         const cat = input.dataset.category;
-        state.currentDecision.expenses[cat] = val;
+        const minCost = GAME_DATA.MIN_EXPENSES[cat] || 0;
+        state.currentDecision.expenses[cat] = Math.max(val, minCost);
         updateLivePreview();
       });
 
@@ -252,6 +261,16 @@
         const cat = input.dataset.category;
         let valStr = input.value.replace(/[^\d]/g, '');
         let val = parseInt(valStr) || 0;
+        const minCost = GAME_DATA.MIN_EXPENSES[cat] || 0;
+        if (val < minCost) {
+          const EXPENSE_NAMES = {
+            housing: 'Housing', utility: 'Utility', food: 'Food',
+            transport: 'Transport', healthcare: 'Healthcare', entertainment: 'Entertainment'
+          };
+          UI.toast.warning(`Budget for ${EXPENSE_NAMES[cat]} cannot be lower than the Minimum Cost (${UI.formatVND(minCost)}).`);
+          val = minCost;
+          input.value = val > 0 ? val.toLocaleString('vi-VN') : '';
+        }
         state.currentDecision.expenses[cat] = val;
         updateLivePreview();
       });
@@ -478,10 +497,15 @@
     if (confirmBtn) {
       confirmBtn.addEventListener('click', () => {
         const categories = ['housing', 'utility', 'food', 'transport', 'healthcare', 'entertainment'];
+        const EXPENSE_NAMES = {
+          housing: 'Housing', utility: 'Utility', food: 'Food',
+          transport: 'Transport', healthcare: 'Healthcare', entertainment: 'Entertainment'
+        };
         for (const cat of categories) {
           const val = state.currentDecision.expenses[cat];
-          if (val === undefined || isNaN(val) || val < 0) {
-            UI.toast.warning(`Please enter a valid amount for ${cat}.`);
+          const minCost = GAME_DATA.MIN_EXPENSES[cat] || 0;
+          if (val === undefined || isNaN(val) || val < minCost) {
+            UI.toast.warning(`Please enter a valid amount for ${EXPENSE_NAMES[cat]} (minimum: ${UI.formatVND(minCost)}).`);
             const input = document.getElementById(`exp-${cat}-input`);
             if (input) {
               input.focus();

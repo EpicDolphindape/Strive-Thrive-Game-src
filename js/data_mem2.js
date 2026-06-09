@@ -20,11 +20,11 @@
      ────────────────────────────────────────────────────────── */
 
   const SIDE_JOBS = {
-    none:       { id: 'none',       label: 'No side job',  wage: 0 },
-    waiter:     { id: 'waiter',     label: 'Waiter',        wage: 38_299 },
-    shipper:    { id: 'shipper',    label: 'Shipper',       wage: 59_226 },
-    tutor:      { id: 'tutor',      label: 'Tutor',         wage: 137_924 },
-    freelancer: { id: 'freelancer', label: 'Freelancer',   wage: 157_785 },
+    none:       { id: 'none',       label: 'No side job',              wage: 0 },
+    bookkeeper: { id: 'bookkeeper', label: 'Part-time Bookkeeper',     wage: 60_248 },
+    adviser:    { id: 'adviser',    label: 'Personal Finance Adviser', wage: 116_476 },
+    tutor:      { id: 'tutor',      label: 'Tutor',                    wage: 137_924 },
+    blogger:    { id: 'blogger',    label: 'Guest Blogger',            wage: 157_785 },
   };
 
   /* ──────────────────────────────────────────────────────────
@@ -32,16 +32,25 @@
      ────────────────────────────────────────────────────────── */
 
   /**
-   * Base monthly expense values (VND).
+   * Base expense ratios used to calculate default monthly budgets.
    * In round > 1, "base" shown to player is previous round's actual.
    */
   const BASE_EXPENSES = {
-    healthcare:    3_000_000,
-    entertainment: 3_000_000,
-    housing:         960_000,
-    food:            800_000,
-    utility:         500_000,
-    transport:       500_000,
+    healthcare:    0.0533,
+    entertainment: 0.3,
+    housing:       0.25,
+    food:          0.17,
+    utility:       0.0467,
+    transport:     0.0333,
+  };
+
+  const MIN_EXPENSES = {
+    housing:       1_500_000,
+    food:          1_500_000,
+    utility:         400_000,
+    transport:       150_000,
+    healthcare:      200_000,
+    entertainment:         0,
   };
 
   /** Base ratios used in MH expense formula (base / 15,000,000) */
