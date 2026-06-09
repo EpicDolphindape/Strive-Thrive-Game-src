@@ -1,5 +1,5 @@
 /* Health scoring events */
-  
+
   const HEALTH_WARNING_EVENTS = {
     mental: [
       { min: 50, max: 60, text: "You’ve been feeling quite stressed lately, and you keep wishing you could leave work just a little earlier. Maybe it’s time to slow down and give yourself some space to heal.", penalty: 0 },
@@ -17,9 +17,9 @@
     ]
   };
 
-  /** Get health threshold info for a value */
+  /* Get health threshold info for a value */ 
 
-  const HEALTH_THRESHOLDS = [
+   const HEALTH_THRESHOLDS = [
     { min: 50, max: 60, type: 'warning',   penalty: 0,   canWork: true,  label: 'Feeling tired' },
     { min: 40, max: 49, type: 'event',     penalty: -2,  canWork: true,  label: 'Moderate issue' },
     { min: 30, max: 39, type: 'event',     penalty: -5,  canWork: true,  label: 'Significant issue' },
@@ -27,7 +27,7 @@
     { min:  1, max: 19, type: 'critical',  penalty: -10, canWork: false, label: 'Critical — cannot work' },
     { min:  0, max:  0, type: 'lose',      penalty: 0,   canWork: false, label: 'Game Over' },
   ];
-  
+
   function getHealthThreshold(value) {
     for (const t of HEALTH_THRESHOLDS) {
       if (value >= t.min && value <= t.max) return t;
@@ -107,11 +107,10 @@
     },
   };
 
- /* ──────────────────────────────────────────────────────────
-     LIFE EVENTS
-     ────────────────────────────────────────────────────────── */
-
-  const LIFE_EVENTS = [
+  /* ──────────────────────────────────────────────────────────
+      LIFE EVENTS 
+      ────────────────────────────────────────────────────────── */
+    const LIFE_EVENTS = [
     // Round 1
     {
       id: 'reward_parents',
