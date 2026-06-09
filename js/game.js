@@ -33,7 +33,11 @@ const GAME = (function() {
       selector: '.right-panel',
       tab: 'information',
       title: "Personal & Market information",
+<<<<<<< HEAD
       text: "<p><strong>Personal information panel:</strong> Here you can view surprise life scenarios which can be either good or bad. Each event will immediately affect your character's stats, so be prepared for the unexpected!</p><p><strong>Market information panel:</strong> Here you can view the overall market condition of the current round. Pay attention to these information since they will affect your later financial decisions related to investment.</p>",
+=======
+      text: "<p><strong>Character's information panel:</strong> The game will update character's background information for each round in this block, where you can retrieve input about age, main job's title, and yearly salary in order to make decisions.</p><p><strong>Character's stats:</strong> Four main stats will be displayed, revealing player's current state. This consists of cash balance, investment value, and two well-being-related stats of physical health and mental health. These will be later updated with every decision you make later on.</p>",
+>>>>>>> 846c61a0e7847f68843a7e47d0246463ff0773ef
       placement: 'left'
     },
     {
@@ -306,19 +310,7 @@ const GAME = (function() {
     saveGame();
   }
 
-  function initRoundDecisions() {
-    if (!state) return;
-    state.currentDecision = GAME_DATA.createRoundDecision(state.currentRound);
-    
-    // Carry over previous expenses if round > 1
-    if (state.currentRound > 1) {
-      const prevDecision = state.rounds[state.currentRound - 2]?.decisions;
-      if (prevDecision && prevDecision.expenses) {
-        state.currentDecision.expenses = { ...prevDecision.expenses };
-      }
-    }
-  }
-
+  // >>> 4-TYPE EVENT-ROLL LOGIC
   function rollRoundEvents(round) {
     if (!state) return;
     const rolled = [];
@@ -450,6 +442,10 @@ const GAME = (function() {
     });
   }
 
+<<<<<<< HEAD
+=======
+  // >>> REVISED WARNING-EVENT LOGIC
+>>>>>>> 846c61a0e7847f68843a7e47d0246463ff0773ef
   function checkStartingHealthWarnings() {
     if (!state) return;
     const round = state.currentRound;
@@ -596,7 +592,7 @@ const GAME = (function() {
       UI.toast.danger(`Game Over: ${GAME_DATA.LOSE_CONDITIONS[state.loseCondition].label}!`);
     }
   }
-
+  
   function renderInformationTab() {
     if (!state) return;
     const round = state.currentRound;
@@ -1098,89 +1094,80 @@ const GAME = (function() {
     table.innerHTML = html;
   }
 
-  function attachIncomeListeners() {
-    const dec = state.currentDecision;
+  function attachExpenseListeners() {
+    const inputs = document.querySelectorAll('.expense-input');
+    inputs.forEach(input => {
+      input.addEventListener('input', () => {
+        let valStr = input.value.replace(/[^\d]/g, '');
+        let val = parseInt(valStr) || 0;
+        input.value = val > 0 ? val.toLocaleString('vi-VN') : '';
+        
+        const cat = input.dataset.category;
+        const minCost = GAME_DATA.MIN_EXPENSES[cat] || 0;
+        state.currentDecision.expenses[cat] = Math.max(val, minCost);
+        updateLivePreview();
+      });
 
-    // Side Job checkboxes
-    const sideJobChecks = document.querySelectorAll('.side-job-checkbox');
-    sideJobChecks.forEach(check => {
-      check.addEventListener('change', () => {
-        const sideJobId = check.dataset.sidejob;
-        if (check.checked) {
-          dec.sideJob = sideJobId;
-          dec.sideJobHours = 10;
-        } else {
-          if (dec.sideJob === sideJobId) {
-            dec.sideJob = 'none';
-            dec.sideJobHours = 0;
-          }
+      input.addEventListener('blur', () => {
+        const cat = input.dataset.category;
+        let valStr = input.value.replace(/[^\d]/g, '');
+        let val = parseInt(valStr) || 0;
+        
+        const minCost = GAME_DATA.MIN_EXPENSES[cat] || 0;
+        if (val < minCost) {
+          const EXPENSE_NAMES = {
+            housing: 'Housing', utility: 'Utility', food: 'Food',
+            transport: 'Transport', healthcare: 'Healthcare', entertainment: 'Entertainment'
+          };
+          UI.toast.warning(`Budget for ${EXPENSE_NAMES[cat]} cannot be lower than the Minimum Cost (${UI.formatVND(minCost)}).`);
+          val = minCost;
+          input.value = val > 0 ? val.toLocaleString('vi-VN') : '';
         }
-        renderDecisionsTab();
+
+        state.currentDecision.expenses[cat] = val;
+        updateLivePreview();
       });
     });
 
-    // Side Job decrement buttons
-    const sideJobDecBtns = document.querySelectorAll('.side-job-dec-btn');
-    sideJobDecBtns.forEach(btn => {
+    const buttons = document.querySelectorAll('.expense-enter-btn');
+    buttons.forEach(btn => {
       btn.addEventListener('click', () => {
-        const sideJobId = btn.dataset.sidejob;
-        if (dec.sideJob === sideJobId) {
-          dec.sideJobHours = Math.max(0, dec.sideJobHours - 10);
-          if (dec.sideJobHours === 0) {
-            dec.sideJob = 'none';
+        const cat = btn.dataset.category;
+        const input = document.getElementById(`exp-${cat}-input`);
+        if (input) {
+          let valStr = input.value.replace(/[^\d]/g, '');
+          let val = parseInt(valStr) || 0;
+
+          const minCost = GAME_DATA.MIN_EXPENSES[cat] || 0;
+          const EXPENSE_NAMES = {
+            housing: 'Housing', utility: 'Utility', food: 'Food',
+            transport: 'Transport', healthcare: 'Healthcare', entertainment: 'Entertainment'
+          };
+
+          if (val < minCost) {
+            UI.toast.warning(`Budget for ${EXPENSE_NAMES[cat]} cannot be lower than the Minimum Cost (${UI.formatVND(minCost)}).`);
+            input.focus();
+            input.classList.add('flash-negative');
+            setTimeout(() => input.classList.remove('flash-negative'), 800);
+            return;
           }
-          renderDecisionsTab();
+
+          state.currentDecision.expenses[cat] = val;
+
+          // Update the Base Cost column cell in this row immediately
+          const row = btn.closest('tr');
+          if (row) {
+            const baseCostCell = row.querySelector('.cell-base');
+            if (baseCostCell) {
+              baseCostCell.textContent = UI.formatVND(val);
+            }
+          }
+
+          UI.toast.success(`Set budget for ${EXPENSE_NAMES[cat]} to ${UI.formatVND(val)}`);
+          updateLivePreview();
         }
       });
     });
-
-    // Side Job increment buttons
-    const sideJobIncBtns = document.querySelectorAll('.side-job-inc-btn');
-    sideJobIncBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const sideJobId = btn.dataset.sidejob;
-        if (dec.sideJob !== sideJobId) {
-          dec.sideJob = sideJobId;
-          dec.sideJobHours = 10;
-        } else {
-          dec.sideJobHours = Math.min(40, dec.sideJobHours + 10);
-        }
-        renderDecisionsTab();
-      });
-    });
-
-    // OT checkbox
-    const otCheck = document.getElementById('job-ot-check');
-    if (otCheck) {
-      otCheck.addEventListener('change', () => {
-        if (otCheck.checked) {
-          if (dec.otHours === 0) {
-            dec.otHours = 10;
-          }
-        } else {
-          dec.otHours = 0;
-        }
-        renderDecisionsTab();
-      });
-    }
-
-    // OT decrement button
-    const otDecBtn = document.getElementById('job-ot-dec-btn');
-    if (otDecBtn) {
-      otDecBtn.addEventListener('click', () => {
-        dec.otHours = Math.max(0, dec.otHours - 10);
-        renderDecisionsTab();
-      });
-    }
-
-    // OT increment button
-    const otIncBtn = document.getElementById('job-ot-inc-btn');
-    if (otIncBtn) {
-      otIncBtn.addEventListener('click', () => {
-        dec.otHours = Math.min(40, dec.otHours + 10);
-        renderDecisionsTab();
-      });
-    }
   }
 
   function attachExpenseListeners() {
@@ -1335,7 +1322,7 @@ const GAME = (function() {
         state.realizedPnL = (state.realizedPnL || 0) + (netGained - qty * pos.avgCost);
         const newQty = pos.quantity - qty;
         const newAvgCost = newQty === 0 ? 0 : pos.avgCost;
-
+        
         state.portfolio[code] = {
           quantity: newQty,
           avgCost: newAvgCost
@@ -1362,7 +1349,11 @@ const GAME = (function() {
       phImpact: e.impact.physicalHealth || 0
     }));
 
+<<<<<<< HEAD
     // No mid-round conditional events in the 4-type system
+=======
+    // Check for active deterministic conditional events in live preview
+>>>>>>> 846c61a0e7847f68843a7e47d0246463ff0773ef
     const condWarningTexts = [];
 
     const result = HEALTH.applyRound(state, state.currentDecision, mappedEvents);
@@ -1400,7 +1391,7 @@ const GAME = (function() {
       updatePreviewLabelClass(barMent, proj, prev);
     }
 
-    const summaryTitle = document.getElementById('income-summary-title');
+        const summaryTitle = document.getElementById('income-summary-title');
     const summaryBox = document.getElementById('income-summary-box');
     if (summaryTitle) {
       const otHours = state.currentDecision.otHours || 0;
@@ -1538,6 +1529,7 @@ const GAME = (function() {
       const pos = portfolio[code] || { quantity: 0, avgCost: 0 };
       totalCapital += pos.quantity * pos.avgCost;
       totalMarketValue += pos.quantity * prices[code];
+<<<<<<< HEAD
     });
 
     const roundReturn = totalMarketValue - totalCapital;
@@ -1556,6 +1548,25 @@ const GAME = (function() {
       }
     }
 
+=======
+
+  const roundReturn = totalMarketValue - totalCapital;
+      
+    // Calculate Cumulative capital invested
+    let cumulativeCapital = 0;
+    for (let r = 1; r <= roundNumber; r++) {
+      const outcome_r = state.rounds[r - 1];
+      if (outcome_r) {
+        let tc = 0;
+        const port_r = outcome_r.portfolio || {};
+        for (const [code, pos] of Object.entries(port_r)) {
+          tc += pos.quantity * pos.avgCost;
+        }
+        cumulativeCapital += tc;
+      }
+    }
+
+>>>>>>> 846c61a0e7847f68843a7e47d0246463ff0773ef
     const realizedPnL = outcome.realizedPnL || 0;
     const cumulativeReturnPct = cumulativeCapital > 0
       ? ((realizedPnL + (totalMarketValue - totalCapital)) / cumulativeCapital) * 100
@@ -1623,7 +1634,14 @@ const GAME = (function() {
       });
       tbody.innerHTML = html;
     }
+  // 4. Savings Account Table
+    const savingsOpening = outcome.savingsOpening || 0;
+    const additionalDeposit = savingsBalance - savingsOpening;
+    const principal = savingsBalance;
+    const interest = income.savingsInterest;
+    const closingBalance = savingsBalance + interest;
 
+<<<<<<< HEAD
     // 4. Savings Account Table
     const savingsOpening = outcome.savingsOpening || 0;
     const additionalDeposit = savingsBalance - savingsOpening;
@@ -1631,6 +1649,8 @@ const GAME = (function() {
     const interest = income.savingsInterest;
     const closingBalance = savingsBalance + interest;
 
+=======
+>>>>>>> 846c61a0e7847f68843a7e47d0246463ff0773ef
     const savOpeningEl = document.getElementById('result-savings-opening');
     if (savOpeningEl) savOpeningEl.textContent = UI.formatVND(savingsOpening);
 
@@ -1970,6 +1990,10 @@ const GAME = (function() {
     
     // In the new 4-type event system, all starting events (including warnings, job-rewards, and expense-penalties)
     // are already rolled at startRound and stored in state.activeEvents. No mid-round conditional rolls are needed.
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 846c61a0e7847f68843a7e47d0246463ff0773ef
 
     const mappedEvents = (state.activeEvents || []).map(e => ({
       id: e.id,
@@ -1981,11 +2005,17 @@ const GAME = (function() {
     }));
 
     const completedRound = state.currentRound;
+<<<<<<< HEAD
     const completedBranch = state.marketBranch || '1.1';
 
     // Capture the active savings balance before it gets auto-withdrawn/reset in applyRound
     const activeSavingsBalance = state.savingsBalance;
 
+=======
+  // Capture the market-event branch used for the completed round.
+    const completedBranch = state.marketBranch || '1.1';
+    
+>>>>>>> 846c61a0e7847f68843a7e47d0246463ff0773ef
     const result = HEALTH.applyRound(state, state.currentDecision, mappedEvents);
     state = result.newState;
     
@@ -2000,6 +2030,7 @@ const GAME = (function() {
       state.currentPrices = newPrices;
       roundStockChanges = stockPriceChanges;
       
+<<<<<<< HEAD
       // Advance market branch for the new round
       const currentBranchData = GAME_DATA.MARKET_EVENT_TREE[completedBranch];
       if (currentBranchData && currentBranchData.children && currentBranchData.children.length > 0) {
@@ -2016,6 +2047,8 @@ const GAME = (function() {
       state.stats.investment = HEALTH.calcPortfolioValue(state.portfolio, state.currentPrices) + state.savingsBalance;
     }
 
+=======
+>>>>>>> 846c61a0e7847f68843a7e47d0246463ff0773ef
     // 2. Save structural copy of portfolio, prices, and savings for history rendering
     if (state.rounds[completedRoundIdx]) {
       state.rounds[completedRoundIdx].portfolio = JSON.parse(JSON.stringify(state.portfolio));
@@ -2040,6 +2073,84 @@ const GAME = (function() {
 
     // Auto-save game state
     saveGame();
+  }
+  function showMarketHistoryModal() {
+    if (!state) return;
+
+    const expandedView = document.getElementById('market-expanded-view');
+    const expandedBody = document.getElementById('market-expanded-body');
+    if (!expandedView || !expandedBody) return;
+
+    // Construct the timeline items
+    let cardsHtml = '';
+    const totalRounds = state.currentRound;
+
+    for (let r = 1; r <= totalRounds; r++) {
+      let branchKey = '1.1';
+      let currentSavingsRateAdjustment = 0;
+      let currentSavingsBalance = 0;
+      
+      if (r < state.currentRound) {
+        const roundData = state.rounds[r - 1];
+        branchKey = roundData?.marketBranch || '1.1';
+        currentSavingsRateAdjustment = roundData?.savingsRateAdjustment || 0;
+        currentSavingsBalance = roundData?.savingsBalance || 0;
+      } else {
+        branchKey = state.marketBranch || '1.1';
+        currentSavingsRateAdjustment = state.savingsRateAdjustment || 0;
+        currentSavingsBalance = state.savingsBalance || 0;
+      }
+
+      const data = GAME_DATA.MARKET_EVENT_TREE[branchKey];
+      if (!data) continue;
+
+      const age = GAME_DATA.ROUNDS[r - 1]?.age || (22 + r - 1);
+
+      // Stock changes formatting - only for past/completed rounds
+      let stockChangesStr = '';
+      if (r < state.currentRound) {
+        const roundData = state.rounds[r - 1];
+        const changes = roundData?.stockPriceChanges;
+        if (changes) {
+          const parts = [];
+          for (const [stock, change] of Object.entries(changes)) {
+            const sign = change > 0 ? '+' : '';
+            const percent = (change * 100).toFixed(1) + '%';
+            const color = change > 0 ? 'var(--color-gain)' : (change < 0 ? 'var(--color-loss)' : 'var(--color-neutral)');
+            parts.push(`<span style="color: ${color}; font-weight: var(--fw-bold);">${stock}: ${sign}${percent}</span>`);
+          }
+          stockChangesStr = parts.join(' &nbsp;·&nbsp; ');
+        }
+      }
+
+      const rate = GAME_DATA.getSavingsRate(currentSavingsBalance, r, currentSavingsRateAdjustment);
+      const tier = GAME_DATA.getSavingsTierLabel(currentSavingsBalance);
+
+      cardsHtml += `
+        <div class="market-history-card" style="background-color: var(--color-bg-panel); border: 1px solid var(--color-border); border-left: 4px solid var(--color-navy); padding: var(--space-4); border-radius: var(--radius-md); margin-bottom: var(--space-4);">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px dashed var(--color-border); padding-bottom: var(--space-2); margin-bottom: var(--space-3);">
+            <h3 style="margin: 0; color: var(--color-navy); font-family: var(--font-display); font-size: var(--fs-h2);">Year ${r} (Age ${age}): ${data.title}</h3>
+            ${r === state.currentRound ? '<span style="background-color: var(--color-navy); color: var(--color-text-white); font-size: var(--fs-micro); font-weight: var(--fw-bold); padding: 2px 6px; border-radius: var(--radius-xs); text-transform: uppercase;">Active</span>' : ''}
+          </div>
+          <p style="color: var(--color-text-primary); font-size: var(--fs-body); line-height: 1.5; margin-bottom: var(--space-3); font-style: normal;">
+            ${data.sectorInfo || data.scenarioOverview}
+          </p>
+          <div style="background-color: var(--color-bg-white); border: 1px solid var(--color-border); padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); font-size: var(--fs-small); display: flex; flex-direction: column; gap: 4px; line-height: 1.4;">
+            ${stockChangesStr ? `
+            <div style="display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap;">
+              <strong>Stock Trends:</strong>
+              <div>${stockChangesStr}</div>
+            </div>` : ''}
+            <div style="border-top: 1px solid var(--color-bg-panel); padding-top: 4px; margin-top: 2px;">
+              <strong>Savings Account:</strong> Rate is <strong>${(rate * 100).toFixed(2)}% / year</strong> (Tier: ${tier}).
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    expandedBody.innerHTML = cardsHtml;
+    expandedView.classList.add('active');
   }
 
   function showMarketHistoryModal() {
@@ -2213,7 +2324,10 @@ const GAME = (function() {
       }
     });
 
+<<<<<<< HEAD
     // Zoom Market History Modal
+=======
+>>>>>>> 846c61a0e7847f68843a7e47d0246463ff0773ef
     const zoomMarketBtn = document.getElementById('btn-zoom-market');
     if (zoomMarketBtn) {
       zoomMarketBtn.addEventListener('click', () => {
@@ -2493,7 +2607,11 @@ const GAME = (function() {
   return {
     init,
     getState: () => state,
+<<<<<<< HEAD
     setState: (newState) => { state = newState; },
+=======
+    setState: (newState) => { state = newState; }
+>>>>>>> 846c61a0e7847f68843a7e47d0246463ff0773ef
     rollRoundEvents,
     checkStartingHealthWarnings
   };
