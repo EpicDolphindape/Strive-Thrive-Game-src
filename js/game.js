@@ -26,14 +26,14 @@ const GAME = (function() {
       selector: '.left-panel',
       tab: 'information',
       title: "Character's information panel & stats",
-      text: "Character's information panel: The game will update character's background information for each round in this block, where you can retrieve input about age, main job's title, and yearly salary in order to make decisions.\n\nCharacter's stats: Four main stats will be displayed, revealing player's current state. This consists of cash balance, investment value, and two well-being-related stats of physical health and mental health. These will be later updated with every decision you make later on.",
+      text: "<p><strong>Character's information panel:</strong> The game will update character's background information for each round in this block, where you can retrieve input about age, main job's title, and yearly salary in order to make decisions.</p><p><strong>Character's stats:</strong> Four main stats will be displayed, revealing player's current state. This consists of cash balance, investment value, and two well-being-related stats of physical health and mental health. These will be later updated with every decision you make later on.</p>",
       placement: 'right'
     },
     {
       selector: '.right-panel',
       tab: 'information',
       title: "Personal & Market information",
-      text: "Personal information panel: Here you can view surprise life scenarios which can be either good or bad. Each event will immediately affect your character's stats, so be prepared for the unexpected!\n\nMarket information panel: Here you can view the overall market condition of the current round. Pay attention to these information since they will affect your later financial decisions related to investment.",
+      text: "<p><strong>Personal information panel:</strong> Here you can view surprise life scenarios which can be either good or bad. Each event will immediately affect your character's stats, so be prepared for the unexpected!</p><p><strong>Market information panel:</strong> Here you can view the overall market condition of the current round. Pay attention to these information since they will affect your later financial decisions related to investment.</p>",
       placement: 'left'
     },
     {
@@ -167,7 +167,7 @@ const GAME = (function() {
         const textEl = document.getElementById('tour-text');
         
         if (titleEl) titleEl.textContent = step.title;
-        if (textEl) textEl.textContent = step.text;
+        if (textEl) textEl.innerHTML = step.text;
 
         if (callout) {
           // Reset arrow classes
@@ -276,9 +276,18 @@ const GAME = (function() {
   function startRound(round) {
     if (!state) return;
     state.currentRound = round;
+    state.screen = 'main-game';
+    
+    state.savingsOpening = state.savingsBalance;
+    state.stockPurchases = 0;
+    state.stockSells = 0;
     
     // Initialize decisions for this round
     initRoundDecisions();
+    
+    // Add main job annual salary for the round to player's cash
+    const meta = GAME_DATA.ROUNDS[round - 1];
+    state.stats.cash += meta.monthlySalary * 12;
     
     // Roll start-of-round events
     rollRoundEvents(round);
@@ -312,25 +321,123 @@ const GAME = (function() {
 
   function rollRoundEvents(round) {
     if (!state) return;
-    const events = GAME_DATA.LIFE_EVENTS.filter(e => e.round === round);
     const rolled = [];
-    
-    events.forEach(e => {
-      // Unconditional events have zero formal parameters (length === 0)
-      const isUnconditional = !e.condition || e.condition.length === 0;
-      if (isUnconditional) {
-        if (Math.random() <= e.probability) {
-          rolled.push(e);
+
+    // Check if critical health work restrictions are active
+    const isCritical = state.stats.physicalHealth < 20 || state.stats.mentalHealth < 20;
+
+    if (isCritical) {
+      // "Ở level này thì các event liên quan đến job, expense và cả random event đều ko hiện nữa"
+      state.activeEvents = rolled;
+      return;
+    }
+
+    // 1. Job-Reward Events
+    let jobRewardEvent = null;
+    if (round > 1) {
+      const prevDec = state.rounds[round - 2]?.decisions;
+      const prevOT = prevDec ? (prevDec.otHours || 0) : 0;
+      if (prevOT > 0) {
+        let triggerProb = 0;
+        if (prevOT === 10) triggerProb = 0.20;
+        else if (prevOT === 20) triggerProb = 0.40;
+        else if (prevOT === 30) triggerProb = 0.60;
+        else if (prevOT === 40) triggerProb = 0.80;
+
+        if (Math.random() <= triggerProb) {
+          let tier = 'minor';
+          const r = Math.random();
+          if (prevOT === 10) {
+            tier = r <= 0.70 ? 'minor' : 'moderate';
+          } else if (prevOT === 20) {
+            tier = r <= 0.50 ? 'minor' : 'moderate';
+          } else if (prevOT === 30) {
+            tier = r <= 0.50 ? 'moderate' : 'major';
+          } else if (prevOT === 40) {
+            tier = r <= 0.70 ? 'major' : 'exceptional';
+          }
+
+          const roundRewardEvents = GAME_DATA.JOB_REWARD_EVENTS[round];
+          if (roundRewardEvents && roundRewardEvents[tier]) {
+            jobRewardEvent = roundRewardEvents[tier];
+            rolled.push(jobRewardEvent);
+          }
         }
       }
-    });
-    
+    }
+
+    // 2. Random Events
+    const N = Math.random() < 0.5 ? 3 : 4;
+    const numRandomToRoll = jobRewardEvent ? N - 1 : N;
+
+    let rolledRandomCount = 0;
+    let attempts = 0;
+    while (rolledRandomCount < numRandomToRoll && attempts < 100) {
+      attempts++;
+      const tag = Math.random() <= 0.45 ? 'positive' : 'negative';
+      const rarityRoll = Math.random();
+      let rarity = 'common';
+      if (rarityRoll <= 0.50) rarity = 'common';
+      else if (rarityRoll <= 0.75) rarity = 'uncommon';
+      else if (rarityRoll <= 0.90) rarity = 'rare';
+      else if (rarityRoll <= 0.98) rarity = 'very_rare';
+      else rarity = 'ultra_rare';
+
+      const matches = GAME_DATA.RANDOM_EVENTS.filter(e => e.tag === tag && e.rarity === rarity);
+      if (matches.length > 0) {
+        const totalWeight = matches.reduce((sum, e) => sum + e.weight, 0);
+        let rWeight = Math.random() * totalWeight;
+        let selectedEvent = matches[0];
+        for (const e of matches) {
+          rWeight -= e.weight;
+          if (rWeight <= 0) {
+            selectedEvent = e;
+            break;
+          }
+        }
+
+        if (!rolled.some(e => e.id === selectedEvent.id)) {
+          rolled.push(selectedEvent);
+          rolledRandomCount++;
+        }
+      }
+    }
+
+    // 3. Expense Penalty Events
+    if (round > 1) {
+      const prevDec = state.rounds[round - 2]?.decisions;
+      if (prevDec && prevDec.expenses) {
+        const categories = ['housing', 'food', 'utility', 'transport', 'healthcare'];
+        categories.forEach(cat => {
+          const prevVal = prevDec.expenses[cat];
+          const minVal = GAME_DATA.MIN_EXPENSES[cat];
+          if (prevVal !== undefined && prevVal === minVal) {
+            const penalties = GAME_DATA.EXPENSE_PENALTY_EVENTS[cat];
+            if (penalties && penalties.length > 0) {
+              const r = Math.random();
+              let selectedPenalty = penalties[0];
+              let cumulative = 0;
+              for (const p of penalties) {
+                cumulative += p.prob;
+                if (r <= cumulative) {
+                  selectedPenalty = p;
+                  break;
+                }
+              }
+              rolled.push(selectedPenalty);
+            }
+          }
+        });
+      }
+    }
+
     state.activeEvents = rolled;
 
-    // Apply starting events immediately to stats
+    // Apply starting event impacts immediately to player stats
     rolled.forEach(e => {
       if (e.impact) {
-        if (e.impact.cash !== undefined) {
+        const isCovered = e.isMedical && state.hasInsurance;
+        if (e.impact.cash !== undefined && e.impact.cash !== 0 && !isCovered) {
           state.stats.cash += e.impact.cash;
         }
         if (e.impact.physicalHealth !== undefined) {
@@ -343,80 +450,139 @@ const GAME = (function() {
     });
   }
 
-  /**
-   * Evaluates conditional events for the current round.
-   * If isRollTime is true, rolls for probabilistic conditional events (like side_job_tip).
-   * Otherwise (live preview), only returns deterministic ones (probability = 1.0).
-   */
-  function evaluateConditionalEvents(round, decisions, isRollTime = false) {
-    const events = GAME_DATA.LIFE_EVENTS.filter(e => e.round === round && e.condition && e.condition.length > 0);
-    const triggered = [];
-    events.forEach(e => {
-      if (e.condition(decisions)) {
-        if (isRollTime) {
-          if (Math.random() <= e.probability) {
-            triggered.push(e);
+  function checkStartingHealthWarnings() {
+    if (!state) return;
+    const round = state.currentRound;
+
+    // Check death conditions first (if health dropped to 0 from start-of-round events)
+    if (state.stats.physicalHealth <= 0) {
+      state.loseCondition = 'physical';
+      clearSave();
+      renderLoseScreen();
+      UI.showScreen('screen-game-lose', 'fade');
+      UI.toast.danger(`Game Over: ${GAME_DATA.LOSE_CONDITIONS[state.loseCondition].label}!`);
+      return;
+    }
+    if (state.stats.mentalHealth <= 0) {
+      state.loseCondition = 'mental';
+      clearSave();
+      renderLoseScreen();
+      UI.showScreen('screen-game-lose', 'fade');
+      UI.toast.danger(`Game Over: ${GAME_DATA.LOSE_CONDITIONS[state.loseCondition].label}!`);
+      return;
+    }
+
+    let startPH_current = 70;
+    let startMH_current = 70;
+    let startPH_prev = 70;
+    let startMH_prev = 70;
+    let wasPhysWarnedLastRound = false;
+    let wasMentWarnedLastRound = false;
+    let wasPhysCardShownLastRound = false;
+    let wasMentCardShownLastRound = false;
+
+    if (round > 1) {
+      const prevRoundHistory = state.rounds[round - 2];
+      if (prevRoundHistory && prevRoundHistory.endStats) {
+        startPH_current = prevRoundHistory.endStats.physicalHealth;
+        startMH_current = prevRoundHistory.endStats.mentalHealth;
+      }
+      if (prevRoundHistory && prevRoundHistory.events) {
+        wasPhysWarnedLastRound = prevRoundHistory.events.some(e => e.id === 'health_warning_physical' || e.id === 'health_critical_physical' || e.id === 'health_warning_physical_suppressed');
+        wasMentWarnedLastRound = prevRoundHistory.events.some(e => e.id === 'health_warning_mental' || e.id === 'health_critical_mental' || e.id === 'health_warning_mental_suppressed');
+        
+        wasPhysCardShownLastRound = prevRoundHistory.events.some(e => e.id === 'health_warning_physical' || e.id === 'health_critical_physical');
+        wasMentCardShownLastRound = prevRoundHistory.events.some(e => e.id === 'health_warning_mental' || e.id === 'health_critical_mental');
+      }
+    }
+
+    if (round > 2) {
+      const roundR2 = state.rounds[round - 3];
+      if (roundR2 && roundR2.endStats) {
+        startPH_prev = roundR2.endStats.physicalHealth;
+        startMH_prev = roundR2.endStats.mentalHealth;
+      }
+    }
+
+    const currentPH = state.stats.physicalHealth;
+    const currentMH = state.stats.mentalHealth;
+
+    // --- 1. PHYSICAL HEALTH WARNING ---
+    if (currentPH < 50) {
+      const isPhysBypassed = wasPhysWarnedLastRound && (startPH_current - startPH_prev >= 5);
+
+      if (!isPhysBypassed) {
+        const w = GAME_DATA.HEALTH_WARNING_EVENTS.physical.find(x => currentPH >= x.min && currentPH <= x.max);
+        if (w) {
+          if (w.penalty < 0) {
+            state.stats.physicalHealth = Math.max(0, state.stats.physicalHealth + w.penalty);
           }
-        } else {
-          if (e.probability === 1.0) {
-            triggered.push(e);
+          const cashPen = (w.cashPenalty && !state.hasInsurance) ? w.cashPenalty : 0;
+          if (cashPen > 0) {
+            state.stats.cash = Math.max(0, state.stats.cash - cashPen);
+          }
+
+          const showPhysCard = !wasPhysCardShownLastRound;
+
+          const warningEvent = {
+            id: showPhysCard ? (currentPH < 20 ? 'health_critical_physical' : 'health_warning_physical') : 'health_warning_physical_suppressed',
+            text: w.text,
+            probability: 1.0,
+            tag: 'negative',
+            impact: {
+              physicalHealth: w.penalty,
+              cash: -cashPen
+            }
+          };
+
+          if (showPhysCard) {
+            state.activeEvents.push(warningEvent);
+          } else {
+            warningEvent.hiddenFromUI = true;
+            state.activeEvents.push(warningEvent);
           }
         }
       }
-    });
-    return triggered;
-  }
+    }
 
-  /**
-   * Evaluates the starting health scores.
-   * Subtracts penalties for ranges below 50% and logs them as event cards.
-   * Displays alert toasts for the 50-60% range.
-   */
-  function checkStartingHealthWarnings() {
-    if (!state) return;
-    
-    const ph = state.stats.physicalHealth;
-    const mh = state.stats.mentalHealth;
+    // --- 2. MENTAL HEALTH WARNING ---
+    if (currentMH < 50) {
+      const isMentBypassed = wasMentWarnedLastRound && (startMH_current - startMH_prev >= 5);
 
-    // 1. Check Physical Health Warning
-    const phWarning = GAME_DATA.HEALTH_WARNING_EVENTS.physical.find(w => ph >= w.min && ph <= w.max);
-    if (phWarning) {
-      if (phWarning.penalty < 0) {
-        state.stats.physicalHealth = Math.max(0, state.stats.physicalHealth + phWarning.penalty);
-        state.activeEvents.push({
-          id: 'health_warning_physical',
-          text: phWarning.text,
-          probability: 1.0,
-          tag: 'negative',
-          impact: { physicalHealth: phWarning.penalty }
-        });
-      } else {
-        setTimeout(() => {
-          UI.toast.warning(`Physical Health Warning: ${phWarning.text}`, { duration: 8000 });
-        }, 600);
+      if (!isMentBypassed) {
+        const w = GAME_DATA.HEALTH_WARNING_EVENTS.mental.find(x => currentMH >= x.min && currentMH <= x.max);
+        if (w) {
+          if (w.penalty < 0) {
+            state.stats.mentalHealth = Math.max(0, state.stats.mentalHealth + w.penalty);
+          }
+          const cashPen = (w.cashPenalty && !state.hasInsurance) ? w.cashPenalty : 0;
+          if (cashPen > 0) {
+            state.stats.cash = Math.max(0, state.stats.cash - cashPen);
+          }
+
+          const showMentCard = !wasMentCardShownLastRound;
+
+          const warningEvent = {
+            id: showMentCard ? (currentMH < 20 ? 'health_critical_mental' : 'health_warning_mental') : 'health_warning_mental_suppressed',
+            text: w.text,
+            probability: 1.0,
+            tag: 'negative',
+            impact: {
+              mentalHealth: w.penalty,
+              cash: -cashPen
+            }
+          };
+
+          if (showMentCard) {
+            state.activeEvents.push(warningEvent);
+          } else {
+            warningEvent.hiddenFromUI = true;
+            state.activeEvents.push(warningEvent);
+          }
+        }
       }
     }
 
-    // 2. Check Mental Health Warning
-    const mhWarning = GAME_DATA.HEALTH_WARNING_EVENTS.mental.find(w => mh >= w.min && mh <= w.max);
-    if (mhWarning) {
-      if (mhWarning.penalty < 0) {
-        state.stats.mentalHealth = Math.max(0, state.stats.mentalHealth + mhWarning.penalty);
-        state.activeEvents.push({
-          id: 'health_warning_mental',
-          text: mhWarning.text,
-          probability: 1.0,
-          tag: 'negative',
-          impact: { mentalHealth: mhWarning.penalty }
-        });
-      } else {
-        setTimeout(() => {
-          UI.toast.warning(`Mental Health Warning: ${mhWarning.text}`, { duration: 8000 });
-        }, 1200);
-      }
-    }
-
-    // Trigger immediate loss if health collapses from start-of-round penalties
     if (state.stats.physicalHealth <= 0) {
       state.loseCondition = 'physical';
     } else if (state.stats.mentalHealth <= 0) {
@@ -502,7 +668,9 @@ const GAME = (function() {
     const listEl = document.getElementById('personal-events-list');
     if (!listEl) return;
 
-    if (!state.activeEvents || state.activeEvents.length === 0) {
+    const visibleEvents = (state.activeEvents || []).filter(e => !e.hiddenFromUI);
+
+    if (visibleEvents.length === 0) {
       listEl.innerHTML = `
         <div class="event-card event-card--neutral">
           <div class="event-card__title">Peaceful Year</div>
@@ -514,7 +682,7 @@ const GAME = (function() {
     }
 
     listEl.innerHTML = '';
-    state.activeEvents.forEach(e => {
+    visibleEvents.forEach(e => {
       const card = document.createElement('div');
       card.className = `event-card event-card--${e.tag || 'neutral'}`;
       
@@ -539,35 +707,77 @@ const GAME = (function() {
 
   function getEventTitle(id) {
     const titles = {
-      reward_parents: "Reward from Parents",
-      summer_retreat: "Summer Retreat",
-      learn_chinese: "Language Learning",
-      wedding_decline: "Wedding Invitation",
-      food_poisoning: "Food Poisoning",
-      police_pull_over: "Traffic Ticket",
-      chinese_friend: "New Friend",
-      laptop_broke: "Equipment Failure",
-      grandfather_hospital: "Family Emergency",
-      side_job_tip: "Customer Tip",
-      closed_contract_china: "Business Success",
-      insomnia: "Health Issue",
-      grandfather_passed: "Family Loss",
-      bavi_trip: "Weekend Getaway",
-      neck_massager: "Lucky Draw",
-      netflix_trial: "Subscription Charge",
-      fomo_weddings: "Social Life",
-      projects_reward: "Project Bonus",
-      situationship_cheat: "Relationship Issue",
-      famous_entrepreneur: "Inspirational Meeting",
-      lottery_win: "Lottery Winner!",
-      lost_report: "Work Mishap",
-      parents_trip: "Family Celebration",
-      motorbike_fall: "Accident",
-      online_scam: "Financial Scam",
-      tiktok_viral: "Social Media Fame",
-      volunteer_local: "Community Service",
+      // Random Events
+      rand_lottery: "Lottery Winner!",
+      rand_retreat: "Summer Retreat",
+      rand_massager: "Lucky Draw",
+      rand_weddings_fomo: "Social Life",
+      rand_volunteer: "Community Service",
+      rand_entrepreneur: "Inspirational Meeting",
+      rand_dog: "New Friend",
+      rand_thailand: "Company Trip",
+      rand_lucky_money: "Found Money",
+      rand_dyson: "Dyson Gift",
+      rand_decline_wedding: "Wedding Invitation",
+      rand_police: "Traffic Ticket",
+      rand_grandfather_hospital: "Family Emergency",
+      rand_grandfather_death: "Family Loss",
+      rand_netflix: "Subscription Charge",
+      rand_cheated: "Relationship Issue",
+      rand_report_lost: "Work Mishap",
+      rand_scam: "Financial Scam",
+      rand_storm: "Accident",
+      rand_mother_accident: "Family Emergency",
+      rand_flat_tire: "Accident",
+      rand_ac_broken: "Home Maintenance",
+      rand_driving_fail: "Driving Test",
+      rand_luggage_lost: "Travel Incident",
+
+      // Job Reward Events
+      job_y1_minor: "Job Recognition (Minor)",
+      job_y1_moderate: "Job Reward (Moderate)",
+      job_y1_major: "Job Promotion (Major)",
+      job_y2_minor: "Job Recognition (Minor)",
+      job_y2_moderate: "Job Reward (Moderate)",
+      job_y2_major: "Job Promotion (Major)",
+      job_y2_exceptional: "Job Honor (Exceptional)",
+      job_y3_minor: "Job Recognition (Minor)",
+      job_y3_moderate: "Job Reward (Moderate)",
+      job_y3_major: "Job Promotion (Major)",
+      job_y3_exceptional: "Job Honor (Exceptional)",
+      job_y4_minor: "Job Recognition (Minor)",
+      job_y4_moderate: "Job Reward (Moderate)",
+      job_y4_major: "Job Promotion (Major)",
+      job_y4_exceptional: "Job Honor (Exceptional)",
+      job_y5_minor: "Job Recognition (Minor)",
+      job_y5_moderate: "Job Reward (Moderate)",
+      job_y5_major: "Job Promotion (Major)",
+      job_y5_exceptional: "Job Honor (Exceptional)",
+
+      // Expense Penalties
+      exp_housing_1: "Housing Expense Penalty",
+      exp_housing_2: "Housing Expense Penalty",
+      exp_housing_3: "Housing Expense Penalty",
+      exp_food_1: "Food Expense Penalty",
+      exp_food_2: "Food Expense Penalty",
+      exp_food_3: "Food Expense Penalty",
+      exp_utility_1: "Utility Expense Penalty",
+      exp_utility_2: "Utility Expense Penalty",
+      exp_utility_3: "Utility Expense Penalty",
+      exp_transport_1: "Transport Expense Penalty",
+      exp_transport_2: "Transport Expense Penalty",
+      exp_transport_3: "Transport Expense Penalty",
+      exp_healthcare_1: "Healthcare Expense Penalty",
+      exp_healthcare_2: "Healthcare Expense Penalty",
+      exp_healthcare_3: "Healthcare Expense Penalty",
+
+      // Warnings
       health_warning_physical: "Physical Health Warning",
-      health_warning_mental: "Mental Health Warning"
+      health_warning_mental: "Mental Health Warning",
+      health_critical_physical: "Physical Health Collapse",
+      health_critical_mental: "Mental Health Collapse",
+      health_warning_physical_suppressed: "Physical Health Penalty",
+      health_warning_mental_suppressed: "Mental Health Penalty"
     };
     return titles[id] || id.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   }
@@ -594,7 +804,8 @@ const GAME = (function() {
     const container = document.getElementById('market-events-list');
     if (!container) return;
 
-    const data = GAME_DATA.MARKET_EVENTS[round - 1];
+    const branchKey = state.marketBranch || '1.1';
+    const data = GAME_DATA.MARKET_EVENT_TREE[branchKey];
     if (!data) {
       container.innerHTML = `<div class="market-text"><p>No market information available.</p></div>`;
       return;
@@ -605,24 +816,13 @@ const GAME = (function() {
     let html = `
       <div class="market-text">
         <p class="market-year-title">Year ${round} (Age ${age}): ${data.title}</p>
-        <p class="market-year-description" style="margin-bottom: var(--space-3); color: var(--color-text-secondary); font-size: var(--font-size-sm); line-height: 1.5;">
-          ${data.description}
+        <p class="market-year-description" style="margin-bottom: var(--space-3); color: var(--color-text-secondary); font-size: var(--font-size-sm); line-height: 1.6; font-style: normal;">
+          ${data.sectorInfo || data.scenarioOverview}
         </p>
     `;
 
-    data.events.forEach(subEvent => {
-      html += `
-        <div class="market-event-item" style="margin-bottom: var(--space-3);">
-          <strong>${subEvent.title}:</strong> ${subEvent.text}
-          <div class="market-event-impact" style="margin-top: 4px; font-size: var(--font-size-xs); color: var(--color-primary); font-weight: 500;">
-            ${subEvent.impact}
-          </div>
-        </div>
-      `;
-    });
-
     const balance = state.savingsBalance || 0;
-    const rate = GAME_DATA.getSavingsRate(balance, round);
+    const rate = GAME_DATA.getSavingsRate(balance, round, state.savingsRateAdjustment || 0);
     const tier = GAME_DATA.getSavingsTierLabel(balance);
     
     html += `
@@ -644,12 +844,6 @@ const GAME = (function() {
     if (!state) return;
     const round = state.currentRound;
 
-    // Update Spendable Cash
-    const spendableCashVal = document.getElementById('decisions-spendable-cash-val');
-    if (spendableCashVal) {
-      spendableCashVal.textContent = UI.formatVND(state.stats.cash);
-    }
-
     // 1. Build Income choices
     buildIncomeChoices(round);
 
@@ -660,14 +854,19 @@ const GAME = (function() {
     const savingsRateLabel = document.getElementById('savings-rate-label');
     if (savingsRateLabel) {
       const balance = state.savingsBalance || 0;
-      const rate = GAME_DATA.getSavingsRate(balance, round);
+      const rate = GAME_DATA.getSavingsRate(balance, round, state.savingsRateAdjustment || 0);
       const tier = GAME_DATA.getSavingsTierLabel(balance);
       savingsRateLabel.textContent = `Interest rate: ${(rate * 100).toFixed(2)}% / year (Tier: ${tier})`;
     }
 
+    const savingsBalDisplay = document.getElementById('savings-balance-display');
+    if (savingsBalDisplay) {
+      savingsBalDisplay.textContent = `Savings Balance: ${state.savingsBalance.toLocaleString('vi-VN')} VND`;
+    }
+
     const savingsInput = document.getElementById('invest-savings-input');
     if (savingsInput) {
-      savingsInput.placeholder = `Bal: ${state.savingsBalance.toLocaleString('vi-VN')} VND`;
+      savingsInput.placeholder = "Amount...";
     }
 
     // 4. Update Insurance Checkbox and Label
@@ -727,23 +926,40 @@ const GAME = (function() {
 
     const dec = state.currentDecision;
 
-    // Main Job Row
+    // 1. Render Overtime row (now first and full-width, with note to its right)
+    const otHours = dec.otHours || 0;
+    const otChecked = otHours > 0;
+    const otDecDisabled = hasWorkBan || !otChecked || otHours <= 0;
+    const otIncDisabled = hasWorkBan || otHours >= 40;
+    const otCheckDisabled = hasWorkBan;
+
     let html = `
-      <!-- Main Job -->
-      <div class="income-row income-row--full">
-        <input type="checkbox" class="income-row__checkbox" id="job-main-check" checked disabled>
-        <label class="income-row__label" for="job-main-check">${meta.job} (Main Job)</label>
-        <span class="income-row__rate">${UI.formatVND(meta.monthlySalary)} / month</span>
-        <div class="hours-selector">
-          <button type="button" class="hours-btn" id="job-main-dec-btn" disabled>-</button>
-          <span class="hours-display" id="job-main-hours-display">40 hours</span>
-          <button type="button" class="hours-btn" id="job-main-inc-btn" disabled>+</button>
+      <div class="income-row income-row--full" style="display: flex; justify-content: space-between; gap: var(--space-4); align-items: center;">
+        <div style="display: flex; align-items: center; gap: var(--space-3); flex: 1;">
+          <input type="checkbox" class="income-row__checkbox" id="job-ot-check" ${otChecked ? 'checked' : ''} ${otCheckDisabled ? 'disabled' : ''}>
+          <label class="income-row__label" for="job-ot-check">Overtime (OT)</label>
+          <span class="income-row__rate">${UI.formatVND(Math.round(GAME_DATA.getOTWage(meta.monthlySalary)))} / hour</span>
+          <div class="hours-selector">
+            <button type="button" class="hours-btn" id="job-ot-dec-btn" ${otDecDisabled ? 'disabled' : ''}>-</button>
+            <span class="hours-display" id="job-ot-hours-display">${otHours} hours</span>
+            <button type="button" class="hours-btn" id="job-ot-inc-btn" ${otIncDisabled ? 'disabled' : ''}>+</button>
+          </div>
+        </div>
+        <div class="income-note" style="flex: 1.2; font-size: 0.8rem; color: var(--color-text-secondary); border-left: 2px solid var(--color-border); padding-left: var(--space-3); line-height: 1.3;">
+          <strong>Note:</strong> Overtime increases your income but also increases mental and physical health deterioration. The more overtime hours you work, the larger the health penalty you may experience
         </div>
       </div>
     `;
 
-    // Render 4 side jobs
-    const sideJobsKeys = ['tutor', 'freelancer', 'shipper', 'waiter'];
+    // 2. Render "Side Job" section header
+    html += `
+      <div class="income-section-header" style="grid-column: 1 / -1; margin-top: var(--space-3); font-weight: var(--fw-bold); color: var(--color-navy); font-size: 1.1rem; border-bottom: 1.5px solid var(--color-navy); padding-bottom: 4px; margin-bottom: 4px;">
+        Side job
+      </div>
+    `;
+
+    // 3. Render 4 side jobs (2x2 grid)
+    const sideJobsKeys = ['tutor', 'blogger', 'adviser', 'bookkeeper'];
     sideJobsKeys.forEach(key => {
       const sj = GAME_DATA.SIDE_JOBS[key];
       const isActive = (dec.sideJob === sj.id);
@@ -768,28 +984,14 @@ const GAME = (function() {
       `;
     });
 
-    // Render Overtime row
-    const otHours = dec.otHours || 0;
-    const otChecked = otHours > 0;
-    const otDecDisabled = hasWorkBan || !otChecked || otHours <= 0;
-    const otIncDisabled = hasWorkBan || otHours >= 40;
-    const otCheckDisabled = hasWorkBan;
-
+    // 4. Render bottom note for side jobs
     html += `
-      <div class="income-row">
-        <input type="checkbox" class="income-row__checkbox" id="job-ot-check" ${otChecked ? 'checked' : ''} ${otCheckDisabled ? 'disabled' : ''}>
-        <label class="income-row__label" for="job-ot-check">Overtime (OT)</label>
-        <span class="income-row__rate">${UI.formatVND(Math.round(GAME_DATA.getOTWage(meta.monthlySalary)))} / hour</span>
-        <div class="hours-selector">
-          <button type="button" class="hours-btn" id="job-ot-dec-btn" ${otDecDisabled ? 'disabled' : ''}>-</button>
-          <span class="hours-display" id="job-ot-hours-display">${otHours} hours</span>
-          <button type="button" class="hours-btn" id="job-ot-inc-btn" ${otIncDisabled ? 'disabled' : ''}>+</button>
-        </div>
+      <div class="income-row--full" style="font-size: 0.8rem; color: var(--color-text-secondary); line-height: 1.4; border: none; background: none; padding: var(--space-2) 0 0 0; grid-column: 1 / -1;">
+        <strong>Note:</strong> Taking a side job provides additional income but increases workload. Different side jobs are associated with different occupation-specific health penalties, meaning higher income opportunities may also carry higher health risks
       </div>
     `;
 
     grid.innerHTML = html;
-
   }
 
   function buildExpenseChoices(round) {
@@ -807,12 +1009,13 @@ const GAME = (function() {
 
     let html = '';
     const categories = ['housing', 'utility', 'food', 'transport', 'healthcare', 'entertainment'];
+    const metaRound = GAME_DATA.ROUNDS[round - 1];
 
     categories.forEach(cat => {
       const meta = EXPENSE_METADATA[cat];
       
-      // Get base cost: previous round's actual chosen expense, or default BASE_EXPENSES
-      let baseCost = GAME_DATA.BASE_EXPENSES[cat];
+      // Get base cost: previous round's actual chosen expense, or default BASE_EXPENSES * monthlySalary
+      let baseCost = Math.round(GAME_DATA.BASE_EXPENSES[cat] * metaRound.monthlySalary);
       if (round > 1) {
         const prevDec = state.rounds[round - 2]?.decisions;
         if (prevDec && prevDec.expenses && prevDec.expenses[cat] !== undefined) {
@@ -820,14 +1023,18 @@ const GAME = (function() {
         }
       }
 
+      // If player already entered a budget for this round, show it in the Base Cost column as confirmed
       const currentVal = state.currentDecision.expenses[cat];
+      const displayedBaseCost = (currentVal !== undefined && currentVal !== 0) ? currentVal : baseCost;
       const displayVal = currentVal !== undefined ? currentVal.toLocaleString('vi-VN') : '';
+      const minCost = GAME_DATA.MIN_EXPENSES[cat] || 0;
 
       html += `
         <tr data-category="${cat}">
           <td class="cell-category"><span class="category-badge">${meta.name}</span></td>
           <td class="cell-desc">${meta.desc}</td>
-          <td class="cell-base" style="text-align: right; white-space: nowrap;">${UI.formatVND(baseCost)}</td>
+          <td class="cell-min" style="text-align: right; white-space: nowrap;">${UI.formatVND(minCost)}</td>
+          <td class="cell-base" style="text-align: right; white-space: nowrap;">${UI.formatVND(displayedBaseCost)}</td>
           <td class="cell-input">
             <input type="text" class="amount-input expense-input" id="exp-${cat}-input" data-category="${cat}" value="${displayVal}" placeholder="Amount...">
           </td>
@@ -845,6 +1052,14 @@ const GAME = (function() {
     const table = document.querySelector('#stock-market-table tbody');
     if (!table) return;
 
+    const iconMap = {
+      'BNK-V': 'Bank.svg',
+      'TEC-F': 'Tech.svg',
+      'CSM-M': 'Consumer.svg',
+      'REA-V': 'Real estate.svg',
+      'ENE-G': 'Energy.svg'
+    };
+
     let html = '';
     const codes = ['BNK-V', 'TEC-F', 'CSM-M', 'REA-V', 'ENE-G'];
 
@@ -859,7 +1074,12 @@ const GAME = (function() {
 
       html += `
         <tr data-code="${code}">
-          <td class="stock-row__code">${code}</td>
+          <td class="stock-row__code">
+            <div style="display: flex; align-items: center; gap: var(--space-2);">
+              <img src="assets/icons/${iconMap[code]}" alt="${code} icon" style="width: 20px; height: 20px;">
+              <span>${code}</span>
+            </div>
+          </td>
           <td class="stock-row__price">${UI.formatVND(price)}/share</td>
           <td class="stock-row__owned" id="stock-${safeId}-owned">${ownedText}</td>
           <td style="text-align: center;">
@@ -972,7 +1192,8 @@ const GAME = (function() {
         input.value = val > 0 ? val.toLocaleString('vi-VN') : '';
         
         const cat = input.dataset.category;
-        state.currentDecision.expenses[cat] = val;
+        const minCost = GAME_DATA.MIN_EXPENSES[cat] || 0;
+        state.currentDecision.expenses[cat] = Math.max(val, minCost);
         updateLivePreview();
       });
 
@@ -980,6 +1201,18 @@ const GAME = (function() {
         const cat = input.dataset.category;
         let valStr = input.value.replace(/[^\d]/g, '');
         let val = parseInt(valStr) || 0;
+        
+        const minCost = GAME_DATA.MIN_EXPENSES[cat] || 0;
+        if (val < minCost) {
+          const EXPENSE_NAMES = {
+            housing: 'Housing', utility: 'Utility', food: 'Food',
+            transport: 'Transport', healthcare: 'Healthcare', entertainment: 'Entertainment'
+          };
+          UI.toast.warning(`Budget for ${EXPENSE_NAMES[cat]} cannot be lower than the Minimum Cost (${UI.formatVND(minCost)}).`);
+          val = minCost;
+          input.value = val > 0 ? val.toLocaleString('vi-VN') : '';
+        }
+
         state.currentDecision.expenses[cat] = val;
         updateLivePreview();
       });
@@ -993,11 +1226,32 @@ const GAME = (function() {
         if (input) {
           let valStr = input.value.replace(/[^\d]/g, '');
           let val = parseInt(valStr) || 0;
-          state.currentDecision.expenses[cat] = val;
+
+          const minCost = GAME_DATA.MIN_EXPENSES[cat] || 0;
           const EXPENSE_NAMES = {
             housing: 'Housing', utility: 'Utility', food: 'Food',
             transport: 'Transport', healthcare: 'Healthcare', entertainment: 'Entertainment'
           };
+
+          if (val < minCost) {
+            UI.toast.warning(`Budget for ${EXPENSE_NAMES[cat]} cannot be lower than the Minimum Cost (${UI.formatVND(minCost)}).`);
+            input.focus();
+            input.classList.add('flash-negative');
+            setTimeout(() => input.classList.remove('flash-negative'), 800);
+            return;
+          }
+
+          state.currentDecision.expenses[cat] = val;
+
+          // Update the Base Cost column cell in this row immediately
+          const row = btn.closest('tr');
+          if (row) {
+            const baseCostCell = row.querySelector('.cell-base');
+            if (baseCostCell) {
+              baseCostCell.textContent = UI.formatVND(val);
+            }
+          }
+
           UI.toast.success(`Set budget for ${EXPENSE_NAMES[cat]} to ${UI.formatVND(val)}`);
           updateLivePreview();
         }
@@ -1014,11 +1268,12 @@ const GAME = (function() {
         const qtyInput = document.getElementById(`stock-${safeId}-qty`);
         if (!qtyInput) return;
 
-        const qty = parseInt(qtyInput.value) || 0;
-        if (qty <= 0) {
-          UI.toast.warning("Please enter a valid quantity of shares to buy.");
+        const val = Number(qtyInput.value);
+        if (!Number.isInteger(val) || val <= 0) {
+          UI.toast.warning("Error: you must enter a positive integer number.");
           return;
         }
+        const qty = val;
 
         const price = state.currentPrices[code];
         const cost = qty * price;
@@ -1031,6 +1286,7 @@ const GAME = (function() {
         }
 
         state.stats.cash -= totalCost;
+        state.stockPurchases = (state.stockPurchases || 0) + totalCost;
         const pos = state.portfolio[code] || { quantity: 0, avgCost: 0 };
         const newQty = pos.quantity + qty;
         const newAvgCost = ((pos.avgCost * pos.quantity) + cost) / newQty;
@@ -1055,11 +1311,12 @@ const GAME = (function() {
         const qtyInput = document.getElementById(`stock-${safeId}-qty`);
         if (!qtyInput) return;
 
-        const qty = parseInt(qtyInput.value) || 0;
-        if (qty <= 0) {
-          UI.toast.warning("Please enter a valid quantity of shares to sell.");
+        const val = Number(qtyInput.value);
+        if (!Number.isInteger(val) || val <= 0) {
+          UI.toast.warning("Error: you must enter a positive integer number.");
           return;
         }
+        const qty = val;
 
         const pos = state.portfolio[code] || { quantity: 0, avgCost: 0 };
         if (pos.quantity < qty) {
@@ -1074,6 +1331,8 @@ const GAME = (function() {
         const netGained = proceeds - fee - tax;
 
         state.stats.cash += netGained;
+        state.stockSells = (state.stockSells || 0) + netGained;
+        state.realizedPnL = (state.realizedPnL || 0) + (netGained - qty * pos.avgCost);
         const newQty = pos.quantity - qty;
         const newAvgCost = newQty === 0 ? 0 : pos.avgCost;
 
@@ -1103,22 +1362,8 @@ const GAME = (function() {
       phImpact: e.impact.physicalHealth || 0
     }));
 
-    // Check for active deterministic conditional events in live preview
-    const condEvents = evaluateConditionalEvents(state.currentRound, state.currentDecision, false);
+    // No mid-round conditional events in the 4-type system
     const condWarningTexts = [];
-    condEvents.forEach(e => {
-      mappedEvents.push({
-        id: e.id,
-        text: e.text,
-        tag: e.tag,
-        cashImpact: e.impact.cash || 0,
-        mhImpact: e.impact.mentalHealth || 0,
-        phImpact: e.impact.physicalHealth || 0
-      });
-      const impactStr = formatEventImpact(e.impact);
-      const eventTitle = getEventTitle(e.id);
-      condWarningTexts.push(`⚠️ Triggered: ${eventTitle} (${impactStr})`);
-    });
 
     const result = HEALTH.applyRound(state, state.currentDecision, mappedEvents);
     const newState = result.newState;
@@ -1158,13 +1403,19 @@ const GAME = (function() {
     const summaryTitle = document.getElementById('income-summary-title');
     const summaryBox = document.getElementById('income-summary-box');
     if (summaryTitle) {
-      const hours = state.currentDecision.otHours + state.currentDecision.sideJobHours;
-      const phPenalty = GAME_DATA.PH_WORK_COEFF * hours;
-      const mentPenalty = GAME_DATA.MH_WORK_COEFF * hours;
+      const otHours = state.currentDecision.otHours || 0;
+      const sideJobHours = state.currentDecision.sideJobHours || 0;
+      const sideJob = state.currentDecision.sideJob || 'none';
+      const mhJobMult = GAME_DATA.SIDE_JOB_MH_MULTIPLIERS[sideJob] || 0.0;
+      const phJobMult = GAME_DATA.SIDE_JOB_PH_MULTIPLIERS[sideJob] || 0.0;
+
+      const phPenalty = (5 * 0.034 * otHours) + (5 * 0.034 * sideJobHours * phJobMult);
+      const mentPenalty = (5 * 0.048 * otHours) + (5 * 0.048 * sideJobHours * mhJobMult);
+      const totalHours = otHours + sideJobHours;
       
       let summaryText = '';
-      if (hours > 0) {
-        summaryText = `Extra Work: ${hours} hours/month · Projected work penalty: -${phPenalty.toFixed(1)} Physical, -${mentPenalty.toFixed(1)} Mental health`;
+      if (totalHours > 0) {
+        summaryText = `Extra Work: ${totalHours} hours/month · Projected work penalty: -${phPenalty.toFixed(1)} Physical, -${mentPenalty.toFixed(1)} Mental health`;
       } else {
         summaryText = "Summary: No extra work selected. No health penalties applied.";
       }
@@ -1176,6 +1427,53 @@ const GAME = (function() {
       summaryTitle.innerHTML = summaryText;
       if (summaryBox) summaryBox.classList.add('visible');
     }
+
+    // Update Expense Recap Card
+    const expSummaryTitle = document.getElementById('expense-summary-title');
+    const expSummaryBreakdown = document.getElementById('expense-summary-breakdown');
+    const expSummaryBox = document.getElementById('expense-summary-box');
+    if (expSummaryTitle && expSummaryBreakdown && expSummaryBox) {
+      const monthlyIncome = result.income.totalMonthly;
+      const healthcareRecovery = result.phDelta.healthcareRecovery || 0;
+      const totalMHExpenseEffect = result.mhDelta.expenseEffect || 0;
+
+      const phSign = healthcareRecovery >= 0 ? '+' : '';
+      const mhSign = totalMHExpenseEffect >= 0 ? '+' : '';
+
+      expSummaryTitle.textContent = `Summary: ${phSign}${healthcareRecovery.toFixed(1)} Physical health, ${mhSign}${totalMHExpenseEffect.toFixed(1)} Mental health`;
+
+      let breakdownHtml = '';
+      const categories = ['housing', 'utility', 'food', 'transport', 'healthcare', 'entertainment'];
+      const EXPENSE_NAMES = {
+        housing: 'Housing', utility: 'Utility', food: 'Food',
+        transport: 'Transportation', healthcare: 'Medical', entertainment: 'Entertainment'
+      };
+
+      categories.forEach(cat => {
+        const actualVal = state.currentDecision.expenses[cat] || 0;
+        const actualRatio = monthlyIncome > 0 ? actualVal / monthlyIncome : 0;
+        const baseRatio = GAME_DATA.BASE_RATIOS[cat];
+        const coeff = GAME_DATA.MH_EXPENSE_COEFF[cat];
+        
+        // MH impact: 15 * coeff * (baseRatio - actualRatio)
+        const mhImpact = 15 * coeff * (baseRatio - actualRatio);
+        // PH impact: healthcare recovery for healthcare, 0 otherwise
+        const phImpact = (cat === 'healthcare') ? healthcareRecovery : 0;
+
+        const catPhSign = phImpact >= 0 ? '+' : '';
+        const catMhSign = mhImpact >= 0 ? '+' : '';
+
+        breakdownHtml += `
+          <div class="summary-box__line" style="font-size: var(--fs-micro); margin-bottom: 2px;">
+            · ${EXPENSE_NAMES[cat]}: ${catPhSign}${phImpact.toFixed(1)} Physical health, ${catMhSign}${mhImpact.toFixed(1)} Mental health
+          </div>
+        `;
+      });
+
+      expSummaryBreakdown.innerHTML = breakdownHtml;
+      expSummaryBox.classList.add('visible');
+    }
+    saveGame();
   }
 
   function updatePreviewLabelClass(el, proj, prev) {
@@ -1223,8 +1521,7 @@ const GAME = (function() {
     
     const subtitleEl = document.getElementById('result-round-subtitle');
     if (subtitleEl) {
-      const age = GAME_DATA.ROUNDS[roundNumber - 1].age;
-      subtitleEl.textContent = `Year ${roundNumber} (Age ${age}) Summary`;
+      subtitleEl.textContent = "This is your result breakdown. Congratulations for surviving!";
     }
 
     const avatarEl = document.getElementById('result-avatar-el');
@@ -1235,23 +1532,34 @@ const GAME = (function() {
     // 2. Investment Portfolio Calculations
     let totalCapital = 0;
     let totalMarketValue = 0;
-    let roundReturn = 0;
 
     const codes = ['BNK-V', 'TEC-F', 'CSM-M', 'REA-V', 'ENE-G'];
     codes.forEach(code => {
       const pos = portfolio[code] || { quantity: 0, avgCost: 0 };
       totalCapital += pos.quantity * pos.avgCost;
       totalMarketValue += pos.quantity * prices[code];
-
-      // Round return calculation
-      const changes = GAME_DATA.STOCK_PRICE_CHANGES[roundNumber - 1];
-      const changePct = changes[code] || 0;
-      const priceBeforeChange = prices[code] / (1 + changePct);
-      const priceDelta = prices[code] - priceBeforeChange;
-      roundReturn += pos.quantity * priceDelta;
     });
 
-    const cumulativeReturn = totalMarketValue - totalCapital;
+    const roundReturn = totalMarketValue - totalCapital;
+
+    // Calculate Cumulative capital invested
+    let cumulativeCapital = 0;
+    for (let r = 1; r <= roundNumber; r++) {
+      const outcome_r = state.rounds[r - 1];
+      if (outcome_r) {
+        let tc = 0;
+        const port_r = outcome_r.portfolio || {};
+        for (const [code, pos] of Object.entries(port_r)) {
+          tc += pos.quantity * pos.avgCost;
+        }
+        cumulativeCapital += tc;
+      }
+    }
+
+    const realizedPnL = outcome.realizedPnL || 0;
+    const cumulativeReturnPct = cumulativeCapital > 0
+      ? ((realizedPnL + (totalMarketValue - totalCapital)) / cumulativeCapital) * 100
+      : 0;
 
     // Set portfolio header stats
     const capEl = document.getElementById('result-portfolio-capital');
@@ -1268,14 +1576,22 @@ const GAME = (function() {
 
     const cumRetEl = document.getElementById('result-portfolio-cumulative-return');
     if (cumRetEl) {
-      cumRetEl.textContent = (cumulativeReturn >= 0 ? '+' : '') + UI.formatVND(cumulativeReturn);
-      cumRetEl.className = cumulativeReturn > 0 ? 'num-gain' : (cumulativeReturn < 0 ? 'num-loss' : 'num-neutral');
+      cumRetEl.textContent = (cumulativeReturnPct >= 0 ? '+' : '') + cumulativeReturnPct.toFixed(2) + '%';
+      cumRetEl.className = cumulativeReturnPct > 0 ? 'num-gain' : (cumulativeReturnPct < 0 ? 'num-loss' : 'num-neutral');
     }
 
     // 3. Stock Portfolio Table
     const tbody = document.getElementById('result-stock-tbody');
     if (tbody) {
       let html = '';
+      const iconMap = {
+        'BNK-V': 'Bank.svg',
+        'TEC-F': 'Tech.svg',
+        'CSM-M': 'Consumer.svg',
+        'REA-V': 'Real estate.svg',
+        'ENE-G': 'Energy.svg'
+      };
+
       codes.forEach(code => {
         const pos = portfolio[code] || { quantity: 0, avgCost: 0 };
         const price = prices[code];
@@ -1292,9 +1608,13 @@ const GAME = (function() {
 
         html += `
           <tr>
-            <td><strong>${code}</strong></td>
+            <td>
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <img src="assets/icons/${iconMap[code]}" alt="${code} icon" style="width: 20px; height: 20px;">
+                <strong>${code}</strong>
+              </div>
+            </td>
             <td class="text-right">${pos.quantity}</td>
-            <td class="text-right">${pos.quantity > 0 ? UI.formatVND(Math.round(pos.avgCost)) : '-'}</td>
             <td class="text-right">${UI.formatVND(price)}</td>
             <td class="text-right">${pos.quantity > 0 ? UI.formatVND(mktVal) : '-'}</td>
             <td class="text-right ${gainClass}">${gainText}</td>
@@ -1305,19 +1625,37 @@ const GAME = (function() {
     }
 
     // 4. Savings Account Table
-    const savBalEl = document.getElementById('result-savings-balance');
-    if (savBalEl) savBalEl.textContent = UI.formatVND(savingsBalance);
+    const savingsOpening = outcome.savingsOpening || 0;
+    const additionalDeposit = savingsBalance - savingsOpening;
+    const principal = savingsBalance;
+    const interest = income.savingsInterest;
+    const closingBalance = savingsBalance + interest;
+
+    const savOpeningEl = document.getElementById('result-savings-opening');
+    if (savOpeningEl) savOpeningEl.textContent = UI.formatVND(savingsOpening);
+
+    const savDepositEl = document.getElementById('result-savings-deposit');
+    if (savDepositEl) savDepositEl.textContent = UI.formatVND(additionalDeposit);
+
+    const savPrincipalEl = document.getElementById('result-savings-principal');
+    if (savPrincipalEl) savPrincipalEl.textContent = UI.formatVND(principal);
 
     const savRateEl = document.getElementById('result-savings-rate');
     if (savRateEl) {
-      const rate = GAME_DATA.getSavingsRate(savingsBalance, roundNumber);
+      const adjustment = outcome.savingsRateAdjustment !== undefined ? outcome.savingsRateAdjustment : 0;
+      const rate = GAME_DATA.getSavingsRate(savingsBalance, roundNumber, adjustment);
       const tier = GAME_DATA.getSavingsTierLabel(savingsBalance);
       savRateEl.textContent = `${(rate * 100).toFixed(2)}% / year (${tier})`;
     }
 
     const savIntEl = document.getElementById('result-savings-interest');
     if (savIntEl) {
-      savIntEl.textContent = `+${UI.formatVND(income.savingsInterest)}`;
+      savIntEl.textContent = `+${UI.formatVND(interest)}`;
+    }
+
+    const savClosingEl = document.getElementById('result-savings-closing');
+    if (savClosingEl) {
+      savClosingEl.textContent = UI.formatVND(closingBalance);
     }
 
     // 5. Financial Statements Table
@@ -1346,13 +1684,27 @@ const GAME = (function() {
     document.getElementById('result-expense-insurance').textContent = UI.formatVND(expense.annual.insurance);
     document.getElementById('result-expense-total').textContent = UI.formatVND(expense.totalAnnual);
 
-    // Net and Balance
-    const netIncEl = document.getElementById('result-net-income');
-    netIncEl.textContent = (netIncome >= 0 ? '+' : '') + UI.formatVND(netIncome);
-    netIncEl.className = netIncome > 0 ? 'num-gain' : (netIncome < 0 ? 'num-loss' : 'num-neutral');
+    // Populate new Investment Activity & Balances rows
+    const portValEl = document.getElementById('result-portfolio-value');
+    if (portValEl) portValEl.textContent = UI.formatVND(totalMarketValue);
 
-    document.getElementById('result-cash-balance').textContent = UI.formatVND(endStats.cash);
-    document.getElementById('result-net-worth').textContent = UI.formatVND(endStats.cash + endStats.investment);
+    const stockPurEl = document.getElementById('result-stock-purchase');
+    if (stockPurEl) stockPurEl.textContent = UI.formatVND(outcome.stockPurchases || 0);
+
+    const stockSellEl = document.getElementById('result-stock-sell');
+    if (stockSellEl) stockSellEl.textContent = UI.formatVND(outcome.stockSells || 0);
+
+    const savDepValEl = document.getElementById('result-savings-deposit-val');
+    if (savDepValEl) savDepValEl.textContent = UI.formatVND(additionalDeposit);
+
+    const savClosingValEl = document.getElementById('result-savings-closing-val');
+    if (savClosingValEl) savClosingValEl.textContent = UI.formatVND(closingBalance);
+
+    const cashBalValEl = document.getElementById('result-cash-balance-val');
+    if (cashBalValEl) cashBalValEl.textContent = UI.formatVND(endStats.cash - closingBalance);
+
+    const netWorthValEl = document.getElementById('result-net-worth-val');
+    if (netWorthValEl) netWorthValEl.textContent = UI.formatVND(endStats.cash + totalMarketValue);
 
     // 6. Well-being Summary
     // Physical
@@ -1388,7 +1740,7 @@ const GAME = (function() {
     const eventsList = document.getElementById('result-events-list');
     if (eventsCard && eventsList) {
       eventsCard.style.display = 'block';
-      const roundEvents = outcome.events || [];
+      const roundEvents = (outcome.events || []).filter(e => !e.hiddenFromUI);
       if (roundEvents.length === 0) {
         eventsList.innerHTML = `
           <div class="event-card event-card--neutral" style="margin: 0; padding: var(--space-2);">
@@ -1616,11 +1968,8 @@ const GAME = (function() {
   function processRoundResults() {
     console.log("Processing round results...");
     
-    // 1. Evaluate and roll conditional events based on final decisions
-    const condEvents = evaluateConditionalEvents(state.currentRound, state.currentDecision, true);
-    if (condEvents.length > 0) {
-      state.activeEvents = [...(state.activeEvents || []), ...condEvents];
-    }
+    // In the new 4-type event system, all starting events (including warnings, job-rewards, and expense-penalties)
+    // are already rolled at startRound and stored in state.activeEvents. No mid-round conditional rolls are needed.
 
     const mappedEvents = (state.activeEvents || []).map(e => ({
       id: e.id,
@@ -1631,33 +1980,145 @@ const GAME = (function() {
       phImpact: e.impact.physicalHealth || 0
     }));
 
+    const completedRound = state.currentRound;
+    const completedBranch = state.marketBranch || '1.1';
+
+    // Capture the active savings balance before it gets auto-withdrawn/reset in applyRound
+    const activeSavingsBalance = state.savingsBalance;
+
     const result = HEALTH.applyRound(state, state.currentDecision, mappedEvents);
     state = result.newState;
     
     // Outcome round index is state.currentRound - 1
-    const completedRound = state.currentRound - 1;
+    const completedRoundIdx = completedRound - 1;
+
+    let roundStockChanges = null;
 
     // Update stock prices for the next round
     if (!state.loseCondition && state.currentRound <= 5) {
-      state.currentPrices = HEALTH.updateStockPrices(state.currentPrices, completedRound);
+      const { newPrices, stockPriceChanges } = HEALTH.updateStockPrices(state.currentPrices, completedRound, completedBranch);
+      state.currentPrices = newPrices;
+      roundStockChanges = stockPriceChanges;
+      
+      // Advance market branch for the new round
+      const currentBranchData = GAME_DATA.MARKET_EVENT_TREE[completedBranch];
+      if (currentBranchData && currentBranchData.children && currentBranchData.children.length > 0) {
+        const children = currentBranchData.children;
+        const nextBranchKey = children[Math.floor(Math.random() * children.length)];
+        state.marketBranch = nextBranchKey;
+        const nextBranchData = GAME_DATA.MARKET_EVENT_TREE[nextBranchKey];
+        if (nextBranchData) {
+          state.savingsRateAdjustment = (state.savingsRateAdjustment || 0) + (nextBranchData.savingsRateAdjustment || 0);
+          state.inflationRate = (state.inflationRate || 0) + (nextBranchData.inflationRate || 0);
+        }
+      }
+
       state.stats.investment = HEALTH.calcPortfolioValue(state.portfolio, state.currentPrices) + state.savingsBalance;
     }
 
     // 2. Save structural copy of portfolio, prices, and savings for history rendering
-    const completedRoundIdx = completedRound - 1;
     if (state.rounds[completedRoundIdx]) {
       state.rounds[completedRoundIdx].portfolio = JSON.parse(JSON.stringify(state.portfolio));
       state.rounds[completedRoundIdx].prices = { ...state.currentPrices };
-      state.rounds[completedRoundIdx].savingsBalance = state.savingsBalance;
+      state.rounds[completedRoundIdx].savingsBalance = activeSavingsBalance;
       state.rounds[completedRoundIdx].hasInsurance = state.hasInsurance;
+      state.rounds[completedRoundIdx].stockPurchases = state.stockPurchases || 0;
+      state.rounds[completedRoundIdx].stockSells = state.stockSells || 0;
+      state.rounds[completedRoundIdx].savingsOpening = state.savingsOpening || 0;
+      state.rounds[completedRoundIdx].realizedPnL = state.realizedPnL || 0;
+      if (roundStockChanges) {
+        state.rounds[completedRoundIdx].stockPriceChanges = roundStockChanges;
+      }
     }
     
+    // Set screen status for F5 safety
+    state.screen = 'round-result';
+
     // Render and show results
     renderRoundResult(completedRound, false);
     UI.showScreen('screen-round-result', 'fade');
 
     // Auto-save game state
     saveGame();
+  }
+
+  function showMarketHistoryModal() {
+    if (!state) return;
+
+    const expandedView = document.getElementById('market-expanded-view');
+    const expandedBody = document.getElementById('market-expanded-body');
+    if (!expandedView || !expandedBody) return;
+
+    // Construct the timeline items
+    let cardsHtml = '';
+    const totalRounds = state.currentRound;
+
+    for (let r = 1; r <= totalRounds; r++) {
+      let branchKey = '1.1';
+      let currentSavingsRateAdjustment = 0;
+      let currentSavingsBalance = 0;
+      
+      if (r < state.currentRound) {
+        const roundData = state.rounds[r - 1];
+        branchKey = roundData?.marketBranch || '1.1';
+        currentSavingsRateAdjustment = roundData?.savingsRateAdjustment || 0;
+        currentSavingsBalance = roundData?.savingsBalance || 0;
+      } else {
+        branchKey = state.marketBranch || '1.1';
+        currentSavingsRateAdjustment = state.savingsRateAdjustment || 0;
+        currentSavingsBalance = state.savingsBalance || 0;
+      }
+
+      const data = GAME_DATA.MARKET_EVENT_TREE[branchKey];
+      if (!data) continue;
+
+      const age = GAME_DATA.ROUNDS[r - 1]?.age || (22 + r - 1);
+
+      // Stock changes formatting - only for past/completed rounds
+      let stockChangesStr = '';
+      if (r < state.currentRound) {
+        const roundData = state.rounds[r - 1];
+        const changes = roundData?.stockPriceChanges;
+        if (changes) {
+          const parts = [];
+          for (const [stock, change] of Object.entries(changes)) {
+            const sign = change > 0 ? '+' : '';
+            const percent = (change * 100).toFixed(1) + '%';
+            const color = change > 0 ? 'var(--color-gain)' : (change < 0 ? 'var(--color-loss)' : 'var(--color-neutral)');
+            parts.push(`<span style="color: ${color}; font-weight: var(--fw-bold);">${stock}: ${sign}${percent}</span>`);
+          }
+          stockChangesStr = parts.join(' &nbsp;·&nbsp; ');
+        }
+      }
+
+      const rate = GAME_DATA.getSavingsRate(currentSavingsBalance, r, currentSavingsRateAdjustment);
+      const tier = GAME_DATA.getSavingsTierLabel(currentSavingsBalance);
+
+      cardsHtml += `
+        <div class="market-history-card" style="background-color: var(--color-bg-panel); border: 1px solid var(--color-border); border-left: 4px solid var(--color-navy); padding: var(--space-4); border-radius: var(--radius-md); margin-bottom: var(--space-4);">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px dashed var(--color-border); padding-bottom: var(--space-2); margin-bottom: var(--space-3);">
+            <h3 style="margin: 0; color: var(--color-navy); font-family: var(--font-display); font-size: var(--fs-h2);">Year ${r} (Age ${age}): ${data.title}</h3>
+            ${r === state.currentRound ? '<span style="background-color: var(--color-navy); color: var(--color-text-white); font-size: var(--fs-micro); font-weight: var(--fw-bold); padding: 2px 6px; border-radius: var(--radius-xs); text-transform: uppercase;">Active</span>' : ''}
+          </div>
+          <p style="color: var(--color-text-primary); font-size: var(--fs-body); line-height: 1.5; margin-bottom: var(--space-3); font-style: normal;">
+            ${data.sectorInfo || data.scenarioOverview}
+          </p>
+          <div style="background-color: var(--color-bg-white); border: 1px solid var(--color-border); padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); font-size: var(--fs-small); display: flex; flex-direction: column; gap: 4px; line-height: 1.4;">
+            ${stockChangesStr ? `
+            <div style="display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap;">
+              <strong>Stock Trends:</strong>
+              <div>${stockChangesStr}</div>
+            </div>` : ''}
+            <div style="border-top: 1px solid var(--color-bg-panel); padding-top: 4px; margin-top: 2px;">
+              <strong>Savings Account:</strong> Rate is <strong>${(rate * 100).toFixed(2)}% / year</strong> (Tier: ${tier}).
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    expandedBody.innerHTML = cardsHtml;
+    expandedView.classList.add('active');
   }
 
   // ----------------------------------------------------
@@ -1699,6 +2160,10 @@ const GAME = (function() {
               if (state.loseCondition) {
                 renderLoseScreen();
                 UI.showScreen('screen-game-lose', 'fade');
+              } else if (state.screen === 'round-result') {
+                const completedRound = state.currentRound - 1;
+                renderRoundResult(completedRound, false);
+                UI.showScreen('screen-round-result', 'fade');
               } else if (state.currentRound > 5) {
                 renderWinScreen();
                 UI.showScreen('screen-game-win', 'fade');
@@ -1747,6 +2212,23 @@ const GAME = (function() {
         if (decisionsTab) decisionsTab.style.display = 'none';
       }
     });
+
+    // Zoom Market History Modal
+    const zoomMarketBtn = document.getElementById('btn-zoom-market');
+    if (zoomMarketBtn) {
+      zoomMarketBtn.addEventListener('click', () => {
+        showMarketHistoryModal();
+      });
+    }
+
+    // Close Market History Expanded Screen
+    const closeExpandedBtn = document.getElementById('btn-close-market-expanded');
+    if (closeExpandedBtn) {
+      closeExpandedBtn.addEventListener('click', () => {
+        const expandedView = document.getElementById('market-expanded-view');
+        if (expandedView) expandedView.classList.remove('active');
+      });
+    }
 
     // Starting Screen -> Static Tutorial Screen
     const startBtn = document.getElementById('btn-start-game');
@@ -1840,11 +2322,10 @@ const GAME = (function() {
       });
     }
 
-    // Savings deposit / withdrawal listener registration
+    // Savings deposit listener registration
     const savingsInput = document.getElementById('invest-savings-input');
     const savingsBtn = document.getElementById('invest-savings-btn');
-    const savingsWithdrawBtn = document.getElementById('invest-savings-withdraw-btn');
-    if (savingsInput && savingsBtn && savingsWithdrawBtn) {
+    if (savingsInput && savingsBtn) {
       savingsInput.addEventListener('blur', () => {
         const rawVal = savingsInput.value.replace(/[^\d]/g, '');
         const val = parseInt(rawVal) || 0;
@@ -1871,27 +2352,6 @@ const GAME = (function() {
         savingsInput.value = '';
         renderDecisionsTab();
       });
-
-      savingsWithdrawBtn.addEventListener('click', () => {
-        const rawVal = savingsInput.value.replace(/[^\d]/g, '');
-        const amount = parseInt(rawVal) || 0;
-        if (amount <= 0) {
-          UI.toast.warning("Please enter a valid withdrawal amount.");
-          return;
-        }
-
-        if (state.savingsBalance < amount) {
-          UI.toast.warning("Not enough savings balance to withdraw this amount.");
-          return;
-        }
-        state.savingsBalance -= amount;
-        state.stats.cash += amount;
-        UI.toast.success(`Withdrew ${UI.formatVND(amount)} from savings account.`);
-
-        state.stats.investment = HEALTH.calcPortfolioValue(state.portfolio, state.currentPrices) + state.savingsBalance;
-        savingsInput.value = '';
-        renderDecisionsTab();
-      });
     }
 
     // Health Insurance purchase listener registration
@@ -1908,10 +2368,15 @@ const GAME = (function() {
     if (confirmBtn) {
       confirmBtn.addEventListener('click', () => {
         const categories = ['housing', 'utility', 'food', 'transport', 'healthcare', 'entertainment'];
+        const EXPENSE_NAMES = {
+          housing: 'Housing', utility: 'Utility', food: 'Food',
+          transport: 'Transport', healthcare: 'Healthcare', entertainment: 'Entertainment'
+        };
         for (const cat of categories) {
           const val = state.currentDecision.expenses[cat];
-          if (val === undefined || isNaN(val) || val < 0) {
-            UI.toast.warning(`Please enter a valid amount for ${cat}.`);
+          const minCost = GAME_DATA.MIN_EXPENSES[cat] || 0;
+          if (val === undefined || isNaN(val) || val < minCost) {
+            UI.toast.warning(`Please enter a valid amount for ${EXPENSE_NAMES[cat]} (minimum: ${UI.formatVND(minCost)}).`);
             const input = document.getElementById(`exp-${cat}-input`);
             if (input) {
               input.focus();
@@ -2028,7 +2493,9 @@ const GAME = (function() {
   return {
     init,
     getState: () => state,
-    setState: (newState) => { state = newState; }
+    setState: (newState) => { state = newState; },
+    rollRoundEvents,
+    checkStartingHealthWarnings
   };
 
 })();
