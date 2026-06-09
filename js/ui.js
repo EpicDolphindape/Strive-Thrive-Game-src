@@ -1,6 +1,40 @@
-// UI utility functions
-// Handles navigation, modals, notifications and animations
+/**
+ * STRIVE & THRIVE — UI Utilities (ui.js)
+ * ============================================================
+ * Handles all shared, stateless UI interactions:
+ *  - Nav tab switching
+ *  - Progress bar updates (animated)
+ *  - Modal open/close
+ *  - Toast notifications
+ *  - Button ripple effect
+ *  - Screen transitions
+ *  - Number counters (animated count-up)
+ *  - Confetti (game win)
+ *
+ * Usage: import or <script src="js/ui.js"> before other scripts.
+ * All functions live on the global `UI` object.
+ * ============================================================
+ */
 
+const UI = (() => {
+
+  /* ──────────────────────────────────────────────────────────
+     1. NAV TAB SWITCHING
+     ────────────────────────────────────────────────────────── */
+
+  /**
+   * Initialise a nav bar so that clicking a tab:
+   *   - Sets that tab to nav-tab--active
+   *   - Sets all others to nav-tab--inactive
+   *   - Optionally calls an onChange callback
+   *
+   * @param {string|Element} navBarSelector  CSS selector OR Element for the .nav-bar
+   * @param {function}       onChange        Optional: called with (tabId) on change
+   *
+   * HTML convention:  each tab button must have  data-tab="someId"
+   *   <button class="nav-tab nav-tab--active"   data-tab="information">Information</button>
+   *   <button class="nav-tab nav-tab--inactive"  data-tab="decisions">Decisions</button>
+   */
   function initNavBar(navBarSelector, onChange) {
     const bar = typeof navBarSelector === 'string'
       ? document.querySelector(navBarSelector)
@@ -512,5 +546,88 @@
    * e.g. 70.5 → "70%"
    */
   function formatPct(value) {
-  return Math.round(value) + '%';
-}
+    return Math.round(value) + '%';
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     11. PRIVATE HELPERS
+     ────────────────────────────────────────────────────────── */
+
+  function _easeOut(t) {
+    return 1 - Math.pow(1 - t, 3); // cubic ease-out
+  }
+
+  /** Parse a number from a text like "1,500,000 VND" or "70%" */
+  function _parseNumText(text) {
+    if (!text) return 0;
+    const cleaned = text.replace(/[^\d.-]/g, '');
+    return parseFloat(cleaned) || 0;
+  }
+
+  /** Flash an element green or red based on direction */
+  function _flashEl(el, positive) {
+    if (!el) return;
+    const cls = positive ? 'flash-positive' : 'flash-negative';
+    el.classList.remove('flash-positive', 'flash-negative');
+    void el.offsetWidth;
+    el.classList.add(cls);
+    setTimeout(() => el.classList.remove(cls), 800);
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     AUTO-INIT on DOMContentLoaded
+     ────────────────────────────────────────────────────────── */
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initRipple(document);
+  });
+
+  /* ──────────────────────────────────────────────────────────
+     PUBLIC API
+     ────────────────────────────────────────────────────────── */
+  return {
+    // Nav
+    initNavBar,
+    switchTab,
+    getActiveTab,
+
+    // Progress bars
+    setBar,
+    updateAllStats,
+
+    // Modals
+    openModal,
+    closeModal,
+    showConfirm,
+
+    // Toasts
+    showToast,
+    toast,
+
+    // Screens
+    showScreen,
+
+    // Ripple
+    initRipple,
+
+    // Counter
+    countTo,
+
+    // Banners
+    showHealthWarning,
+
+    // Confetti
+    fireConfetti,
+
+    // Formatters
+    formatVND,
+    formatCompact,
+    formatPct,
+
+    // Internals (exposed for testing)
+    _countUp,
+    _flashEl,
+    _parseNumText,
+  };
+
+})();
