@@ -1212,11 +1212,12 @@ const GAME = (function() {
         const qtyInput = document.getElementById(`stock-${safeId}-qty`);
         if (!qtyInput) return;
 
-        const qty = parseInt(qtyInput.value) || 0;
-        if (qty <= 0) {
-          UI.toast.warning("Please enter a valid quantity of shares to buy.");
+        const val = Number(qtyInput.value);
+        if (!Number.isInteger(val) || val <= 0) {
+          UI.toast.warning("Error: you must enter a positive integer number.");
           return;
         }
+        const qty = val;
 
         const price = state.currentPrices[code];
         const cost = qty * price;
@@ -1229,6 +1230,7 @@ const GAME = (function() {
         }
 
         state.stats.cash -= totalCost;
+        state.stockPurchases = (state.stockPurchases || 0) + totalCost;
         const pos = state.portfolio[code] || { quantity: 0, avgCost: 0 };
         const newQty = pos.quantity + qty;
         const newAvgCost = ((pos.avgCost * pos.quantity) + cost) / newQty;
@@ -1253,11 +1255,12 @@ const GAME = (function() {
         const qtyInput = document.getElementById(`stock-${safeId}-qty`);
         if (!qtyInput) return;
 
-        const qty = parseInt(qtyInput.value) || 0;
-        if (qty <= 0) {
-          UI.toast.warning("Please enter a valid quantity of shares to sell.");
+        const val = Number(qtyInput.value);
+        if (!Number.isInteger(val) || val <= 0) {
+          UI.toast.warning("Error: you must enter a positive integer number.");
           return;
         }
+        const qty = val;
 
         const pos = state.portfolio[code] || { quantity: 0, avgCost: 0 };
         if (pos.quantity < qty) {
@@ -1272,9 +1275,11 @@ const GAME = (function() {
         const netGained = proceeds - fee - tax;
 
         state.stats.cash += netGained;
+        state.stockSells = (state.stockSells || 0) + netGained;
+        state.realizedPnL = (state.realizedPnL || 0) + (netGained - qty * pos.avgCost);
         const newQty = pos.quantity - qty;
         const newAvgCost = newQty === 0 ? 0 : pos.avgCost;
-
+        
         state.portfolio[code] = {
           quantity: newQty,
           avgCost: newAvgCost
@@ -1471,7 +1476,6 @@ const GAME = (function() {
     // 2. Investment Portfolio Calculations
     let totalCapital = 0;
     let totalMarketValue = 0;
-    let roundReturn = 0;
 
     const codes = ['BNK-V', 'TEC-F', 'CSM-M', 'REA-V', 'ENE-G'];
     codes.forEach(code => {
@@ -1479,15 +1483,26 @@ const GAME = (function() {
       totalCapital += pos.quantity * pos.avgCost;
       totalMarketValue += pos.quantity * prices[code];
 
-      // Round return calculation
-      const changes = GAME_DATA.STOCK_PRICE_CHANGES[roundNumber - 1];
-      const changePct = changes[code] || 0;
-      const priceBeforeChange = prices[code] / (1 + changePct);
-      const priceDelta = prices[code] - priceBeforeChange;
-      roundReturn += pos.quantity * priceDelta;
-    });
+  const roundReturn = totalMarketValue - totalCapital;
+      
+    // Calculate Cumulative capital invested
+    let cumulativeCapital = 0;
+    for (let r = 1; r <= roundNumber; r++) {
+      const outcome_r = state.rounds[r - 1];
+      if (outcome_r) {
+        let tc = 0;
+        const port_r = outcome_r.portfolio || {};
+        for (const [code, pos] of Object.entries(port_r)) {
+          tc += pos.quantity * pos.avgCost;
+        }
+        cumulativeCapital += tc;
+      }
+    }
 
-    const cumulativeReturn = totalMarketValue - totalCapital;
+    const realizedPnL = outcome.realizedPnL || 0;
+    const cumulativeReturnPct = cumulativeCapital > 0
+      ? ((realizedPnL + (totalMarketValue - totalCapital)) / cumulativeCapital) * 100
+      : 0;
 
     // Set portfolio header stats
     const capEl = document.getElementById('result-portfolio-capital');
@@ -1551,7 +1566,7 @@ const GAME = (function() {
       });
       tbody.innerHTML = html;
     }
-
+  // 4. Savings Account Table
     const savingsOpening = outcome.savingsOpening || 0;
     const additionalDeposit = savingsBalance - savingsOpening;
     const principal = savingsBalance;
@@ -1920,17 +1935,23 @@ const GAME = (function() {
 
     // Update stock prices for the next round
     if (!state.loseCondition && state.currentRound <= 5) {
-      state.currentPrices = HEALTH.updateStockPrices(state.currentPrices, completedRound);
-      state.stats.investment = HEALTH.calcPortfolioValue(state.portfolio, state.currentPrices) + state.savingsBalance;
-    }
-
+      const { newPrices, stockPriceChanges } = HEALTH.updateStockPrices(state.currentPrices, completedRound, completedBranch);
+      state.currentPrices = newPrices;
+      roundStockChanges = stockPriceChanges;
+      
     // 2. Save structural copy of portfolio, prices, and savings for history rendering
-    const completedRoundIdx = completedRound - 1;
     if (state.rounds[completedRoundIdx]) {
       state.rounds[completedRoundIdx].portfolio = JSON.parse(JSON.stringify(state.portfolio));
       state.rounds[completedRoundIdx].prices = { ...state.currentPrices };
-      state.rounds[completedRoundIdx].savingsBalance = state.savingsBalance;
+      state.rounds[completedRoundIdx].savingsBalance = activeSavingsBalance;
       state.rounds[completedRoundIdx].hasInsurance = state.hasInsurance;
+      state.rounds[completedRoundIdx].stockPurchases = state.stockPurchases || 0;
+      state.rounds[completedRoundIdx].stockSells = state.stockSells || 0;
+      state.rounds[completedRoundIdx].savingsOpening = state.savingsOpening || 0;
+      state.rounds[completedRoundIdx].realizedPnL = state.realizedPnL || 0;
+      if (roundStockChanges) {
+        state.rounds[completedRoundIdx].stockPriceChanges = roundStockChanges;
+      }
     }
     
     // Render and show results
