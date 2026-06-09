@@ -1,11 +1,45 @@
+// Extracted from js\health.js
+// This file is a responsibility slice, not a standalone module.
 
-  function updateStockPrices(currentPrices, round) {
-    const changes = GAME_DATA.STOCK_PRICE_CHANGES[round - 1];
-    const newPrices = { ...currentPrices };
-    for (const [code, changePct] of Object.entries(changes)) {
-      newPrices[code] = Math.round(newPrices[code] * (1 + changePct));
+// --- stock price updates and portfolio calculations (source lines 344-428) ---
+  function updateStockPrices(currentPrices, round, marketBranch) {
+    const data = (marketBranch && GAME_DATA.MARKET_EVENT_TREE[marketBranch]);
+    if (!data || !data.stockParams) {
+      // Fallback to static changes if params are missing for some reason
+      const changes = (data && data.stockPriceChanges)
+        ? data.stockPriceChanges
+        : GAME_DATA.STOCK_PRICE_CHANGES[round - 1];
+      const newPrices = { ...currentPrices };
+      const stockPriceChanges = {};
+      for (const [code, changePct] of Object.entries(changes)) {
+        newPrices[code] = Math.round(newPrices[code] * (1 + changePct));
+        stockPriceChanges[code] = changePct;
+      }
+      return { newPrices, stockPriceChanges };
     }
-    return newPrices;
+
+    const rMarket = data.stockParams.rMarket;
+    const newPrices = { ...currentPrices };
+    const stockPriceChanges = {};
+
+    for (const [code, price] of Object.entries(currentPrices)) {
+      const params = data.stockParams.stocks[code];
+      if (!params) {
+        stockPriceChanges[code] = 0;
+        continue;
+      }
+
+      const { rSector, gamma, mScenario, sigmaBase } = params;
+      const sigma = sigmaBase * mScenario;
+      // Generate uniform random number in [-sigma, sigma]
+      const epsilon = (Math.random() * 2 - 1) * sigma;
+      const r_i = rMarket + gamma * rSector + epsilon;
+
+      newPrices[code] = Math.round(price * (1 + r_i));
+      stockPriceChanges[code] = r_i;
+    }
+
+    return { newPrices, stockPriceChanges };
   }
 
   /**
@@ -50,4 +84,7 @@
    *
    * @returns {object}
    *   { netWorthScore, wellbeingScore, totalScore,
+   *     netWorthLabel, wellbeingLabel,
+   *     archetype, label2, label3, badgeFile }
+   */
 
