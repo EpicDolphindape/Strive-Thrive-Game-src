@@ -1,0 +1,596 @@
+{
+  "random_events": [
+    {
+      "text": "YOU WON THE LOTTERY! The prize reaches 500,000,000 VND.",
+      "tag": "positive",
+      "rarity": "Ultra rare",
+      "weight": 1,
+      "impact": {
+        "cash": 500000000,
+        "mentalHealth": 15
+      }
+    },
+    {
+      "text": "Your manager organized a one-week summer retreat for the whole department. The retreat resort also has the greatest massage service!",
+      "tag": "positive",
+      "rarity": "Uncommon",
+      "weight": 6,
+      "impact": {
+        "mentalHealth": 8,
+        "physicalHealth": 4
+      }
+    },
+    {
+      "text": "During a company health workshop, you joined the lucky draw with no hope. To your surprise, you won a high-quality neck and shoulder massager, perfectly saving your aching back.",
+      "tag": "positive",
+      "rarity": "Rare",
+      "weight": 8,
+      "impact": {
+        "mentalHealth": 3,
+        "physicalHealth": 5
+      }
+    },
+    {
+      "text": "You are invited to two weddings of your high school friends. You are genuinely happy for them, but you also feel a little FOMO as people around you start to form their family.",
+      "tag": "positive",
+      "rarity": "Common",
+      "weight": 10,
+      "impact": {
+        "mentalHealth": -1
+      }
+    },
+    {
+      "text": "You sign up for a local volunteer activity. It is tiring, but the experience feels meaningful and leaves you surprisingly happy.",
+      "tag": "positive",
+      "rarity": "Common",
+      "weight": 10,
+      "impact": {
+        "mentalHealth": 5,
+        "physicalHealth": 1
+      }
+    },
+    {
+      "text": "During a casual coffee outing, you unexpectedly meet a famous entrepreneur you have admired for a long time. The two of you have a pleasant conversation, and you leave feeling incredibly motivated.",
+      "tag": "positive",
+      "rarity": "Rare",
+      "weight": 5,
+      "impact": {
+        "mentalHealth": 8
+      }
+    },
+    {
+      "text": "Your neighbor recently adopted an adorable Golden Retriever. You quickly became fond of the dog, and it seems to like you just as much. Since then, you've been spending time playing with it and occasionally taking it out for walks.",
+      "tag": "positive",
+      "rarity": "Common",
+      "weight": 9,
+      "impact": {
+        "mentalHealth": 6,
+        "physicalHealth": 2
+      }
+    },
+    {
+      "text": "Thanks to your office's outstanding performance and its success in bringing in new clients, management has decided to reward the entire team with an 8-day, 7-night trip to Thailand.",
+      "tag": "positive",
+      "rarity": "Very rare",
+      "weight": 4,
+      "impact": {
+        "mentalHealth": 12,
+        "physicalHealth": 4
+      }
+    },
+    {
+      "text": "You accidentally found an old lucky money envelope while tidying up your wardrobe. To your surprise, the amount of money inside the envelope is quite high.",
+      "tag": "positive",
+      "rarity": "Uncommon",
+      "weight": 7,
+      "impact": {
+        "cash": 5000000,
+        "mentalHealth": 2
+      }
+    },
+    {
+      "text": "You write a heartfelt review praising the durability and practicality of your 5-year-old Dyson vacuum cleaner. To your surprise, the post goes viral that even Dyson notices it and decides to send you their latest vacuum model as a gift.",
+      "tag": "positive",
+      "rarity": "Very rare",
+      "weight": 3,
+      "impact": {
+        "cash": 15000000,
+        "mentalHealth": 8
+      }
+    },
+    {
+      "text": "A close friend invites you to be a bridesmaid/groomsman and attend a wedding. However, you are too busy with your work so you decline your friend's invitation.",
+      "tag": "negative",
+      "rarity": "Common",
+      "weight": 10,
+      "impact": {
+        "mentalHealth": -3
+      }
+    },
+    {
+      "text": "In a moment of distraction while driving, you forgot to use your turn signal and got pulled over by the traffic police. That's how your food budget for the weekend gone away.",
+      "tag": "negative",
+      "rarity": "Common",
+      "weight": 10,
+      "impact": {
+        "cash": -1000000,
+        "mentalHealth": -2
+      }
+    },
+    {
+      "text": "You heard that your grandfather was hospitalized with atherosclerosis. You sent some money to help your parents with the medical bills and went to the hospital to visit him.",
+      "tag": "negative",
+      "rarity": "Uncommon",
+      "weight": 8,
+      "impact": {
+        "cash": -5000000,
+        "mentalHealth": -3
+      }
+    },
+    {
+      "text": "After a year of medical treatment, your grandfather passes away. His departure leaves you deeply saddened.",
+      "tag": "negative",
+      "rarity": "Rare",
+      "weight": 5,
+      "impact": {
+        "mentalHealth": -10
+      }
+    },
+    {
+      "text": "You accidentally signed up for a 7-day free trial of Netflix account and completely forgot about it. You only realized after 2 months but your bank account already deducted money.",
+      "tag": "negative",
+      "rarity": "Common",
+      "weight": 10,
+      "impact": {
+        "cash": -400000,
+        "mentalHealth": -1
+      }
+    },
+    {
+      "text": "You got cheated on because the person in a situationship with you secretly texted 2 more people. You ended your relationship but still felt heartbroken.",
+      "tag": "negative",
+      "rarity": "Rare",
+      "weight": 6,
+      "impact": {
+        "mentalHealth": -8
+      }
+    },
+    {
+      "text": "Your report was lost because you forgot to save it. You had to stay up all night to redo it. Don't make this mistake again!",
+      "tag": "negative",
+      "rarity": "Uncommon",
+      "weight": 8,
+      "impact": {
+        "mentalHealth": -4,
+        "physicalHealth": -2
+      }
+    },
+    {
+      "text": "You get tricked by an online scam and lose a lot of money. The financial loss really hurts, but what makes you angrier is how stupid you feel for believing them. You are left feeling totally embarrassed and deeply frustrated.",
+      "tag": "negative",
+      "rarity": "Ultra rare",
+      "weight": 7,
+      "impact": {
+        "cash": -80000000,
+        "mentalHealth": -10
+      }
+    },
+    {
+      "text": "A powerful storm hits Hanoi, causing widespread flooding across the city. Unfortunately, your vehicle breaks down in the middle of the flooded streets. You have no choice but to walk home and pay for costly repairs afterward.",
+      "tag": "negative",
+      "rarity": "Rare",
+      "weight": 5,
+      "impact": {
+        "cash": -5000000,
+        "mentalHealth": -4
+      }
+    },
+    {
+      "text": "While on her way to the market, your mother is involved in a traffic accident. Worried, you rush home to check on her. Fortunately, her injuries are not serious, but you decide to take three days off work to stay by her side and help with her recovery.",
+      "tag": "negative",
+      "rarity": "Very rare",
+      "weight": 4,
+      "impact": {
+        "cash": -2000000,
+        "mentalHealth": -6
+      }
+    },
+    {
+      "text": "While commuting home after a long day, your motorbike suddenly gets a flat tire. You have to push the bike to the nearest repair shop and arriving home much later than expected.",
+      "tag": "negative",
+      "rarity": "Common",
+      "weight": 9,
+      "impact": {
+        "cash": -200000,
+        "mentalHealth": -2
+      }
+    },
+    {
+      "text": "Hanoi's temperature in this summer can surge up to more than 40 degrees. However, your AC suddenly stops working. The repair technician cannot come until next week, leaving you to suffer through several ultra-hot days.",
+      "tag": "negative",
+      "rarity": "Uncommon",
+      "weight": 7,
+      "impact": {
+        "cash": -2500000,
+        "mentalHealth": -4,
+        "physicalHealth": -1
+      }
+    },
+    {
+      "text": "After weeks of preparation, you take the driving license test with confidence. Unfortunately, a small mistake during the practical exam makes you fail! Better luck next time.",
+      "tag": "negative",
+      "rarity": "Uncommon",
+      "weight": 6,
+      "impact": {
+        "cash": -1000000,
+        "mentalHealth": -5
+      }
+    },
+    {
+      "text": "While traveling, you discover that your checked luggage has gone missing. Although the airline eventually compensates part of the loss, replacing your belongings is still frustrating.",
+      "tag": "negative",
+      "rarity": "Very rare",
+      "weight": 5,
+      "impact": {
+        "cash": -5000000,
+        "mentalHealth": -5
+      }
+    }
+  ],
+  "job_events": {
+    "1": [
+      {
+        "text": "You occasionally stay after work to help your colleagues. Over time, you build stronger relationships with your teammates and gain valuable insights from more experienced coworkers.",
+        "tier": "Minor",
+        "impact": {
+          "mentalHealth": 3
+        }
+      },
+      {
+        "text": "You frequently stay late to assist with unexpected tasks. One of the senior staff members is impressed by your attitude and shares a collection of work guides and notes that he has compiled over the years.",
+        "tier": "Moderate",
+        "impact": {
+          "mentalHealth": 4
+        }
+      }
+    ],
+    "2": [
+      {
+        "text": "During a small project, you voluntarily cleared a backlog of paperwork and administrative tasks, helping the team finish ahead of schedule. Your team leader rewards you for your timely support.",
+        "tier": "Major",
+        "impact": {
+          "cash": 5000000,
+          "mentalHealth": 4
+        }
+      },
+      {
+        "text": "Because of your willingness to help outside regular working hours, you are selected to join an internal professional training program reserved for high-performing employees.",
+        "tier": "Minor",
+        "impact": {
+          "mentalHealth": 4
+        }
+      },
+      {
+        "text": "An internal project falls behind schedule. You volunteer to provide additional support and help the team deliver on time. Your department manager rewards you for your contribution.",
+        "tier": "Moderate",
+        "impact": {
+          "cash": 5000000,
+          "mentalHealth": 5
+        }
+      },
+      {
+        "text": "You are chosen to join a short business trip with senior managers to work on a potential acquisition deal involving a technology startup in Singapore.",
+        "tier": "Major",
+        "impact": {
+          "cash": 10000000,
+          "mentalHealth": 5
+        }
+      }
+    ],
+    "3": [
+      {
+        "text": "Your annual performance review places you among the top 5% most dedicated employees in the company. Senior management grants you a special bonus in recognition of your efforts.",
+        "tier": "Exceptional",
+        "impact": {
+          "cash": 15000000,
+          "mentalHealth": 8
+        }
+      },
+      {
+        "text": "A new manager is assigned to your office. You are asked to help him settle into his new role, and your intelligence and work ethic quickly earn his trust and appreciation.",
+        "tier": "Minor",
+        "impact": {
+          "mentalHealth": 5
+        }
+      },
+      {
+        "text": "Thanks to your hard work, a project negotiation is completed one week ahead of schedule. The client is highly satisfied, and the team's performance bonus increases significantly.",
+        "tier": "Moderate",
+        "impact": {
+          "cash": 10000000,
+          "mentalHealth": 6
+        }
+      },
+      {
+        "text": "You are recognized as one of the five most outstanding employees during the first six months of the year. As a reward, you receive a 3-day, 2-night vacation package at a Vinpearl Resort in Nha Trang.",
+        "tier": "Major",
+        "impact": {
+          "cash": 15000000,
+          "mentalHealth": 8
+        }
+      }
+    ],
+    "4": [
+      {
+        "text": "A high-value project exceeds expectations. The board decides to distribute an additional bonus to the core team, and you receive one of the largest shares.",
+        "tier": "Exceptional",
+        "impact": {
+          "cash": 30000000,
+          "mentalHealth": 8
+        }
+      },
+      {
+        "text": "You are invited to join a task force focused on improving internal workflows. Your recommendations significantly reduce processing time across the department.",
+        "tier": "Minor",
+        "impact": {
+          "mentalHealth": 5
+        }
+      },
+      {
+        "text": "A long-term client specifically requests that you continue working on future projects because of the excellent quality of your previous work.",
+        "tier": "Moderate",
+        "impact": {
+          "cash": 10000000,
+          "mentalHealth": 7
+        }
+      },
+      {
+        "text": "You represent your department at an international professional conference alongside senior leadership. The trip helps you expand your professional network considerably.",
+        "tier": "Major",
+        "impact": {
+          "cash": 15000000,
+          "mentalHealth": 8
+        }
+      }
+    ],
+    "5": [
+      {
+        "text": "You play a key role in a fundraising deal with a private LP from the United Kingdom. The transaction successfully raises USD 1 million, and your team receives an immediate performance bonus.",
+        "tier": "Exceptional",
+        "impact": {
+          "cash": 40000000,
+          "mentalHealth": 10
+        }
+      },
+      {
+        "text": "Many junior employees seek your career advice. The company formally recognizes your contributions to mentoring and developing younger staff members.",
+        "tier": "Minor",
+        "impact": {
+          "mentalHealth": 5
+        }
+      },
+      {
+        "text": "You become a professional mentor for the company's Fresh Graduate Recruitment Program. You share your experiences with candidates and earn admiration from many young applicants.",
+        "tier": "Moderate",
+        "impact": {
+          "cash": 15000000
+        }
+      },
+      {
+        "text": "Thanks to the reputation you have built over the years, you are invited to join an important fundraising project involving a major European pension fund. You spend one month in France working directly with the client.",
+        "tier": "Major",
+        "impact": {
+          "cash": 25000000,
+          "mentalHealth": 8
+        }
+      },
+      {
+        "text": "At the company's year-end ceremony, you are awarded the title of Employee of the Year. The achievement comes with a substantial bonus and widespread recognition from colleagues, clients, and senior management.",
+        "tier": "Exceptional",
+        "impact": {
+          "cash": 60000000,
+          "mentalHealth": 12
+        }
+      }
+    ]
+  },
+  "expense_penalties": {
+    "housing": [
+      {
+        "text": "Living in overcrowded accommodation reduces comfort and sleep quality.",
+        "probability": 0.5,
+        "impact": {
+          "mentalHealth": -3,
+          "physicalHealth": -2
+        }
+      },
+      {
+        "text": "Frequent conflicts with roommates create stress and reduce well-being.",
+        "probability": 0.3,
+        "impact": {
+          "mentalHealth": -4
+        }
+      },
+      {
+        "text": "Housing instability requires an unexpected move.",
+        "probability": 0.2,
+        "impact": {
+          "mentalHealth": -2,
+          "cash": -500000
+        }
+      }
+    ],
+    "food": [
+      {
+        "text": "A prolonged period of low-cost meals reduces energy and physical well-being.",
+        "probability": 0.5,
+        "impact": {
+          "physicalHealth": -4
+        }
+      },
+      {
+        "text": "Inadequate nutrition affects concentration and work performance.",
+        "probability": 0.3,
+        "impact": {
+          "mentalHealth": -2
+        }
+      },
+      {
+        "text": "A nutrition-related health issue occurs.",
+        "probability": 0.2,
+        "impact": {
+          "physicalHealth": -3,
+          "cash": -300000
+        }
+      }
+    ],
+    "utility": [
+      {
+        "text": "Limited spending results in unstable internet access.",
+        "probability": 0.4,
+        "impact": {
+          "mentalHealth": -2
+        }
+      },
+      {
+        "text": "Insufficient utility usage reduces living comfort.",
+        "probability": 0.4,
+        "impact": {
+          "mentalHealth": -2,
+          "physicalHealth": -1
+        }
+      },
+      {
+        "text": "Deferred maintenance or unpaid service fees generate additional costs.",
+        "probability": 0.2,
+        "impact": {
+          "cash": -300000
+        }
+      }
+    ],
+    "transport": [
+      {
+        "text": "Reliance on low-cost transportation significantly increases travel time.",
+        "probability": 0.5,
+        "impact": {
+          "mentalHealth": -2
+        }
+      },
+      {
+        "text": "Transportation constraints cause you to miss an important opportunity.",
+        "probability": 0.3,
+        "impact": {
+          "cash": -500000
+        }
+      },
+      {
+        "text": "Long and inconvenient travel routines reduce well-being.",
+        "probability": 0.2,
+        "impact": {
+          "mentalHealth": -1,
+          "physicalHealth": -2
+        }
+      },
+      {
+        "text": "An unexpected medical bill occurs.",
+        "probability": 0.2,
+        "impact": {
+          "physicalHealth": -2
+        }
+      }
+    ],
+    "healthcare": [
+      {
+        "text": "A health issue is not addressed early enough.",
+        "probability": 0.5,
+        "impact": {
+          "physicalHealth": -5
+        }
+      },
+      {
+        "text": "A minor health problem becomes more serious.",
+        "probability": 0.3,
+        "impact": {
+          "mentalHealth": -2,
+          "physicalHealth": -4
+        }
+      }
+    ]
+  },
+  "health_warnings": {
+    "mental": [
+      {
+        "text": "You visit a mental health professional after weeks of stress and poor sleep. The doctor told that you’re showing signs of anxiety.",
+        "min": 40,
+        "max": 49,
+        "penalty": -2,
+        "cash": -1000000
+      },
+      {
+        "text": "You feel exhausted before the day even starts. A check-up suggests early burnout from long-term work stress.",
+        "min": 30,
+        "max": 39,
+        "penalty": -5,
+        "cash": -1000000
+      },
+      {
+        "text": "You often have trouble sleeping, lose your appetite, and feels frustrated all the time. The doctor said you're having severe signs of depression.",
+        "min": 20,
+        "max": 29,
+        "penalty": -7,
+        "cash": -10000000
+      },
+      {
+        "text": "You're constantly anxious and stressed as hell. Your boss knows this and insists on asking you to quit your job to improve your health.",
+        "min": 0,
+        "max": 19,
+        "penalty": -7,
+        "cash": 0
+      }
+    ],
+    "physical": [
+      {
+        "text": "Die",
+        "min": 0,
+        "max": 0,
+        "penalty": 0,
+        "cash": 0
+      },
+      {
+        "text": "You’ve been having trouble sleeping and often feel exhausted by the end of the day. Your neck and shoulders have also started aching.",
+        "min": 40,
+        "max": 49,
+        "penalty": -2,
+        "cash": -1500000
+      },
+      {
+        "text": "You faint at work because of acute stomach pain. The doctor says your lifestyle and diet are clearly not okay.",
+        "min": 30,
+        "max": 39,
+        "penalty": -5,
+        "cash": -5000000
+      },
+      {
+        "text": "You end up in the hospital again. This time, the doctor says your body is exhausted and your immune system is struggling.",
+        "min": 20,
+        "max": 29,
+        "penalty": -7,
+        "cash": -10000000
+      },
+      {
+        "text": "You are hospitalized because of a heart attack. The doctor is furious because you ignored every warning and kept neglecting your health.",
+        "min": 1,
+        "max": 19,
+        "penalty": -10,
+        "cash": -50000000
+      },
+      {
+        "text": "Die",
+        "min": 0,
+        "max": 0,
+        "penalty": 0,
+        "cash": 0
+      }
+    ]
+  }
+}
