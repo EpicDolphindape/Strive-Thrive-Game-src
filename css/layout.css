@@ -1,0 +1,773 @@
+/* ============================================================
+   STRIVE & THRIVE — Layout CSS
+   Page shell, navigation bar, split panels, stat bar
+   Depends on: base.css
+   ============================================================ */
+
+/* ─── Game Shell ─────────────────────────────────────────────── */
+/* The root container that holds the entire game.
+   Screens are hidden/shown via JS by toggling .screen--active */
+
+#game-root {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--color-bg);
+  position: relative;
+}
+
+/* ─── Screen Containers ──────────────────────────────────────── */
+/* Every screen is a .screen div inside #game-root */
+
+.screen {
+  display: none;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-bg);
+  overflow: hidden;
+}
+
+.screen--active {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Starting Screen Layout (already in Starting_Page/) ───── */
+/* Keep for reference; not re-styled here */
+
+/* ─── Tutorial Screen Layout ─────────────────────────────────── */
+
+.tutorial-layout {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-bg);
+  padding: clamp(var(--space-8), 5vh, var(--space-12)) 
+           clamp(var(--space-6), 4vw, var(--space-12));
+  gap: clamp(var(--space-6), 4vw, var(--space-10));
+  align-items: flex-start;
+}
+
+.tutorial-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 60%;
+}
+
+.tutorial-illustration {
+  flex: 0 0 auto;
+  width: clamp(200px, 35%, 400px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 100%;
+}
+
+.tutorial-illustration img,
+.tutorial-illustration svg {
+  width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+}
+
+/* Tutorial title */
+.tutorial-title {
+  font-size: clamp(1.5rem, 3.5vw, 2.75rem);
+  font-weight: var(--fw-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-6);
+  letter-spacing: var(--ls-wide);
+}
+
+/* ─── Main Game Screen Layout (Information / Decision tab) ──── */
+
+/* The game main layout has:
+   [NAV BAR] (fixed at top)
+   [CONTENT AREA] (fills remaining height)
+     [LEFT PANEL] | [RIGHT PANEL]
+   [STAT BAR] (optional, fixed at bottom, only in Decision tab)
+*/
+
+.game-layout {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-bg);
+}
+
+/* ─── Top Navigation Bar ─────────────────────────────────────── */
+
+.nav-bar {
+  flex: 0 0 auto;
+  width: 100%;
+  height: var(--nav-height);
+  background-color: var(--color-blue-header);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-6);
+  gap: var(--space-3);
+  z-index: var(--z-sticky);
+  position: relative;
+}
+
+.nav-bar__tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+}
+
+/* Nav tab button */
+.nav-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  font-family: var(--font-body);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), 
+              color var(--transition-fast),
+              border-color var(--transition-fast);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Inactive tab: ghost on blue bar */
+.nav-tab--inactive {
+  background-color: rgba(255,255,255,0.35);
+  color: var(--color-navy);
+  border-color: transparent;
+}
+.nav-tab--inactive:hover {
+  background-color: rgba(255,255,255,0.55);
+}
+
+/* Active tab: solid navy */
+.nav-tab--active {
+  background-color: var(--color-navy);
+  color: var(--color-text-white);
+  border-color: var(--color-navy);
+}
+
+/* Restart button (right side of nav) */
+.nav-restart-btn {
+  margin-left: auto;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-circle);
+  background-color: rgba(255,255,255,0.3);
+  color: var(--color-navy);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  border: none;
+  flex-shrink: 0;
+}
+.nav-restart-btn:hover {
+  background-color: rgba(255,255,255,0.55);
+}
+
+/* Round label in nav (shows "Round 1", "Round 2", etc.) */
+.nav-round-label {
+  font-size: var(--fs-small);
+  font-weight: var(--fw-bold);
+  color: var(--color-navy);
+  opacity: 0.7;
+  margin-left: var(--space-4);
+}
+
+/* ─── Main Content Area (below nav) ──────────────────────────── */
+
+.game-content {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  height: calc(100% - var(--nav-height));
+}
+
+/* With stat bar at bottom */
+.game-content--with-stat-bar {
+  height: calc(100% - var(--nav-height) - var(--stat-bar-height));
+  max-height: calc(100% - var(--nav-height) - var(--stat-bar-height));
+}
+
+/* ─── Left Panel (Character Info) ────────────────────────────── */
+
+.left-panel {
+  flex: 0 0 var(--left-panel-width);
+  width: var(--left-panel-width);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background-color: var(--color-bg);
+  padding: var(--space-4);
+  gap: var(--space-3);
+}
+
+/* Character info card (dark navy) */
+.char-info-card {
+  background-color: var(--color-navy);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text-white);
+}
+
+.char-info-card__title {
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--color-text-white);
+  text-align: center;
+}
+
+/* Avatar circle */
+.avatar-circle {
+  width: clamp(90px, 14vw, 140px);
+  height: clamp(90px, 14vw, 140px);
+  border-radius: var(--radius-circle);
+  background-color: var(--color-bg-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatar-circle img,
+.avatar-circle svg {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+}
+
+/* Character metadata rows */
+.char-meta {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.char-meta-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  font-size: var(--fs-small);
+  color: rgba(255,255,255,0.9);
+}
+
+.char-meta-row--split {
+  justify-content: space-between;
+}
+
+.char-meta-label {
+  font-weight: var(--fw-bold);
+}
+
+.char-meta-value {
+  font-weight: var(--fw-regular);
+}
+
+/* Character stats card (below, light) */
+.char-stats-card {
+  background-color: var(--color-bg-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  box-shadow: var(--shadow-sm);
+}
+
+.char-stats-card__title {
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--color-text-navy);
+  text-align: center;
+}
+
+/* Individual stat row */
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.stat-row__icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.stat-row__label {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  color: var(--color-text-navy);
+  flex: 1;
+}
+
+.stat-row__value {
+  font-size: var(--fs-small);
+  font-weight: var(--fw-bold);
+  color: var(--color-text-primary);
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Progress bar container */
+.stat-row--bar {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-1);
+}
+
+.stat-row--bar .stat-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-bar-track {
+  width: 100%;
+  height: 10px;
+  background-color: var(--color-border);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width var(--transition-slow);
+}
+
+.stat-bar-fill--physical {
+  background-color: var(--color-green-bar);
+}
+
+.stat-bar-fill--mental {
+  background-color: var(--color-red-bar);
+}
+
+/* ─── Right Panel (Scrollable content) ───────────────────────── */
+
+.right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--color-bg);
+  padding: var(--space-4);
+  gap: var(--space-4);
+}
+
+/* Content sections inside right panel */
+.panel-section {
+  background-color: var(--color-bg-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-section--scrollable {
+  flex: 1;
+  min-height: 0; /* critical for flex children to be scrollable */
+}
+
+.panel-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.panel-section__title {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  color: var(--color-text-navy);
+}
+
+/* Zoom / expand button */
+.panel-zoom-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background-color: transparent;
+  color: var(--color-text-navy);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  border: none;
+}
+.panel-zoom-btn:hover {
+  background-color: rgba(46,57,95,0.08);
+}
+
+.panel-section__body {
+  padding: var(--space-3) var(--space-4);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.panel-section__body.scrollable {
+  overflow-y: auto;
+}
+
+/* ─── Decision Panel (full-width, scrollable) ─────────────────── */
+
+.decision-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* ─── Frozen Stat Bar (Decision tab only) ─────────────────────── */
+
+.stat-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--stat-bar-height);
+  background-color: var(--color-bg-white);
+  border-top: 2px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 var(--space-6);
+  z-index: var(--z-sticky);
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.07);
+}
+
+.stat-bar__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  justify-content: center;
+  padding: 0 var(--space-2);
+}
+
+.stat-bar__item + .stat-bar__item {
+  border-left: 1px solid var(--color-border);
+}
+
+.stat-bar__icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.stat-bar__label {
+  font-size: var(--fs-small);
+  font-weight: var(--fw-bold);
+  color: var(--color-text-navy);
+  white-space: nowrap;
+}
+
+.stat-bar__value {
+  font-size: var(--fs-small);
+  font-weight: var(--fw-bold);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+/* ─── Round Result Layout ─────────────────────────────────────── */
+
+.result-screen {
+  background-color: var(--color-bg-warm);
+  overflow-y: auto;
+  padding: var(--space-6) var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  flex: 1;
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin-bottom: var(--space-4);
+}
+
+.result-header__avatar {
+  width: clamp(70px, 8vw, 100px);
+  height: clamp(70px, 8vw, 100px);
+  border-radius: var(--radius-circle);
+  background-color: var(--color-bg-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--color-border);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.result-header__title {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: var(--fw-bold);
+  color: var(--color-text-primary);
+  letter-spacing: var(--ls-tight);
+}
+
+.result-header__subtitle {
+  font-size: var(--fs-body);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-1);
+}
+
+/* Result grid: 2-column cards */
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  flex: 1;
+}
+
+.result-card {
+  background-color: var(--color-bg-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.result-card__title {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  color: var(--color-text-navy);
+  text-align: center;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Result footer with Next button */
+.result-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--space-4);
+}
+
+/* ─── Market Info Expanded View ───────────────────────────────── */
+
+.market-expanded {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-bg);
+  z-index: var(--z-raised);
+  display: none;
+  flex-direction: column;
+}
+
+.market-expanded.active {
+  display: flex;
+}
+
+.market-expanded__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  color: var(--color-text-navy);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+}
+.back-btn:hover {
+  background-color: rgba(46,57,95,0.08);
+}
+
+.market-expanded__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-6) var(--space-8);
+  font-size: var(--fs-body);
+  line-height: var(--lh-relaxed);
+  color: var(--color-text-primary);
+}
+
+/* ─── Game End Screen ─────────────────────────────────────────── */
+
+.game-end-screen {
+  background-color: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  gap: var(--space-6);
+  overflow-y: auto;
+  text-align: center;
+}
+
+.game-end-screen__badge {
+  width: clamp(120px, 20vw, 200px);
+  height: auto;
+}
+
+.game-end-screen__score {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: var(--fw-bold);
+  color: var(--color-navy);
+}
+
+.game-end-screen__label {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  font-weight: var(--fw-bold);
+  color: var(--color-text-primary);
+}
+
+.game-end-screen__comment {
+  max-width: 600px;
+  font-size: var(--fs-body);
+  color: var(--color-text-secondary);
+  line-height: var(--lh-relaxed);
+}
+
+/* ─── Tutorial Slides Layout ─────────────────────────────────── */
+
+/* Tutorial slides with greyed background + tooltip */
+.tutorial-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.tutorial-slide svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.tutorial-slide__overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(200, 200, 200, 0.55);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* The "hole" in the overlay (shows highlighted area) */
+.tutorial-highlight {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Tooltip callout box */
+.tutorial-callout {
+  position: absolute;
+  z-index: 3;
+  background-color: #4A6741;
+  color: var(--color-text-white);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  max-width: 280px;
+  font-size: var(--fs-small);
+  line-height: var(--lh-normal);
+  box-shadow: var(--shadow-lg);
+}
+
+.tutorial-callout__title {
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-body);
+  margin-bottom: var(--space-1);
+}
+
+/* Arrow pointer on callout */
+.tutorial-callout::before {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 8px solid transparent;
+}
+
+.tutorial-callout--arrow-left::before {
+  left: -16px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-right-color: #4A6741;
+}
+
+.tutorial-callout--arrow-top::before {
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-bottom-color: #4A6741;
+}
+
+/* ─── Name Input Screen ───────────────────────────────────────── */
+
+.name-input-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg);
+}
+
+.name-input-card {
+  background-color: var(--color-bg-white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8) var(--space-12);
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  min-width: 360px;
+  max-width: 480px;
+  width: 90%;
+}

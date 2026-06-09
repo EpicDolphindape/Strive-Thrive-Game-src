@@ -1,0 +1,140 @@
+/* ============================================================
+   STRIVE & THRIVE — Starting Page Styles
+   Extracted from Starting_Page/style.css
+   ============================================================ */
+
+/* ─── Page: two-column flex ──────────────────────────────── */
+#screen-starting {
+  display: flex;
+  flex-direction: row;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--color-bg);
+  overflow: hidden;
+}
+
+/* ─── Left column: illustration ─────────────────────────── */
+.graphic-area {
+  flex: 0 0 50%;
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  padding-left: clamp(1.5rem, 3.5vw, 5rem);
+}
+
+.illustration-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ─── Right column: content ─────────────────────────────── */
+.content-area {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-end;
+  padding-top: clamp(2.5rem, 11vh, 8rem);
+  padding-bottom: 0;
+  padding-right: clamp(2rem, 5vw, 7rem);
+  padding-left: clamp(0.5rem, 1vw, 1.5rem);
+  overflow: hidden;
+}
+
+.content-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* ─── Title group ────────────────────────────────────────── */
+.title-group {
+  font-size: clamp(1.4rem, 4.5vw, 5.5rem);
+  display: flex;
+  align-items: last baseline;
+  gap: 0.04em;
+}
+
+.title-words {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.word-strive,
+.word-thrive {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1em;
+  line-height: 1;
+  color: #000;
+  letter-spacing: 0;
+  white-space: nowrap;
+  display: block;
+}
+
+.word-strive {
+  padding-left: 0.45em;
+}
+
+.ampersand {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 2.55em;
+  line-height: 1;
+  color: #000;
+  letter-spacing: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ─── Subtitle ───────────────────────────────────────────── */
+.subtitle {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: clamp(0.85rem, 1.75vw, 2.1rem);
+  color: #000;
+  letter-spacing: 0;
+  white-space: nowrap;
+  text-align: left;
+  margin-top: clamp(0.8rem, 1.8vh, 2rem);
+}
+
+/* ─── Get Started button ─────────────────────────────────── */
+.btn-get-started {
+  align-self: flex-end;
+  margin-top: clamp(0.6rem, 1.4vh, 1.5rem);
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: clamp(0.8rem, 1.6vw, 1.8rem);
+  color: var(--color-text-white);
+  background-color: var(--color-navy);
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: clamp(0.45em, 0.7vh, 0.7em) clamp(0.9em, 1.8vw, 1.6em);
+  min-width: clamp(110px, 12vw, 200px);
+  min-height: clamp(32px, 3.5vh, 52px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, transform 0.12s ease, box-shadow 0.2s ease;
+}
+
+.btn-get-started:hover {
+  background-color: var(--color-navy-light);
+  box-shadow: 0 4px 16px rgba(46, 57, 95, 0.32);
+}
+
+.btn-get-started:active {
+  transform: scale(0.97);
+  box-shadow: none;
+}
+
+.btn-get-started:focus-visible {
+  outline: 3px solid var(--color-navy);
+  outline-offset: 3px;
+}
