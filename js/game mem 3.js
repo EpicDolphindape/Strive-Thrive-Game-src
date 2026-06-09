@@ -37,7 +37,7 @@
   }
 
 
-// --- buy and sell transaction handlers (source lines 1008-1092) ---
+// --- buy and sell transaction handlers  ---
   function attachStockListeners() {
     const buyBtns = document.querySelectorAll('.stock-buy-btn');
     buyBtns.forEach(btn => {
@@ -124,7 +124,7 @@
   }
 
 
-// --- portfolio result rendering (source lines 1235-1306) ---
+// --- portfolio result rendering  ---
     // 2. Investment Portfolio Calculations
     let totalCapital = 0;
     let totalMarketValue = 0;
@@ -198,7 +198,7 @@
     }
 
 
-// --- post-round stock update and portfolio snapshot logic (source lines 1634-1653) ---
+// --- post-round stock update and portfolio snapshot logic ---
     const result = HEALTH.applyRound(state, state.currentDecision, mappedEvents);
     state = result.newState;
     
@@ -220,7 +220,7 @@
       state.rounds[completedRoundIdx].hasInsurance = state.hasInsurance;
     }
 
-// --- savings and insurance transaction handlers (source lines 1844-1903) ---
+// --- savings and insurance transaction handlers  ---
     const savingsInput = document.getElementById('invest-savings-input');
     const savingsBtn = document.getElementById('invest-savings-btn');
     const savingsWithdrawBtn = document.getElementById('invest-savings-withdraw-btn');
