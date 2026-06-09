@@ -1,4 +1,4 @@
-// --- income, expense, health, and round application logic ---
+// --- income, expense, health, and round application logic 
   function calcIncome({ monthlySalary, otHours, sideJob, sideJobHours, savingsBalance, round = 1 }) {
     // Main salary
     const mainJobMonthly = monthlySalary;
@@ -293,7 +293,7 @@
    * Returns a new price map.
    *
 
-// --- numeric final score calculation ---
+// --- numeric final score calculation 
   function calcFinalScore(finalStats, benchmarkNetWorth = 500_000_000) {
     const netWorth = finalStats.cash + finalStats.investment;
 

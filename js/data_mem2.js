@@ -1,4 +1,4 @@
-// --- rounds, jobs, expenses, insurance, savings rules  ---
+// --- rounds, jobs, expenses, insurance, savings rules 
   const ROUNDS = [
     { round: 1, age: 22, job: 'Analyst Executive',       monthlySalary: 15_000_000 },
     { round: 2, age: 23, job: 'Analyst Executive',       monthlySalary: 20_000_000 },
@@ -118,7 +118,7 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
 
   /* ──────────────────────────────────────────────────────────
 
-// --- income quintiles, health coefficients, thresholds  ---
+// --- income quintiles, health coefficients, thresholds 
   const QUINTILE_BREAKPOINTS = [
     // Round 1
     [17_270_000, 18_700_000, 19_920_000, 21_310_000],
@@ -235,6 +235,6 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
      ────────────────────────────────────────────────────────── */
 
 
-// --- score benchmark constant  ---
+// --- score benchmark constant 
   const SCORE_BENCHMARK = 47.36;
 
