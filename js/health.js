@@ -32,7 +32,7 @@ const HEALTH = (() => {
    *     savingsInterest,
    *     totalMonthly, totalAnnual }
    */
-  function calcIncome({ monthlySalary, otHours, sideJob, sideJobHours, savingsBalance, round = 1 }) {
+  function calcIncome({ monthlySalary, otHours, sideJob, sideJobHours, savingsBalance, round = 1, savingsRateAdjustment = 0 }) {
     // Main salary
     const mainJobMonthly = monthlySalary;
     const mainJobAnnual  = mainJobMonthly * 12;
@@ -48,7 +48,7 @@ const HEALTH = (() => {
     const sideJobAnnual  = sideJobMonthly * 12;
 
     // Savings interest (annual)
-    const savingsRate     = GAME_DATA.getSavingsRate(savingsBalance, round);
+    const savingsRate     = GAME_DATA.getSavingsRate(savingsBalance, round, savingsRateAdjustment);
     const savingsInterest = savingsBalance * savingsRate;
 
     // Totals
@@ -77,13 +77,14 @@ const HEALTH = (() => {
    * @returns {object}
    *   { annual: { housing, food, ... }, totalAnnual }
    */
-  function calcExpenses(expenses, insuranceFee = 0) {
+  function calcExpenses(expenses, insuranceFee = 0, inflationRate = 0) {
     const annual = {};
     let totalAnnual = 0;
 
     for (const [key, monthly] of Object.entries(expenses)) {
-      annual[key] = monthly * 12;
-      totalAnnual += monthly * 12;
+      const adjustedMonthly = monthly * (1 + inflationRate);
+      annual[key] = adjustedMonthly * 12;
+      totalAnnual += adjustedMonthly * 12;
     }
 
     annual.insurance = insuranceFee;
@@ -114,6 +115,7 @@ const HEALTH = (() => {
   function calcMentalHealthDelta({
     totalMonthlyIncome,
     otHours,
+    sideJob,
     sideJobHours,
     monthlyExpenses,
     round,
@@ -124,12 +126,14 @@ const HEALTH = (() => {
     const multiplier   = GAME_DATA.MH_MULTIPLIERS[quintile];
     const incomePenalty = GAME_DATA.BASE_HEALTH_LOSS * multiplier; // annual loss
 
-    // 2. Extra-work penalty
-    const extraHours       = otHours + sideJobHours;
-    const extraworkPenalty = GAME_DATA.MH_WORK_COEFF * extraHours; // annual
+    // 2. Overtime & Side-job penalty
+    const overtimePenalty = 5 * 0.048 * otHours;
+    const mhJobMultiplier = GAME_DATA.SIDE_JOB_MH_MULTIPLIERS[sideJob || 'none'] || 0;
+    const sideJobPenalty  = 5 * 0.048 * sideJobHours * mhJobMultiplier;
+    const extraworkPenalty = overtimePenalty + sideJobPenalty;
 
     // 3. Expense-adjusted MH effect
-    //    effect = 8 × Σ( coeff_i × (baseRatio_i - actualRatio_i) )
+    //    effect = 15 × Σ( coeff_i × (baseRatio_i - actualRatio_i) )
     const income = totalMonthlyIncome;
     let expenseSum = 0;
     const coeffMap = GAME_DATA.MH_EXPENSE_COEFF;
@@ -142,12 +146,12 @@ const HEALTH = (() => {
       const coeff       = coeffMap[key];
       expenseSum += coeff * (baseRatio - actualRatio);
     }
-    const expenseEffect = 8 * expenseSum;
+    const expenseEffect = 15 * expenseSum;
 
     // 4. Total delta (positive = health increases, negative = decreases)
     const totalDelta = -incomePenalty - extraworkPenalty + expenseEffect + eventEffect;
 
-    return { incomePenalty, extraworkPenalty, expenseEffect, eventEffect, totalDelta };
+    return { incomePenalty, overtimePenalty, sideJobPenalty, extraworkPenalty, expenseEffect, eventEffect, totalDelta };
   }
 
   /* ──────────────────────────────────────────────────────────
@@ -160,17 +164,19 @@ const HEALTH = (() => {
    * @param {object} params
    * @param {number}   params.totalMonthlyIncome
    * @param {number}   params.otHours
+   * @param {string}   params.sideJob
    * @param {number}   params.sideJobHours
    * @param {number}   params.monthlyHealthcare    Player's healthcare expense per month
    * @param {number}   params.round               1–5
    * @param {number}   [params.eventEffect=0]
    *
    * @returns {object}
-   *   { incomePenalty, extraworkPenalty, healthcareRecovery, eventEffect, totalDelta }
+   *   { incomePenalty, overtimePenalty, sideJobPenalty, extraworkPenalty, healthcareRecovery, eventEffect, totalDelta }
    */
   function calcPhysicalHealthDelta({
     totalMonthlyIncome,
     otHours,
+    sideJob,
     sideJobHours,
     monthlyHealthcare,
     round,
@@ -181,9 +187,11 @@ const HEALTH = (() => {
     const multiplier    = GAME_DATA.PH_MULTIPLIERS[quintile];
     const incomePenalty = GAME_DATA.BASE_HEALTH_LOSS * multiplier;
 
-    // 2. Extra-work penalty
-    const extraHours       = otHours + sideJobHours;
-    const extraworkPenalty = GAME_DATA.PH_WORK_COEFF * extraHours;
+    // 2. Overtime & Side-job penalty
+    const overtimePenalty = 5 * 0.034 * otHours;
+    const phJobMultiplier = GAME_DATA.SIDE_JOB_PH_MULTIPLIERS[sideJob || 'none'] || 0;
+    const sideJobPenalty  = 5 * 0.034 * sideJobHours * phJobMultiplier;
+    const extraworkPenalty = overtimePenalty + sideJobPenalty;
 
     // 3. Healthcare recovery (annual, stepped)
     const annualHealthcare = monthlyHealthcare * 12;
@@ -193,7 +201,7 @@ const HEALTH = (() => {
     // 4. Total delta
     const totalDelta = -incomePenalty - extraworkPenalty + healthcareRecovery + eventEffect;
 
-    return { incomePenalty, extraworkPenalty, healthcareRecovery, eventEffect, totalDelta };
+    return { incomePenalty, overtimePenalty, sideJobPenalty, extraworkPenalty, healthcareRecovery, eventEffect, totalDelta };
   }
 
   /* ──────────────────────────────────────────────────────────
@@ -216,12 +224,7 @@ const HEALTH = (() => {
 
     // Helper to check if event is unconditional (start of round event or health warning)
     const isUnconditionalEvent = (eventId) => {
-      if (eventId === 'health_warning_physical' || eventId === 'health_warning_mental') {
-        return true;
-      }
-      const original = GAME_DATA.LIFE_EVENTS.find(e => e.id === eventId);
-      if (!original) return false;
-      return !original.condition || original.condition.length === 0;
+      return true;
     };
 
     // ── Life event totals (including all events for complete delta description)
@@ -242,11 +245,12 @@ const HEALTH = (() => {
       sideJobHours:    decisions.sideJobHours,
       savingsBalance:  state.savingsBalance,
       round,
+      savingsRateAdjustment: state.savingsRateAdjustment || 0,
     });
 
     // ── Expenses
     const insuranceFee = state.hasInsurance ? GAME_DATA.getInsuranceFee(round) : 0;
-    const expenseResult = calcExpenses(decisions.expenses, insuranceFee);
+    const expenseResult = calcExpenses(decisions.expenses, insuranceFee, state.inflationRate || 0);
 
     // ── Net cash (annual) — events affect cash directly
     const netIncome = incomeResult.totalAnnual - expenseResult.totalAnnual + eventCashTotal;
@@ -255,6 +259,7 @@ const HEALTH = (() => {
     const mhDelta = calcMentalHealthDelta({
       totalMonthlyIncome: incomeResult.totalMonthly,
       otHours:            decisions.otHours,
+      sideJob:            decisions.sideJob,
       sideJobHours:       decisions.sideJobHours,
       monthlyExpenses:    decisions.expenses,
       round,
@@ -265,14 +270,16 @@ const HEALTH = (() => {
     const phDelta = calcPhysicalHealthDelta({
       totalMonthlyIncome: incomeResult.totalMonthly,
       otHours:            decisions.otHours,
+      sideJob:            decisions.sideJob,
       sideJobHours:       decisions.sideJobHours,
       monthlyHealthcare:  decisions.expenses.healthcare || 0,
       round,
       eventEffect:        eventPHTotal,
     });
 
-    // ── New stat values (subtract already applied starting event impacts to prevent double-counting)
-    const newCash     = state.stats.cash + netIncome - startingCash;
+    // ── New stat values (subtract already applied starting event impacts and main job salary pre-added at round start, and auto-withdraw savings balance)
+    const mainJobAnnual = meta.monthlySalary * 12;
+    const newCash     = state.stats.cash + netIncome - startingCash - mainJobAnnual + state.savingsBalance;
     const newPH       = Math.max(0, Math.min(100, state.stats.physicalHealth + phDelta.totalDelta - startingPH));
     const newMH       = Math.max(0, Math.min(100, state.stats.mentalHealth   + mhDelta.totalDelta - startingMH));
 
@@ -286,6 +293,7 @@ const HEALTH = (() => {
     const newState = {
       ...state,
       currentRound: round + 1,
+      savingsBalance: 0, // Auto-withdraw resets savings balance to 0 for the next round
       stats: {
         cash:           newCash,
         investment:     state.stats.investment, // updated separately via stock logic
@@ -304,6 +312,9 @@ const HEALTH = (() => {
           netIncome,
           mhDelta,
           phDelta,
+          marketBranch:          state.marketBranch || '1.1',
+          savingsRateAdjustment: state.savingsRateAdjustment || 0,
+          inflationRate:         state.inflationRate || 0,
           endStats: {
             cash:           newCash,
             investment:     state.stats.investment,
@@ -323,19 +334,51 @@ const HEALTH = (() => {
 
   /**
    * Update stock prices for a given round.
-   * Returns a new price map.
+   * Returns an object { newPrices, stockPriceChanges }.
    *
    * @param {object} currentPrices  { 'BNK-V': price, ... }
    * @param {number} round          1-indexed
-   * @returns {object}              Updated price map
+   * @param {string} marketBranch   branch key e.g. '1.1'
+   * @returns {object}              { newPrices, stockPriceChanges }
    */
-  function updateStockPrices(currentPrices, round) {
-    const changes = GAME_DATA.STOCK_PRICE_CHANGES[round - 1];
-    const newPrices = { ...currentPrices };
-    for (const [code, changePct] of Object.entries(changes)) {
-      newPrices[code] = Math.round(newPrices[code] * (1 + changePct));
+  function updateStockPrices(currentPrices, round, marketBranch) {
+    const data = (marketBranch && GAME_DATA.MARKET_EVENT_TREE[marketBranch]);
+    if (!data || !data.stockParams) {
+      // Fallback to static changes if params are missing for some reason
+      const changes = (data && data.stockPriceChanges)
+        ? data.stockPriceChanges
+        : GAME_DATA.STOCK_PRICE_CHANGES[round - 1];
+      const newPrices = { ...currentPrices };
+      const stockPriceChanges = {};
+      for (const [code, changePct] of Object.entries(changes)) {
+        newPrices[code] = Math.round(newPrices[code] * (1 + changePct));
+        stockPriceChanges[code] = changePct;
+      }
+      return { newPrices, stockPriceChanges };
     }
-    return newPrices;
+
+    const rMarket = data.stockParams.rMarket;
+    const newPrices = { ...currentPrices };
+    const stockPriceChanges = {};
+
+    for (const [code, price] of Object.entries(currentPrices)) {
+      const params = data.stockParams.stocks[code];
+      if (!params) {
+        stockPriceChanges[code] = 0;
+        continue;
+      }
+
+      const { rSector, gamma, mScenario, sigmaBase } = params;
+      const sigma = sigmaBase * mScenario;
+      // Generate uniform random number in [-sigma, sigma]
+      const epsilon = (Math.random() * 2 - 1) * sigma;
+      const r_i = rMarket + gamma * rSector + epsilon;
+
+      newPrices[code] = Math.round(price * (1 + r_i));
+      stockPriceChanges[code] = r_i;
+    }
+
+    return { newPrices, stockPriceChanges };
   }
 
   /**

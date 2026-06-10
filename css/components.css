@@ -530,7 +530,7 @@
 }
 
 .insurance-row__info {
-  flex: 1;
+  flex: 0 0 300px;
 }
 
 .insurance-row__name {
@@ -549,8 +549,9 @@
   font-size: var(--fs-micro);
   color: var(--color-text-secondary);
   line-height: var(--lh-normal);
-  flex: 0 0 200px;
-  text-align: right;
+  flex: 1;
+  text-align: left;
+  max-width: 700px;
 }
 
 /* ── Stock Sub-section ── */

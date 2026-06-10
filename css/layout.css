@@ -250,6 +250,7 @@
   justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
+  margin: 0 auto;
 }
 
 .avatar-circle img,
@@ -257,6 +258,8 @@
   width: 80%;
   height: 80%;
   object-fit: contain;
+  display: block;
+  margin: auto;
 }
 
 /* Character metadata rows */
@@ -461,7 +464,7 @@
   left: 0;
   right: 0;
   height: var(--stat-bar-height);
-  background-color: var(--color-bg-white);
+  background-color: var(--color-blue-header);
   border-top: 2px solid var(--color-border);
   display: flex;
   align-items: center;
@@ -589,7 +592,7 @@
   position: absolute;
   inset: 0;
   background-color: var(--color-bg);
-  z-index: var(--z-raised);
+  z-index: var(--z-overlay);
   display: none;
   flex-direction: column;
 }
