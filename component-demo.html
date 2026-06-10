@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Strive & Thrive — Component Demo</title>
+  <meta name="description" content="Design system demo showing all shared CSS components and JS utilities for the Strive & Thrive life simulator game.">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <style>
+    /* Demo-only styles */
+    body { padding: 2rem 4rem; background: var(--color-bg); }
+
+    .demo-section { margin-bottom: 3rem; }
+    .demo-section > h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--color-navy);
+      margin-bottom: 0.4rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 3px solid var(--color-navy);
+    }
+    .demo-section > .demo-subtitle {
+      font-size: 0.78rem;
+      color: var(--color-text-muted);
+      margin-bottom: 1rem;
+      font-family: monospace;
+    }
+    .demo-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    .demo-chip {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 0.25rem 0.5rem;
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      font-family: monospace;
+    }
+    .demo-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.5rem;
+    }
+    code {
+      background: rgba(46,57,95,0.08);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 0.8em;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Toast container (managed by ui.js) -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <h1 class="text-h1 text-navy" style="margin-bottom:0.5rem">Strive & Thrive — Design System Demo</h1>
+  <p class="text-body text-secondary" style="margin-bottom:2.5rem">
+    All components use classes from <code>base/layout/components/animations.css</code>.
+    All interactions use functions from <code>js/ui.js</code>.
+  </p>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       1. NAVIGATION BAR (Interactive tab switching)
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="demo-section">
+    <h2>1. Navigation Bar — Tab Switching</h2>
+    <p class="demo-subtitle">UI.initNavBar('#demo-nav', callback) — click any tab to switch active state</p>
+
+    <div class="nav-bar" id="demo-nav" style="position:relative; border-radius:var(--radius-md); margin-bottom:0.75rem;">
+      <div style="display:flex; gap:8px; flex:1; align-items:center;">
+        <button class="nav-tab nav-tab--active"   data-tab="information">Information</button>
+        <button class="nav-tab nav-tab--inactive"  data-tab="decisions">Decisions</button>
+        <button class="nav-tab nav-tab--inactive"  data-tab="result">Result</button>
+        <span class="nav-round-label">Round 2</span>
+      </div>
+      <button class="nav-restart-btn" title="Restart game" id="restart-demo-btn">↺</button>
+    </div>
+
+    <p class="text-small text-secondary">
+      Active tab: <strong id="active-tab-display">information</strong>
+    </p>
+
+    <div class="demo-row" style="margin-top:0.75rem;">
+      <button class="btn btn--secondary btn--sm" onclick="UI.switchTab('#demo-nav', 'information')">Switch → Information</button>
+      <button class="btn btn--secondary btn--sm" onclick="UI.switchTab('#demo-nav', 'decisions')">Switch → Decisions</button>
+      <button class="btn btn--secondary btn--sm" onclick="UI.switchTab('#demo-nav', 'result')">Switch → Result</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       2. PROGRESS BARS (Animated)
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="demo-section">
+    <h2>2. Progress Bars — Animated Health Bars</h2>
+    <p class="demo-subtitle">UI.setBar(fillEl, value, labelEl) — smooth animation + green/red flash on change</p>
+
+    <div style="max-width:460px; display:flex; flex-direction:column; gap:1rem; margin-bottom:1.25rem;">
+
+      <!-- Physical health bar -->
+      <div class="progress-bar progress-bar--physical" id="phys-bar">
+        <div class="progress-bar__header">
+          <span class="progress-bar__label">🫀 Physical health</span>
+          <span class="progress-bar__value" id="phys-value">70%</span>
+        </div>
+        <div class="progress-bar__track">
+          <div class="progress-bar__fill" id="phys-fill" style="width:70%"></div>
+        </div>
+      </div>
+
+      <!-- Mental health bar -->
+      <div class="progress-bar progress-bar--mental" id="ment-bar">
+        <div class="progress-bar__header">
+          <span class="progress-bar__label">😊 Mental health</span>
+          <span class="progress-bar__value" id="ment-value">70%</span>
+        </div>
+        <div class="progress-bar__track">
+          <div class="progress-bar__fill" id="ment-fill" style="width:70%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="demo-label">Set Physical health to:</div>
+    <div class="demo-row" style="margin-bottom:0.5rem;">
+      <button class="btn btn--success btn--sm" onclick="UI.setBar('#phys-fill', 95, '#phys-value')">95%</button>
+      <button class="btn btn--success btn--sm" onclick="UI.setBar('#phys-fill', 70, '#phys-value')">70%</button>
+      <button class="btn btn--success btn--sm" onclick="UI.setBar('#phys-fill', 50, '#phys-value')">50%</button>
+      <button class="btn btn--danger  btn--sm" onclick="UI.setBar('#phys-fill', 30, '#phys-value')">30%</button>
+      <button class="btn btn--danger  btn--sm" onclick="UI.setBar('#phys-fill', 10, '#phys-value')">10%</button>
+      <button class="btn btn--danger  btn--sm" onclick="UI.setBar('#phys-fill',  0, '#phys-value')">0%</button>
+    </div>
+
+    <div class="demo-label">Set Mental health to:</div>
+    <div class="demo-row" style="margin-bottom:0.5rem;">
+      <button class="btn btn--success btn--sm" onclick="UI.setBar('#ment-fill', 95, '#ment-value')">95%</button>
+      <button class="btn btn--success btn--sm" onclick="UI.setBar('#ment-fill', 70, '#ment-value')">70%</button>
+      <button class="btn btn--success btn--sm" onclick="UI.setBar('#ment-fill', 50, '#ment-value')">50%</button>
+      <button class="btn btn--danger  btn--sm" onclick="UI.setBar('#ment-fill', 30, '#ment-value')">30%</button>
+      <button class="btn btn--danger  btn--sm" onclick="UI.setBar('#ment-fill', 10, '#ment-value')">10%</button>
+      <button class="btn btn--danger  btn--sm" onclick="UI.setBar('#ment-fill',  0, '#ment-value')">0%</button>
+    </div>
+
+    <div class="demo-row" style="margin-top:0.5rem;">
+      <button class="btn btn--primary btn--sm" onclick="demoRandomizeHealth()">🎲 Randomize both</button>
+      <button class="btn btn--secondary btn--sm" onclick="UI.setBar('#phys-fill',70,'#phys-value'); UI.setBar('#ment-fill',70,'#ment-value')">Reset to 70%</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       3. ANIMATED COUNTER (VND numbers)
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="demo-section">
+    <h2>3. Animated Number Counter</h2>
+    <p class="demo-subtitle">UI.countTo(el, value, { format }) — counts from current value to new value</p>
+
+    <div style="display:flex; flex-direction:column; gap:0.75rem; margin-bottom:1.25rem;">
+      <div class="stat-row">
+        <span class="stat-row__icon">💰</span>
+        <span class="stat-row__label">Cash</span>
+        <span class="stat-row__value" id="demo-cash">180,000,000 VND</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-row__icon">📊</span>
+        <span class="stat-row__label">Investment</span>
+        <span class="stat-row__value" id="demo-invest">0 VND</span>
+      </div>
+    </div>
+
+    <div class="demo-row">
+      <button class="btn btn--success btn--sm" onclick="demoUpdateCash(500000000)">+500M cash</button>
+      <button class="btn btn--danger  btn--sm" onclick="demoUpdateCash(-100000000)">-100M cash</button>
+      <button class="btn btn--success btn--sm" onclick="demoUpdateInvest(250000000)">+250M invest</button>
+      <button class="btn btn--secondary btn--sm" onclick="demoResetFinance()">Reset</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       4. MODAL / CONFIRM POPUP
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="demo-section">
+    <h2>4. Modal / Confirm Popup</h2>
+    <p class="demo-subtitle">UI.showConfirm({ title, body, onConfirm, onCancel }) — auto-managed modal</p>
+
+    <div class="demo-row">
+      <button class="btn btn--primary" onclick="demoShowConfirm()">Open Confirm Modal</button>
+      <button class="btn btn--secondary" onclick="demoShowRestartConfirm()">Restart Confirm</button>
+      <button class="btn btn--ghost" onclick="UI.openModal('#demo-custom-modal')">Custom Modal</button>
+    </div>
+
+    <!-- Custom modal markup (example for game screens) -->
+    <div class="modal-overlay" id="demo-custom-modal">
+      <div class="modal-card">
+        <div class="modal-card__title">Name Your Character</div>
+        <div class="modal-card__body" style="text-align:left">
+          <div class="form-group">
+            <label class="form-label" for="demo-name-input">Character Name</label>
+            <input class="form-input" id="demo-name-input" type="text" placeholder="Enter your name...">
+          </div>
+        </div>
+        <div class="modal-card__actions">
+          <button class="btn btn--secondary" onclick="UI.closeModal('#demo-custom-modal')">Cancel</button>
+          <button class="btn btn--primary"   onclick="demoConfirmName()">Confirm →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       5. TOAST NOTIFICATIONS
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="demo-section">
+    <h2>5. Toast Notifications</h2>
+    <p class="demo-subtitle">UI.toast.success/warning/danger/info(msg) — auto-dismiss after 3s</p>
+
+    <div class="demo-row">
+      <button class="btn btn--success btn--sm" onclick="UI.toast.success('Stock purchased: 5 shares of BNK-V')">✅ Success toast</button>
+      <button class="btn btn--amber   btn--sm" onclick="UI.toast.warning('Mental health is getting low!')">⚠️ Warning toast</button>
+      <button class="btn btn--danger  btn--sm" onclick="UI.toast.danger('Cash dropped below 0 — Game Over!')">❌ Danger toast</button>
+      <button class="btn btn--ghost   btn--sm" onclick="UI.toast.info('Investment portfolio updated.')">ℹ️ Info toast</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       6. BUTTONS
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="demo-section">
+    <h2>6. Buttons</h2>
+    <p class="demo-subtitle">All .btn variants — ripple effect auto-attached by ui.js on DOMContentLoaded</p>
+    <div class="demo-row">
+      <button class="btn btn--primary btn--xl btn--arrow">Get Started</button>
+      <button class="btn btn--primary btn--lg btn--arrow">Next</button>
+      <button class="btn btn--primary">Confirm</button>
+      <button class="btn btn--secondary">Cancel</button>
+      <button class="btn btn--ghost">Back ←</button>
+      <button class="btn btn--amber">Replay</button>
+    </div>
+    <div class="demo-row">
+      <button class="btn btn--success btn--sm">Enter</button>
+      <button class="btn btn--success btn--sm">Deposit</button>
+      <button class="btn btn--success btn--sm">Buy</button>
+      <button class="btn btn--danger  btn--sm">Sell</button>
+      <button class="btn btn--primary" disabled>Disabled</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       7. EVENT CARDS
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="demo-section">
+    <h2>7. Event Cards</h2>
+    <p class="demo-subtitle">.event-card--positive / --negative / --neutral</p>
+    <div style="max-width:560px;">
+      <div class="event-card event-card--positive">
+        <div class="event-card__title">Lottery</div>
+        <div class="event-card__description">You won the lottery and received a small amount of money</div>
+        <div class="event-card__impact">+2,000,000 VND &nbsp;·&nbsp; +10 Mental health</div>
+      </div>
+      <div class="event-card event-card--negative">
+        <div class="event-card__title">Sickness</div>
+        <div class="event-card__description">You somehow managed to fall, sprain your ankle and now you end up in the hospital</div>
+        <div class="event-card__impact">-3,000,000 VND &nbsp;·&nbsp; -10 Physical health</div>
+      </div>
+      <div class="event-card event-card--neutral">
+        <div class="event-card__title">Health Warning</div>
+        <div class="event-card__description">You've been feeling quite stressed lately. Maybe it's time to slow down.</div>
+        <div class="event-card__impact">Impact: None</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       8. TUTORIAL CARDS
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="demo-section">
+    <h2>8. Tutorial Info Cards</h2>
+    <p class="demo-subtitle">.tutorial-card--amber / --red / --green</p>
+    <div style="max-width:560px; display:flex; flex-direction:column; gap:1rem;">
+      <div class="tutorial-card tutorial-card--amber">
+        <div class="tutorial-card__heading">Start Your Journey</div>
+        <div class="tutorial-card__body">You play as a young fresh graduate who must manage life after university. Each round represents one year, and you will make decisions about work, spending, lifestyle and investment.</div>
+      </div>
+      <div class="tutorial-card tutorial-card--red">
+        <div class="tutorial-card__heading">Make Choice and Face Trade-Off</div>
+        <div class="tutorial-card__body">Every decision affects your money, physical health, and mental health. Working overtime may increase your income, but it can reduce your well-being.</div>
+      </div>
+      <div class="tutorial-card tutorial-card--green">
+        <div class="tutorial-card__heading">Review Your Result</div>
+        <div class="tutorial-card__body">At the end of each round, you will receive a summary of your income, expenses, investment portfolio, net worth, and life indicators.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       9. CHARACTER CARD (left panel)
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="demo-section">
+    <h2>9. Character Info Card</h2>
+    <p class="demo-subtitle">.char-info-card + .char-stats-card with live stat bars</p>
+    <div style="max-width:300px; display:flex; flex-direction:column; gap:12px;">
+      <div class="char-info-card">
+        <div class="char-info-card__title">Character's Information</div>
+        <div class="avatar-circle" style="width:100px;height:100px;"><span style="font-size:3rem;">🧑‍💼</span></div>
+        <div class="char-meta" style="width:100%">
+          <div class="char-meta-row char-meta-row--split">
+            <span class="char-meta-label">Name:</span><span class="char-meta-value">Alex</span>
+            <span class="char-meta-label" style="margin-left:12px">Age:</span><span class="char-meta-value">22</span>
+          </div>
+          <div class="char-meta-row"><span class="char-meta-label">Main job:</span><span class="char-meta-value"> Analyst Executive</span></div>
+          <div class="char-meta-row"><span class="char-meta-label">Yearly salary:</span><span class="char-meta-value"> 180,000,000 VND</span></div>
+        </div>
+      </div>
+      <div class="char-stats-card">
+        <div class="char-stats-card__title">Character's Stats</div>
+        <div class="stat-row">
+          <span class="stat-row__icon">💰</span>
+          <span class="stat-row__label">Cash</span>
+          <span class="stat-row__value" id="char-cash">180,000,000 VND</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-row__icon">📊</span>
+          <span class="stat-row__label">Investment</span>
+          <span class="stat-row__value" id="char-invest">0 VND</span>
+        </div>
+        <div class="stat-row stat-row--bar">
+          <div class="stat-bar-header" style="display:flex;justify-content:space-between;">
+            <span class="stat-row__label" style="color:var(--color-green)">🫀 Physical health</span>
+            <span class="stat-row__value" id="char-phys-val">70%</span>
+          </div>
+          <div class="stat-bar-track"><div class="stat-bar-fill stat-bar-fill--physical" id="char-phys-fill" style="width:70%"></div></div>
+        </div>
+        <div class="stat-row stat-row--bar">
+          <div class="stat-bar-header" style="display:flex;justify-content:space-between;">
+            <span class="stat-row__label" style="color:var(--color-red)">😊 Mental health</span>
+            <span class="stat-row__value" id="char-ment-val">70%</span>
+          </div>
+          <div class="stat-bar-track"><div class="stat-bar-fill stat-bar-fill--mental" id="char-ment-fill" style="width:70%"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="demo-row" style="margin-top:1rem;">
+      <button class="btn btn--primary btn--sm" onclick="demoSimulateRound()">🎲 Simulate Round End</button>
+      <button class="btn btn--secondary btn--sm" onclick="demoResetCharStats()">Reset</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       10. SUMMARY BOX + DATA TABLE
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="demo-section">
+    <h2>10. Summary Box &amp; Data Table</h2>
+    <div class="demo-row" style="align-items:flex-start; gap:2rem; flex-wrap:wrap;">
+      <div style="flex:1; min-width:280px; max-width:400px;">
+        <p class="demo-label">Summary Box</p>
+        <div class="summary-box visible">
+          <div class="summary-box__main">Summary: −3 Physical health, −5 Mental health</div>
+          <div class="summary-box__breakdown">
+            <div class="summary-box__line">Housing: −3 Physical health, +2 Mental health</div>
+            <div class="summary-box__line">Utility: +1 Physical health, +1 Mental health</div>
+            <div class="summary-box__line">Food: −1 Physical health, +1 Mental health</div>
+            <div class="summary-box__line">Transport: −2 Mental health</div>
+          </div>
+        </div>
+      </div>
+      <div style="flex:1; min-width:280px; max-width:460px;">
+        <p class="demo-label">Data Table</p>
+        <table class="data-table">
+          <thead><tr><th>Stock</th><th>Avg Cost</th><th>Mkt Price</th><th>Qty</th><th>Gain/Loss</th></tr></thead>
+          <tbody>
+            <tr><td>BNK-V</td><td>60,000</td><td>62,500</td><td>10</td><td class="num-gain">+4.17%</td></tr>
+            <tr><td>TEC-F</td><td>70,000</td><td>75,000</td><td>12</td><td class="num-gain">+7.14%</td></tr>
+            <tr><td>REA-V</td><td>150,000</td><td>147,000</td><td>5</td><td class="num-loss">−2.00%</td></tr>
+            <tr class="row-total"><td colspan="4">Portfolio Value</td><td class="num-gain">1,670,000</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       11. SCORE BADGE + CONFETTI
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="demo-section">
+    <h2>11. Score Badge + Confetti</h2>
+    <p class="demo-subtitle">UI.fireConfetti() — Game Win celebration</p>
+    <div class="demo-row" style="align-items:center; gap:2rem;">
+      <div class="score-badge score-reveal">
+        <div class="score-badge__circle">
+          <span class="score-badge__number" id="demo-score">72.5</span>
+          <span class="score-badge__label">Total Score</span>
+        </div>
+        <p class="text-small text-secondary" style="margin-top:0.5rem">Above average!</p>
+      </div>
+      <button class="btn btn--primary btn--lg" onclick="UI.fireConfetti()">🎊 Fire Confetti!</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       12. HEALTH WARNING BANNER
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="demo-section">
+    <h2>12. Health Warning Banner</h2>
+    <p class="demo-subtitle">UI.showHealthWarning(container, message) — prepended inside panel</p>
+    <div id="health-warning-container" style="max-width:500px; padding:1rem; background:white; border-radius:var(--radius-md); border:1px solid var(--color-border);">
+      <div class="panel-section__title" style="margin-bottom:0.75rem;">Personal Information</div>
+      <!-- Banner will be prepended here -->
+      <div class="event-card event-card--positive">
+        <div class="event-card__title">Lottery</div>
+        <div class="event-card__description">You won a small prize</div>
+        <div class="event-card__impact">+2,000,000 VND</div>
+      </div>
+    </div>
+    <div class="demo-row" style="margin-top:0.75rem;">
+      <button class="btn btn--amber btn--sm" onclick="UI.showHealthWarning('#health-warning-container', 'You\'ve been getting occasional headaches. Please remember to rest.')">⚠️ Show warning</button>
+      <button class="btn btn--ghost  btn--sm" onclick="document.querySelector('#health-warning-container .health-warning-banner')?.remove()">✕ Remove</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       13. COLOR PALETTE
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="demo-section">
+    <h2>13. Color Palette</h2>
+    <div class="demo-row" style="flex-wrap:wrap;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="width:56px;height:56px;background:var(--color-navy);border-radius:8px;"></div><span class="demo-chip">navy</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="width:56px;height:56px;background:var(--color-blue-header);border-radius:8px;border:1px solid #ccc"></div><span class="demo-chip">blue-header</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="width:56px;height:56px;background:var(--color-bg);border-radius:8px;border:1px solid #ccc"></div><span class="demo-chip">bg cream</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="width:56px;height:56px;background:var(--color-green);border-radius:8px;"></div><span class="demo-chip">green</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="width:56px;height:56px;background:var(--color-red);border-radius:8px;"></div><span class="demo-chip">red</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="width:56px;height:56px;background:var(--color-amber);border-radius:8px;"></div><span class="demo-chip">amber</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="width:56px;height:56px;background:var(--color-green-light);border-radius:8px;border:1px solid var(--color-green)"></div><span class="demo-chip">green-light</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="width:56px;height:56px;background:var(--color-red-light);border-radius:8px;border:1px solid var(--color-red)"></div><span class="demo-chip">red-light</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="width:56px;height:56px;background:var(--color-gain);border-radius:8px;"></div><span class="demo-chip">gain</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="width:56px;height:56px;background:var(--color-loss);border-radius:8px;"></div><span class="demo-chip">loss</span></div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────────────────────────────────────────
+       JS — load utilities, then page logic
+       ─────────────────────────────────────────────────────────── -->
+  <script src="js/data.js"></script>
+  <script src="js/health.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    /* ── 1. INIT NAV BAR ── */
+    UI.initNavBar('#demo-nav', (tabId) => {
+      document.getElementById('active-tab-display').textContent = tabId;
+      UI.toast.info(`Switched to: ${tabId}`, { duration: 1500 });
+    });
+
+    document.getElementById('restart-demo-btn').addEventListener('click', () => {
+      UI.showConfirm({
+        title: 'Restart Game?',
+        body: 'All your progress will be lost. Are you sure you want to restart from the beginning?',
+        confirmText: 'Restart',
+        cancelText: 'Keep Playing',
+        onConfirm: () => UI.toast.warning('Game restarted!'),
+      });
+    });
+
+    /* ── 2. HEALTH BAR CONTROLS ── */
+    function demoRandomizeHealth() {
+      const phVal = Math.round(Math.random() * 90 + 5);
+      const mhVal = Math.round(Math.random() * 90 + 5);
+      UI.setBar('#phys-fill', phVal, '#phys-value');
+      UI.setBar('#ment-fill', mhVal, '#ment-value');
+    }
+
+    /* ── 3. CASH COUNTER ── */
+    let _demoCurrentCash   = 180_000_000;
+    let _demoCurrentInvest = 0;
+
+    function demoUpdateCash(delta) {
+      _demoCurrentCash = Math.max(0, _demoCurrentCash + delta);
+      UI.countTo('#demo-cash', _demoCurrentCash, { format: UI.formatVND });
+      UI._flashEl(document.getElementById('demo-cash'), delta > 0);
+    }
+
+    function demoUpdateInvest(delta) {
+      _demoCurrentInvest = Math.max(0, _demoCurrentInvest + delta);
+      UI.countTo('#demo-invest', _demoCurrentInvest, { format: UI.formatVND });
+      UI._flashEl(document.getElementById('demo-invest'), delta > 0);
+    }
+
+    function demoResetFinance() {
+      _demoCurrentCash   = 180_000_000;
+      _demoCurrentInvest = 0;
+      UI.countTo('#demo-cash',   _demoCurrentCash,   { format: UI.formatVND });
+      UI.countTo('#demo-invest', _demoCurrentInvest, { format: UI.formatVND });
+    }
+
+    /* ── 4. CONFIRM MODALS ── */
+    function demoShowConfirm() {
+      UI.showConfirm({
+        title: 'ARE YOU SURE?',
+        body: 'Once you confirm, you will move to the next round. You cannot go back and change your decisions.',
+        onConfirm: () => UI.toast.success('Moved to next round!'),
+        onCancel:  () => UI.toast.info('Stayed on current round.', { duration: 1500 }),
+      });
+    }
+
+    function demoShowRestartConfirm() {
+      UI.showConfirm({
+        title: 'RESTART GAME?',
+        body: 'All your progress and decisions will be permanently deleted.',
+        confirmText: 'Restart',
+        cancelText: 'Keep Playing',
+        onConfirm: () => UI.toast.warning('Game restarted!'),
+      });
+    }
+
+    function demoConfirmName() {
+      const name = document.getElementById('demo-name-input').value.trim();
+      UI.closeModal('#demo-custom-modal');
+      if (name) UI.toast.success(`Welcome, ${name}!`);
+      else UI.toast.warning('Please enter a name!');
+    }
+
+    /* ── 9. CHARACTER CARD SIMULATION ── */
+    let _charStats = { cash: 180_000_000, invest: 0, phys: 70, ment: 70 };
+
+    function demoSimulateRound() {
+      // Simulate a random round outcome
+      const cashChange   = Math.round((Math.random() - 0.3) * 80_000_000);
+      const investChange = Math.round(Math.random() * 50_000_000);
+      const physChange   = Math.round((Math.random() - 0.4) * 20);
+      const mentChange   = Math.round((Math.random() - 0.4) * 20);
+
+      _charStats.cash   = Math.max(0, _charStats.cash + cashChange);
+      _charStats.invest = Math.max(0, _charStats.invest + investChange);
+      _charStats.phys   = Math.max(0, Math.min(100, _charStats.phys + physChange));
+      _charStats.ment   = Math.max(0, Math.min(100, _charStats.ment + mentChange));
+
+      UI.countTo('#char-cash',   _charStats.cash,   { format: UI.formatVND });
+      UI.countTo('#char-invest', _charStats.invest, { format: UI.formatVND });
+      UI._flashEl(document.getElementById('char-cash'),   cashChange > 0);
+      UI._flashEl(document.getElementById('char-invest'), true);
+
+      UI.setBar('#char-phys-fill', _charStats.phys, '#char-phys-val');
+      UI.setBar('#char-ment-fill', _charStats.ment, '#char-ment-val');
+
+      // Health warnings
+      if (_charStats.phys <= 30) UI.toast.danger(`Physical health critical: ${_charStats.phys}%!`);
+      else if (_charStats.phys <= 50) UI.toast.warning(`Physical health low: ${_charStats.phys}%`);
+      if (_charStats.ment <= 30) UI.toast.danger(`Mental health critical: ${_charStats.ment}%!`);
+      else if (_charStats.ment <= 50) UI.toast.warning(`Mental health low: ${_charStats.ment}%`);
+    }
+
+    function demoResetCharStats() {
+      _charStats = { cash: 180_000_000, invest: 0, phys: 70, ment: 70 };
+      UI.countTo('#char-cash',   _charStats.cash,   { format: UI.formatVND });
+      UI.countTo('#char-invest', _charStats.invest, { format: UI.formatVND });
+      UI.setBar('#char-phys-fill', 70, '#char-phys-val');
+      UI.setBar('#char-ment-fill', 70, '#char-ment-val');
+    }
+  </script>
+</body>
+</html>
