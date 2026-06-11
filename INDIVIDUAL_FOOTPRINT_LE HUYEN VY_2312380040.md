@@ -17,7 +17,7 @@ Một số đóng góp nổi bật bao gồm:
 - Màn hình giới thiệu và hướng dẫn giúp người chơi hiểu được mục tiêu và cơ chế của trò chơi.  
 - Giao diện thông tin chính, nơi người chơi theo dõi hồ sơ nhân vật, các chỉ số hiện tại, sự kiện cuộc sống và điều kiện thị trường.  
 - Các màn hình ra quyết định liên quan đến thu nhập, chi tiêu và đầu tư.  
-- Các thành phần giao diện tương tác như nút bấm, toggle, màn hình phóng to thông tin và thông báo cảnh báo.  
+- Các thành phần giao diện tương tác như nút bấm, toast, màn hình phóng to thông tin và thông báo cảnh báo.  
 - Hệ thống phản hồi trực quan giúp người chơi nhận biết sự thay đổi của các chỉ số sau mỗi quyết định.  
 - Màn hình tổng kết cuối mỗi năm mô phỏng.  
 - Màn hình kết thúc trò chơi và các trạng thái thất bại.  
