@@ -157,7 +157,7 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
     }
     return 'No tier';
   }
-
+  
   /* ──────────────────────────────────────────────────────────
      STOCKS
      ────────────────────────────────────────────────────────── */
@@ -169,7 +169,7 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
     'REA-V': { code: 'REA-V', sector: 'Real Estate',  basePrice: 150_000 },
     'ENE-G': { code: 'ENE-G', sector: 'Energy',       basePrice: 80_000 },
   };
-
+  
   /**
    * Stock price change percentages per round (cumulative applied each round).
    * Indexed as [roundIndex] where roundIndex = round - 1.
