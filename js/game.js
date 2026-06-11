@@ -879,6 +879,7 @@ const GAME = (function() {
       insuranceFeeLabel.textContent = `Fee: ${UI.formatVND(GAME_DATA.getInsuranceFee(round))} / year`;
     }
 
+
     // 5. Build Stock table
     buildStockMarketTable();
 
@@ -1510,7 +1511,7 @@ const GAME = (function() {
     const phDelta = outcome.phDelta;
     const endStats = outcome.endStats;
 
-    // Use saved portfolio and stock prices if available (historical), fallback to live
+      // Use saved portfolio and stock prices if available (historical), fallback to live
     const portfolio = outcome.portfolio || state.portfolio;
     const prices = outcome.prices || state.currentPrices;
     const savingsBalance = outcome.savingsBalance !== undefined ? outcome.savingsBalance : state.savingsBalance;
@@ -1530,117 +1531,106 @@ const GAME = (function() {
     }
 
     // 2. Investment Portfolio Calculations
-    let totalCapital = 0;
-    let totalMarketValue = 0;
+   let totalCapital = 0;
+   let totalMarketValue = 0;
 
-    const codes = ['BNK-V', 'TEC-F', 'CSM-M', 'REA-V', 'ENE-G'];
-    codes.forEach(code => {
-      const pos = portfolio[code] || { quantity: 0, avgCost: 0 };
-      totalCapital += pos.quantity * pos.avgCost;
-      totalMarketValue += pos.quantity * prices[code];
-    });
+   const codes = ['BNK-V', 'TEC-F', 'CSM-M', 'REA-V', 'ENE-G'];
+   codes.forEach(code => {
+     const pos = portfolio[code] || { quantity: 0, avgCost: 0 };
+     totalCapital += pos.quantity * pos.avgCost;
+     totalMarketValue += pos.quantity * prices[code];
+   });
 
-    const roundReturn = totalMarketValue - totalCapital;
+   const roundReturn = totalMarketValue - totalCapital;
 
-    // Calculate Cumulative capital invested
-    let cumulativeCapital = 0;
-    for (let r = 1; r <= roundNumber; r++) {
-      const outcome_r = state.rounds[r - 1];
-      if (outcome_r) {
-        let tc = 0;
-        const port_r = outcome_r.portfolio || {};
-        for (const [code, pos] of Object.entries(port_r)) {
-          tc += pos.quantity * pos.avgCost;
-        }
-        cumulativeCapital += tc;
-      }
-    }
+   // Calculate Cumulative capital invested
+   const cumulativeCapital = totalCapital;
 
-    const realizedPnL = outcome.realizedPnL || 0;
-    const cumulativeReturnPct = cumulativeCapital > 0
-      ? ((realizedPnL + (totalMarketValue - totalCapital)) / cumulativeCapital) * 100
-      : 0;
+   const realizedPnL = outcome.realizedPnL || 0;
+   const cumulativeReturnPct = cumulativeCapital > 0
+     ? ((realizedPnL + (totalMarketValue - totalCapital)) / cumulativeCapital) * 100
+     : 0;
 
-    // Set portfolio header stats
-    const capEl = document.getElementById('result-portfolio-capital');
-    if (capEl) capEl.textContent = UI.formatVND(totalCapital);
+   // Set portfolio header stats
+   const capEl = document.getElementById('result-portfolio-capital');
+   if (capEl) capEl.textContent = UI.formatVND(totalCapital);
 
-    const mktEl = document.getElementById('result-portfolio-market');
-    if (mktEl) mktEl.textContent = UI.formatVND(totalMarketValue);
+   const mktEl = document.getElementById('result-portfolio-market');
+   if (mktEl) mktEl.textContent = UI.formatVND(totalMarketValue);
 
-    const rndRetEl = document.getElementById('result-portfolio-round-return');
-    if (rndRetEl) {
-      rndRetEl.textContent = (roundReturn >= 0 ? '+' : '') + UI.formatVND(roundReturn);
-      rndRetEl.className = roundReturn > 0 ? 'num-gain' : (roundReturn < 0 ? 'num-loss' : 'num-neutral');
-    }
+   const rndRetEl = document.getElementById('result-portfolio-round-return');
+   if (rndRetEl) {
+     rndRetEl.textContent = (roundReturn >= 0 ? '+' : '') + UI.formatVND(roundReturn);
+     rndRetEl.className = roundReturn > 0 ? 'num-gain' : (roundReturn < 0 ? 'num-loss' : 'num-neutral');
+   }
 
-    const cumRetEl = document.getElementById('result-portfolio-cumulative-return');
-    if (cumRetEl) {
-      cumRetEl.textContent = (cumulativeReturnPct >= 0 ? '+' : '') + cumulativeReturnPct.toFixed(2) + '%';
-      cumRetEl.className = cumulativeReturnPct > 0 ? 'num-gain' : (cumulativeReturnPct < 0 ? 'num-loss' : 'num-neutral');
-    }
+   const cumRetEl = document.getElementById('result-portfolio-cumulative-return');
+   if (cumRetEl) {
+     cumRetEl.textContent = (cumulativeReturnPct >= 0 ? '+' : '') + cumulativeReturnPct.toFixed(2) + '%';
+     cumRetEl.className = cumulativeReturnPct > 0 ? 'num-gain' : (cumulativeReturnPct < 0 ? 'num-loss' : 'num-neutral');
+   }
 
-    // Update stock table cost header dynamically
-    const costHeaderEl = document.getElementById('result-stock-cost-header');
-    if (costHeaderEl) {
-      costHeaderEl.textContent = roundNumber === 1 ? 'Cost/Share' : 'Avg Cost';
-    }
+   // Update stock table cost header dynamically
+   const costHeaderEl = document.getElementById('result-stock-cost-header');
+   if (costHeaderEl) {
+     costHeaderEl.textContent = roundNumber === 1 ? 'Cost/Share' : 'Avg Cost';
+   }
 
-    // 3. Stock Portfolio Table
-    const tbody = document.getElementById('result-stock-tbody');
-    if (tbody) {
-      let html = '';
-      const iconMap = {
-        'BNK-V': 'Bank.svg',
-        'TEC-F': 'Tech.svg',
-        'CSM-M': 'Consumer.svg',
-        'REA-V': 'Real estate.svg',
-        'ENE-G': 'Energy.svg'
-      };
+   // 3. Stock Portfolio Table
+   const tbody = document.getElementById('result-stock-tbody');
+   if (tbody) {
+     let html = '';
+     const iconMap = {
+       'BNK-V': 'Bank.svg',
+       'TEC-F': 'Tech.svg',
+       'CSM-M': 'Consumer.svg',
+       'REA-V': 'Real estate.svg',
+       'ENE-G': 'Energy.svg'
+     };
 
-      codes.forEach(code => {
-        const pos = portfolio[code] || { quantity: 0, avgCost: 0 };
-        const price = prices[code];
-        const gain = pos.quantity * (price - pos.avgCost);
-        const gainPct = pos.avgCost > 0 ? (gain / (pos.quantity * pos.avgCost)) * 100 : 0;
+     codes.forEach(code => {
+       const pos = portfolio[code] || { quantity: 0, avgCost: 0 };
+       const price = prices[code];
+       const gain = pos.quantity * (price - pos.avgCost);
+       const gainPct = pos.avgCost > 0 ? (gain / (pos.quantity * pos.avgCost)) * 100 : 0;
 
-        const gainText = pos.quantity > 0
-          ? `${gain >= 0 ? '+' : ''}${UI.formatVND(gain)} (${gainPct >= 0 ? '+' : ''}${gainPct.toFixed(1)}%)`
-          : '-';
-        const gainClass = pos.quantity > 0
-          ? (gain > 0 ? 'num-gain' : (gain < 0 ? 'num-loss' : 'num-neutral'))
-          : 'num-neutral';
+       const gainText = pos.quantity > 0
+         ? `${gain >= 0 ? '+' : ''}${UI.formatVND(gain)} (${gainPct >= 0 ? '+' : ''}${gainPct.toFixed(1)}%)`
+         : '-';
+       const gainClass = pos.quantity > 0
+         ? (gain > 0 ? 'num-gain' : (gain < 0 ? 'num-loss' : 'num-neutral'))
+         : 'num-neutral';
 
-        // Calculate Cost/Share (Buy Cost for round 1, Avg Cost for round 2+)
-        let costDisplay = '';
-        if (pos.quantity > 0) {
-          costDisplay = UI.formatVND(pos.avgCost);
-        } else if (roundNumber === 1) {
-          costDisplay = UI.formatVND(price * (1 + GAME_DATA.STOCK_TRADING_FEE));
-        } else {
-          costDisplay = '-';
-        }
+       // Calculate Cost/Share (Buy Cost for round 1, Avg Cost for round 2+)
+       let costDisplay = '';
+       if (pos.quantity > 0) {
+         costDisplay = UI.formatVND(pos.avgCost);
+       } else if (roundNumber === 1) {
+         costDisplay = UI.formatVND(price * (1 + GAME_DATA.STOCK_TRADING_FEE));
+       } else {
+         costDisplay = '-';
+       }
 
-        html += `
-          <tr>
-            <td>
-              <div style="display: flex; align-items: center; gap: var(--space-2);">
-                <img src="assets/icons/${iconMap[code]}" alt="${code} icon" style="width: 20px; height: 20px;">
-                <strong>${code}</strong>
-              </div>
-            </td>
-            <td class="text-right">${pos.quantity}</td>
-            <td class="text-right">${costDisplay}</td>
-            <td class="text-right">${UI.formatVND(price)}</td>
-            <td class="text-right ${gainClass}">${gainText}</td>
-          </tr>
-        `;
-      });
-      tbody.innerHTML = html;
-    }
+       html += `
+         <tr>
+           <td>
+             <div style="display: flex; align-items: center; gap: var(--space-2);">
+               <img src="assets/icons/${iconMap[code]}" alt="${code} icon" style="width: 20px; height: 20px;">
+               <strong>${code}</strong>
+             </div>
+           </td>
+           <td class="text-right">${pos.quantity}</td>
+           <td class="text-right">${costDisplay}</td>
+           <td class="text-right">${UI.formatVND(price)}</td>
+           <td class="text-right ${gainClass}">${gainText}</td>
+         </tr>
+       `;
+     });
+     tbody.innerHTML = html;
+   }
 
     // 4. Savings Account Table
-    const savingsOpening = outcome.savingsOpening || 0;
+     const savingsOpening = outcome.savingsOpening || 0;
     const additionalDeposit = savingsBalance - savingsOpening;
     const principal = savingsBalance;
     const interest = income.savingsInterest;
@@ -2135,7 +2125,7 @@ const GAME = (function() {
     expandedBody.innerHTML = cardsHtml;
     expandedView.classList.add('active');
   }
-
+  
   // ----------------------------------------------------
   // INITIALIZATION
   // ----------------------------------------------------
@@ -2338,46 +2328,73 @@ const GAME = (function() {
     }
 
     // Savings deposit listener registration
-    const savingsInput = document.getElementById('invest-savings-input');
-    const savingsBtn = document.getElementById('invest-savings-btn');
-    if (savingsInput && savingsBtn) {
-      savingsInput.addEventListener('blur', () => {
-        const rawVal = savingsInput.value.replace(/[^\d]/g, '');
-        const val = parseInt(rawVal) || 0;
-        savingsInput.value = val !== 0 ? val.toLocaleString('vi-VN') : '';
-      });
+   const savingsInput = document.getElementById('invest-savings-input');
+   const savingsBtn = document.getElementById('invest-savings-btn');
+   if (savingsInput && savingsBtn) {
+     savingsInput.addEventListener('blur', () => {
+       const rawVal = savingsInput.value.trim();
+       if (rawVal === '') return;
 
-      savingsBtn.addEventListener('click', () => {
-        const rawVal = savingsInput.value.replace(/[^\d]/g, '');
-        const amount = parseInt(rawVal) || 0;
-        if (amount <= 0) {
-          UI.toast.warning("Please enter a valid deposit amount.");
-          return;
-        }
+       // Reject negative input or non-numeric characters (except separators)
+       if (rawVal.includes('-')) {
+         UI.toast.warning("Error: deposit amount must be a positive integer greater than 1,000,000 VND.");
+         savingsInput.value = '';
+         return;
+       }
 
-        if (state.stats.cash < amount) {
-          UI.toast.warning("Not enough cash to deposit this amount.");
-          return;
-        }
-        state.stats.cash -= amount;
-        state.savingsBalance += amount;
-        UI.toast.success(`Deposited ${UI.formatVND(amount)} to savings account.`);
+       const val = parseInt(rawVal.replace(/[^\d]/g, '')) || 0;
+       if (val < 1000000) {
+         UI.toast.warning("Error: deposit amount must be greater than 1,000,000 VND.");
+         savingsInput.value = '';
+         return;
+       }
+       savingsInput.value = val !== 0 ? val.toLocaleString('vi-VN') : '';
+     });
 
-        state.stats.investment = HEALTH.calcPortfolioValue(state.portfolio, state.currentPrices) + state.savingsBalance;
-        savingsInput.value = '';
-        renderDecisionsTab();
-      });
-    }
+     savingsBtn.addEventListener('click', () => {
+       const rawText = savingsInput.value.trim();
+       if (rawText === '') {
+         UI.toast.warning("Please enter a valid deposit amount.");
+         return;
+       }
 
-    // Health Insurance purchase listener registration
-    const insuranceCheck = document.getElementById('invest-insurance-check');
-    if (insuranceCheck) {
-      insuranceCheck.addEventListener('change', () => {
-        state.hasInsurance = insuranceCheck.checked;
-        updateLivePreview();
-      });
-    }
+       // Reject negative input
+       if (rawText.includes('-')) {
+         UI.toast.warning("Error: deposit amount must be a positive integer greater than 1,000,000 VND.");
+         savingsInput.value = '';
+         return;
+       }
 
+       const amount = parseInt(rawText.replace(/[^\d]/g, '')) || 0;
+       if (amount < 1000000) {
+         UI.toast.warning("Error: deposit amount must be greater than 1,000,000 VND.");
+         savingsInput.value = '';
+         return;
+       }
+
+       if (state.stats.cash < amount) {
+         UI.toast.warning("Not enough cash to deposit this amount.");
+         return;
+       }
+       state.stats.cash -= amount;
+       state.savingsBalance += amount;
+       UI.toast.success(`Deposited ${UI.formatVND(amount)} to savings account.`);
+
+       state.stats.investment = HEALTH.calcPortfolioValue(state.portfolio, state.currentPrices) + state.savingsBalance;
+       savingsInput.value = '';
+       renderDecisionsTab();
+     });
+   }
+
+   // Health Insurance purchase listener registration
+   const insuranceCheck = document.getElementById('invest-insurance-check');
+   if (insuranceCheck) {
+     insuranceCheck.addEventListener('change', () => {
+       state.hasInsurance = insuranceCheck.checked;
+       updateLivePreview();
+     });
+   }
+    
     // Final confirm button listener registration
     const confirmBtn = document.getElementById('btn-confirm-decisions');
     if (confirmBtn) {
