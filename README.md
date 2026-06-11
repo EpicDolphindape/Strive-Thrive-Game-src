@@ -192,15 +192,6 @@ Nói cách khác:
 - CSS
 - JavaScript
 
-```text
-src/
-├── app.js          # Vòng lặp chính của trò chơi
-├── state.js        # Quản lý trạng thái người chơi
-├── investment.js   # Hệ thống đầu tư
-├── config.js       # Cấu hình trò chơi
-└── ui.js           # Giao diện người dùng
-```
-
 ---
 
 ## 🚀 Mục tiêu của dự án
@@ -222,5 +213,7 @@ Chúng tôi tạo ra nó để giúp người trẻ hiểu rằng:
 ## 🌱 A Final Note
 
 Dự án được phát triển trong khuôn khổ môn học **Technology Application in Banking and Finance** với mục tiêu kết hợp giáo dục tài chính, mô phỏng ra quyết định và trải nghiệm tương tác thông qua game.
+
+References để hoàn thiện data và logic game: https://docs.google.com/document/d/1ZpIiNosmEpq-OJ4zoar221JfLIQL42ggyVSBogV1d-o/edit?usp=sharing
 
 > *"Work hard, save wisely, invest carefully, and please... go touch some grass."* 🌱
