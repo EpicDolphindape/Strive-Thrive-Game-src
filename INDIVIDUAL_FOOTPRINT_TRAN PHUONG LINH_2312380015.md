@@ -30,6 +30,7 @@ Phần thể hiện rõ nhất đóng góp của em là toàn bộ hệ thống 
 
 **Nghiên cứu các tình huống liên quan đến đời sống, tài chính thực tế để xây dựng gameplay**: Đối với Life events, em cố gắng đưa thật nhiều các sự kiện trong nhiều khía cạnh của cuộc sống nhất có thể, liên quan đến: bản thân, gia đình, công việc, các mối quan hệ trong xã hội, các tình huống từ may mắn đến xui rủi mà một người có thể gặp trong cuộc đời của họ. Đối với Market events, đa phần các sự kiện lớn ảnh hưởng đến thị trường trong game đều được em lấy cảm hứng từ các sự kiện có thật bằng cách đọc báo, đọc tin tức, hỏi AI, sau đó em tìm hiểu sâu hơn để biết được tác động của các sự kiện đó đến nền kinh tế thế giới và Việt Nam như thế nào để có phương án điều chỉnh lại cho phù hợp với quy mô của game.
 
+
 **Thiết kế và triển khai module Life Events**: Sau khi kiểm thử và thấy có những điểm bất hợp lý trong phiên bản ban đầu, em đã thay đổi hệ thống Life event bằng cách chia thành 4 loại:
 
 - Random events: là những sự kiện diễn ra hoàn toàn ngẫu nhiên, được quyết định bởi xác suất. Loại sự kiện này chủ yếu dựa trên “may rủi” của người chơi và có thể xuất hiện ở bất cứ vòng nào.
@@ -39,6 +40,7 @@ Phần thể hiện rõ nhất đóng góp của em là toàn bộ hệ thống 
 
 Với hệ thống 4 loại sự kiện, game sẽ có luồng logic chặt chẽ hơn và phản ánh cơ chế “trade-off” (đánh đổi) một cách rõ ràng hơn. Sau khi viết ra nội dung của các sự kiện, em sẽ gắn tag cho mỗi sự kiện (Tích cực / Tiêu cực), gán cho chúng xác suất, trọng số, hoặc điều kiện, cuối cùng là đưa ra các tác động liên quan đến Tiền, sức khỏe tinh thần, sức khỏe thể chất của mỗi event.
 
+
 **Thiết kế và triển khai module Market Events**: Nếu Life Events mô phỏng những biến cố xảy ra trong cuộc sống cá nhân của người chơi thì Market Events sẽ đại diện cho các biến động của nền kinh tế và thị trường tài chính. Khi xây dựng hệ thống này, em không muốn các sự kiện thị trường chỉ xuất hiện một cách độc lập và ngẫu nhiên, bởi ngoài đời thực các sự kiện kinh tế thường có mối liên hệ với nhau và tạo ra hiệu ứng dây chuyền.
 
 Vì vậy, em đã xây dựng Market Event Tree - một hệ thống nhiều nhánh diễn biến khác nhau. Mỗi nhánh sẽ đại diện cho một bối cảnh kinh tế riêng, ví dụ như giai đoạn phục hồi kinh tế, khủng hoảng kinh tế, lạm phát gia tăng, hay tăng trưởng ổn định. Từ một sự kiện gốc, thị trường có thể diễn biến theo nhiều hướng khác nhau tùy vào xác suất được thiết lập trước, tạo cảm giác khó đoán và gần với thực tế hơn.
@@ -47,11 +49,13 @@ Vì vậy, em đã xây dựng Market Event Tree - một hệ thống nhiều nh
 
 Sau khi hoàn thiện nội dung, em tiến hành gán xác suất, điều kiện kích hoạt và mức độ ảnh hưởng của từng sự kiện tới thị trường. Các sự kiện này sẽ tác động trực tiếp tới giá trị tài sản của người chơi, buộc họ phải liên tục đánh giá lại chiến lược tài chính của mình thay vì chỉ đưa ra một quyết định rồi giữ nguyên trong suốt trò chơi.
 
+
 **Chuyển đổi dữ liệu sự kiện sang cấu trúc JSON tích hợp vào source code**: Sau khi hoàn thành việc thiết kế nội dung cho các Life Events và Market Events, em tiến hành chuẩn hóa toàn bộ dữ liệu sang cấu trúc JSON để có thể tích hợp trực tiếp vào game. Đây là bước quan trọng vì dữ liệu ban đầu được xây dựng dưới dạng bảng và tài liệu mô tả, trong khi hệ thống game cần dữ liệu có cấu trúc rõ ràng để có thể tự động xử lý.
 
 Đối với mỗi sự kiện, em xác định các thuộc tính cần thiết như mã sự kiện, mô tả, loại sự kiện, xác suất xuất hiện, điều kiện kích hoạt, các lựa chọn của người chơi và tác động tương ứng tới các chỉ số trong game. Việc chuẩn hóa dữ liệu giúp các sự kiện có cùng cấu trúc, dễ dàng mở rộng trong tương lai và giảm thiểu lỗi khi tích hợp vào hệ thống.
 
 Ngoài ra, trong quá trình chuyển đổi dữ liệu, em cũng liên tục kiểm tra lại các giá trị đầu vào để đảm bảo các tác động của sự kiện được tính toán đúng theo logic gameplay đã thiết kế trước đó.
+
 
 **Xây dựng hệ thống Scoring đánh giá quyết định tài chính**: Một trong những mục tiêu quan trọng nhất của game là giúp người chơi nhìn thấy hệ quả của những lựa chọn mà họ đưa ra trong suốt quá trình chơi. Vì vậy, em xây dựng hệ thống Scoring dựa trên hai nhóm chỉ số chính là Financial Score và Well-being Score.
 
@@ -61,7 +65,9 @@ Bên cạnh đó, em xây dựng Well-being Score dựa trên trung bình của 
 
 Việc sử dụng đồng thời Financial Score và Well-being Score giúp game không chỉ đánh giá khả năng kiếm tiền mà còn xem xét người chơi đã phải đánh đổi bao nhiêu sức khỏe để đạt được kết quả đó. Đây cũng chính là thông điệp cốt lõi mà nhóm muốn truyền tải thông qua trò chơi.
 
+
 **Lập trình**: Cụ thể, phần lập trình của em tập trung vào ba thành phần liên kết với nhau. Thứ nhất, em xây dựng hệ thống sự kiện; các sự kiện được lựa chọn theo xác suất, độ hiếm, trọng số và hành vi của người chơi. Thứ hai, em tích hợp tác động của sự kiện vào kết quả từng vòng thông qua các biến tiền mặt, sức khỏe thể chất và sức khỏe tinh thần. Thứ ba, em xây dựng cơ chế chấm điểm và phân loại cuối trò chơi dựa trên tài sản, well-being, độ cân bằng giữa tài chính và sức khỏe, đồng thời phân loại rõ nguyên nhân thất bại. Kết quả tính toán được chuyển sang các màn hình kết quả vòng, chiến thắng và thất bại để người chơi hiểu hậu quả của các quyết định đã đưa ra.
+
 
 **Kiểm thử và hiệu chỉnh dữ liệu nhằm đảm bảo cân bằng gameplay**: Sau khi hoàn thành các phiên bản đầu tiên của game, em dành khá nhiều thời gian cho việc kiểm thử. Đầu tiên, em xây dựng một file Excel để mô phỏng và tính toán trước các kết quả có thể xảy ra khi người chơi đưa ra những lựa chọn khác nhau. Việc này giúp em kiểm tra xem các công thức tính toán và hệ thống chấm điểm có đang hoạt động đúng như thiết kế hay không.
 
@@ -108,8 +114,7 @@ Phạm vi đối chiếu: Các bằng chứng về Hệ thống event, chấm đ
 **Bằng chứng GitHub:**
 
 - [Link commit](https://github.com/EpicDolphindape/Strive-Thrive-Game-src/commits/main/) (trong main branch),
-- [Link issue](https://github.com/EpicDolphindape/Strive-Thrive-Game-src/issues) (toàn bộ các issue được khởi tạo bởi em) https://github.com/EpicDolphindape/Strive-Thrive-Game-src/issues
-
+- [Link issue](https://github.com/EpicDolphindape/Strive-Thrive-Game-src/issues) (toàn bộ các issue được khởi tạo bởi em) 
 **Bằng chứng qua Google Drive:**
 
 - Event database: [LIFE & MARKET EVENTS - CODE VER.](https://docs.google.com/spreadsheets/d/1F2M7RwASEpm-_Bb-pauA4BoNVNGVZbXtf1n_F-aj-Sw/edit?usp=drive_link)
