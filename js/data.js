@@ -157,7 +157,7 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
     }
     return 'No tier';
   }
-  
+
   /* ──────────────────────────────────────────────────────────
      STOCKS
      ────────────────────────────────────────────────────────── */
@@ -169,7 +169,7 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
     'REA-V': { code: 'REA-V', sector: 'Real Estate',  basePrice: 150_000 },
     'ENE-G': { code: 'ENE-G', sector: 'Energy',       basePrice: 80_000 },
   };
-  
+
   /**
    * Stock price change percentages per round (cumulative applied each round).
    * Indexed as [roundIndex] where roundIndex = round - 1.
@@ -202,18 +202,48 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
    * Indexed as [roundIndex][0..3] = [Q1 max, Q2 max, Q3 max, Q4 max]
    * (Q5 = anything above Q4 max)
    */
-  const QUINTILE_BREAKPOINTS = [
-    // Round 1
-    [17_770_000, 19_380_000, 20_550_000, 21_840_000],
-    // Round 2
-    [22_770_000, 24_380_000, 25_550_000, 26_840_000],
-    // Round 3
-    [27_770_000, 29_380_000, 30_550_000, 31_840_000],
-    // Round 4
-    [37_770_000, 39_380_000, 40_550_000, 41_840_000],
-    // Round 5
-    [47_770_000, 49_380_000, 50_550_000, 51_840_000],
-  ];
+  const QUINTILE_BREAKPOINTS = (() => {
+    const breakpoints = [];
+    const HOUR_OPTIONS = [0, 10, 20, 30, 40];
+    const activeSideJobs = ['bookkeeper', 'adviser', 'tutor', 'blogger'];
+    const sideJobHoursOptions = [10, 20, 30, 40];
+
+    for (let r = 1; r <= 5; r++) {
+      const roundMeta = ROUNDS[r - 1];
+      const monthlySalary = roundMeta.monthlySalary;
+      const otWage = (monthlySalary / 208) * 1.5;
+
+      const incomes = [];
+
+      // 1. Side Job: none (hours is 0)
+      for (const ot of HOUR_OPTIONS) {
+        incomes.push(monthlySalary + otWage * ot);
+      }
+
+      // 2. Active Side Jobs
+      for (const jobKey of activeSideJobs) {
+        const jobData = SIDE_JOBS[jobKey];
+        const jobWage = jobData.wage;
+        for (const ot of HOUR_OPTIONS) {
+          for (const sh of sideJobHoursOptions) {
+            incomes.push(monthlySalary + otWage * ot + jobWage * sh);
+          }
+        }
+      }
+
+      // Sort lowest to highest
+      incomes.sort((a, b) => a - b);
+
+      // Calculate the 4 boundaries separating the 5 groups of 17
+      const b1 = Math.round((incomes[16] + incomes[17]) / 2);
+      const b2 = Math.round((incomes[33] + incomes[34]) / 2);
+      const b3 = Math.round((incomes[50] + incomes[51]) / 2);
+      const b4 = Math.round((incomes[67] + incomes[68]) / 2);
+
+      breakpoints.push([b1, b2, b3, b4]);
+    }
+    return breakpoints;
+  })();
 
   /**
    * Get income quintile (1–5) for a monthly income value.
@@ -410,9 +440,10 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
     return {
       playerName,
       currentRound: 1,
+      usedRandomEventIds: [], 
       stats: {
         cash:           0,
-        investment:     5_000_000,
+        investment:     10_000_000,
         physicalHealth: 70,
         mentalHealth:   70,
       },
@@ -426,8 +457,8 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
         'REA-V': { quantity: 0, avgCost: 0 },
         'ENE-G': { quantity: 0, avgCost: 0 },
       },
-      savingsBalance: 5_000_000,
-      savingsOpening: 5_000_000,
+      savingsBalance: 10_000_000,
+      savingsOpening: 10_000_000,
       hasInsurance:   false,
       realizedPnL:    0,
       // Current stock prices (updated each round)
@@ -445,13 +476,60 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
     };
   }
 
+  const ROUND_BASE_COSTS = {
+    1: {
+      healthcare:    799500,
+      entertainment: 4500000,
+      housing:       3750000,
+      food:          2550000,
+      utility:       700500,
+      transport:     499500
+    },
+    2: {
+      healthcare:    1070000,
+      entertainment: 6000000,
+      housing:       5000000,
+      food:          3400000,
+      utility:       930000,
+      transport:     666000
+    },
+    3: {
+      healthcare:    1330000,
+      entertainment: 7500000,
+      housing:       6250000,
+      food:          4250000,
+      utility:       1170000,
+      transport:     832500
+    },
+    4: {
+      healthcare:    1870000,
+      entertainment: 10500000,
+      housing:       8750000,
+      food:          5950000,
+      utility:       1630000,
+      transport:     1162500
+    },
+    5: {
+      healthcare:    2400000,
+      entertainment: 13500000,
+      housing:       11250000,
+      food:          7650000,
+      utility:       2100000,
+      transport:     1498500
+    }
+  };
+
+  function getBaseExpense(category, round) {
+    return ROUND_BASE_COSTS[round]?.[category] || 0;
+  }
+
   /** Expense template for a single round */
   function createRoundDecision(round) {
-    const meta = ROUNDS[round - 1];
     const expenses = {};
-    for (const [key, ratio] of Object.entries(BASE_EXPENSES)) {
-      expenses[key] = Math.round(ratio * meta.monthlySalary);
-    }
+    const categories = ['housing', 'utility', 'food', 'transport', 'healthcare', 'entertainment'];
+    categories.forEach(cat => {
+      expenses[cat] = getBaseExpense(cat, round);
+    });
     return {
       round,
       // Income choices
@@ -499,7 +577,7 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
       tag: 'positive',
       rarity: 'common',
       weight: 10,
-      impact: { mentalHealth: -1 }
+      impact: { mentalHealth: 1 }
     },
     {
       id: 'rand_volunteer',
@@ -555,7 +633,7 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
       tag: 'negative',
       rarity: 'common',
       weight: 10,
-      impact: { mentalHealth: -3 }
+      impact: { mentalHealth: -2 }
     },
     {
       id: 'rand_police',
@@ -579,7 +657,7 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
       tag: 'negative',
       rarity: 'rare',
       weight: 5,
-      impact: { mentalHealth: -10 }
+      impact: { mentalHealth: -7 }
     },
     {
       id: 'rand_netflix',
@@ -595,7 +673,7 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
       tag: 'negative',
       rarity: 'rare',
       weight: 6,
-      impact: { mentalHealth: -8 }
+      impact: { mentalHealth: -6 }
     },
     {
       id: 'rand_report_lost',
@@ -603,14 +681,14 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
       tag: 'negative',
       rarity: 'uncommon',
       weight: 8,
-      impact: { mentalHealth: -4, physicalHealth: -2 }
+      impact: { mentalHealth: -2, physicalHealth: -2 }
     },
     {
       id: 'rand_scam',
       text: "You get tricked by an online scam and lose a lot of money. The financial loss really hurts, but what makes you angrier is how stupid you feel for believing them. You are left feeling totally embarrassed and deeply frustrated.",
       tag: 'negative',
       rarity: 'ultra_rare',
-      weight: 7,
+      weight: 2,
       impact: { cash: -80000000, mentalHealth: -10 }
     },
     {
@@ -627,7 +705,7 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
       tag: 'negative',
       rarity: 'very_rare',
       weight: 4,
-      impact: { cash: -2000000, mentalHealth: -6 }
+      impact: { cash: -2000000, mentalHealth: -2, physicalHealth: -2 }
     },
     {
       id: 'rand_flat_tire',
@@ -643,7 +721,7 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
       tag: 'negative',
       rarity: 'uncommon',
       weight: 7,
-      impact: { cash: -2500000, mentalHealth: -4, physicalHealth: -1 }
+      impact: { cash: -2500000, mentalHealth: -2, physicalHealth: -1 }
     },
     {
       id: 'rand_driving_fail',
@@ -651,7 +729,7 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
       tag: 'negative',
       rarity: 'uncommon',
       weight: 6,
-      impact: { cash: -1000000, mentalHealth: -5 }
+      impact: { cash: -1000000, mentalHealth: -3 }
     },
     {
       id: 'rand_luggage_lost',
@@ -659,7 +737,7 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
       tag: 'negative',
       rarity: 'very_rare',
       weight: 5,
-      impact: { cash: -5000000, mentalHealth: -5 }
+      impact: { cash: -5000000, mentalHealth: -3 }
     }
   ];
 
@@ -1300,6 +1378,114 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
     }
   };
 
+  const MARKET_PRICE_BOUNDS = {
+    '1.1': {
+      'BNK-V': { min: 43730, max: 70556 },
+      'CSM-M': { min: 45881, max: 96841 },
+      'ENE-G': { min: 54234, max: 120779 },
+      'REA-V': { min: 11130, max: 232862 },
+      'TEC-F': { min: 47135, max: 79643 },
+    },
+    '2.1': {
+      'BNK-V': { min: 35614, max: 57461 },
+      'CSM-M': { min: 46442, max: 98024 },
+      'ENE-G': { min: 59683, max: 132916 },
+      'REA-V': { min: 12184, max: 254903 },
+      'TEC-F': { min: 61445, max: 103823 },
+    },
+    '2.2': {
+      'BNK-V': { min: 33646, max: 54287 },
+      'CSM-M': { min: 36910, max: 77905 },
+      'ENE-G': { min: 43354, max: 96550 },
+      'REA-V': { min: 15156, max: 183763 },
+      'TEC-F': { min: 46939, max: 79312 },
+    },
+    '3.1': {
+      'BNK-V': { min: 38724, max: 62480 },
+      'CSM-M': { min: 50874, max: 107380 },
+      'ENE-G': { min: 73019, max: 162615 },
+      'REA-V': { min: 13159, max: 275297 },
+      'TEC-F': { min: 62363, max: 105374 },
+    },
+    '3.2': {
+      'BNK-V': { min: 48472, max: 105354 },
+      'CSM-M': { min: 97137, max: 150442 },
+      'ENE-G': { min: 131253, max: 204516 },
+      'REA-V': { min: 125507, max: 329875 },
+      'TEC-F': { min: 104220, max: 150250 },
+    },
+    '3.3': {
+      'BNK-V': { min: 35026, max: 71315 },
+      'CSM-M': { min: 16922, max: 121014 },
+      'ENE-G': { min: 39099, max: 114572 },
+      'REA-V': { min: 43648, max: 199010 },
+      'TEC-F': { min: 97241, max: 131734 },
+    },
+    '3.4': {
+      'BNK-V': { min: 55119, max: 88931 },
+      'CSM-M': { min: 71608, max: 151144 },
+      'ENE-G': { min: 77784, max: 173227 },
+      'REA-V': { min: 14906, max: 311854 },
+      'TEC-F': { min: 71432, max: 120696 },
+    },
+    '4.1': {
+      'BNK-V': { min: 65216, max: 105223 },
+      'CSM-M': { min: 75425, max: 159200 },
+      'ENE-G': { min: 128911, max: 287088 },
+      'REA-V': { min: 22071, max: 461754 },
+      'TEC-F': { min: 110976, max: 187513 },
+    },
+    '4.2': {
+      'BNK-V': { min: 28949, max: 68804 },
+      'CSM-M': { min: 27110, max: 105227 },
+      'ENE-G': { min: 51746, max: 188000 },
+      'REA-V': { min: 10360, max: 155002 },
+      'TEC-F': { min: 66650, max: 149659 },
+    },
+    '4.3': {
+      'BNK-V': { min: 48399, max: 78090 },
+      'CSM-M': { min: 27449, max: 57937 },
+      'ENE-G': { min: 37635, max: 83814 },
+      'REA-V': { min: 10822, max: 226408 },
+      'TEC-F': { min: 98313, max: 166117 },
+    },
+    '4.4': {
+      'BNK-V': { min: 48345, max: 78002 },
+      'CSM-M': { min: 61950, max: 130758 },
+      'ENE-G': { min: 76529, max: 170432 },
+      'REA-V': { min: 11081, max: 231839 },
+      'TEC-F': { min: 64408, max: 108828 },
+    },
+    '5.1': {
+      'BNK-V': { min: 76071, max: 122738 },
+      'CSM-M': { min: 79009, max: 166765 },
+      'ENE-G': { min: 13861, max: 30869 },
+      'REA-V': { min: 18585, max: 388814 },
+      'TEC-F': { min: 143373, max: 242254 },
+    },
+    '5.2': {
+      'BNK-V': { min: 49524, max: 117705 },
+      'CSM-M': { min: 46749, max: 181457 },
+      'ENE-G': { min: 75502, max: 274311 },
+      'REA-V': { min: 14226, max: 256248 },
+      'TEC-F': { min: 86606, max: 194469 },
+    },
+    '5.3': {
+      'BNK-V': { min: 54205, max: 123401 },
+      'CSM-M': { min: 14620, max: 76510 },
+      'ENE-G': { min: 33335, max: 141534 },
+      'REA-V': { min: 12055, max: 374974 },
+      'TEC-F': { min: 126011, max: 272077 },
+    },
+    '5.4': {
+      'BNK-V': { min: 39980, max: 64505 },
+      'CSM-M': { min: 34213, max: 72213 },
+      'ENE-G': { min: 58132, max: 129462 },
+      'REA-V': { min: 11189, max: 116834 },
+      'TEC-F': { min: 43716, max: 73865 },
+    },
+  };
+
   const MARKET_EVENTS = [
     {
       year: 1,
@@ -1385,6 +1571,7 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
     LIFE_EVENTS,
     MARKET_EVENTS,
     MARKET_EVENT_TREE,
+    MARKET_PRICE_BOUNDS,
     SAVINGS_RATE_ADJUSTMENTS,
     RANDOM_EVENTS,
     JOB_REWARD_EVENTS,
@@ -1399,6 +1586,7 @@ const SAVINGS_RATE_ADJUSTMENTS = [0, 0.005, -0.015, 0.015, -0.005];
     getHealthcareRecovery,
     getHealthThreshold,
     getCharacterSVG,
+    getBaseExpense,
     createInitialState,
     createRoundDecision,
   };

@@ -36,7 +36,7 @@
       "rarity": "Common",
       "weight": 10,
       "impact": {
-        "mentalHealth": -1
+        "mentalHealth": 1
       }
     },
     {
@@ -104,7 +104,7 @@
       "rarity": "Common",
       "weight": 10,
       "impact": {
-        "mentalHealth": -3
+        "mentalHealth": -2
       }
     },
     {
@@ -133,7 +133,7 @@
       "rarity": "Rare",
       "weight": 5,
       "impact": {
-        "mentalHealth": -10
+        "mentalHealth": -7
       }
     },
     {
@@ -152,7 +152,7 @@
       "rarity": "Rare",
       "weight": 6,
       "impact": {
-        "mentalHealth": -8
+        "mentalHealth": -6
       }
     },
     {
@@ -161,7 +161,7 @@
       "rarity": "Uncommon",
       "weight": 8,
       "impact": {
-        "mentalHealth": -4,
+        "mentalHealth": -2,
         "physicalHealth": -2
       }
     },
@@ -169,7 +169,7 @@
       "text": "You get tricked by an online scam and lose a lot of money. The financial loss really hurts, but what makes you angrier is how stupid you feel for believing them. You are left feeling totally embarrassed and deeply frustrated.",
       "tag": "negative",
       "rarity": "Ultra rare",
-      "weight": 7,
+      "weight": 2,
       "impact": {
         "cash": -80000000,
         "mentalHealth": -10
@@ -192,7 +192,8 @@
       "weight": 4,
       "impact": {
         "cash": -2000000,
-        "mentalHealth": -6
+        "mentalHealth": -2,
+        "physicalHealth": -2
       }
     },
     {
@@ -212,7 +213,7 @@
       "weight": 7,
       "impact": {
         "cash": -2500000,
-        "mentalHealth": -4,
+        "mentalHealth": -2,
         "physicalHealth": -1
       }
     },
@@ -223,7 +224,7 @@
       "weight": 6,
       "impact": {
         "cash": -1000000,
-        "mentalHealth": -5
+        "mentalHealth": -3
       }
     },
     {
@@ -233,7 +234,7 @@
       "weight": 5,
       "impact": {
         "cash": -5000000,
-        "mentalHealth": -5
+        "mentalHealth": -3
       }
     }
   ],

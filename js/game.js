@@ -309,14 +309,6 @@ const GAME = (function() {
   function initRoundDecisions() {
     if (!state) return;
     state.currentDecision = GAME_DATA.createRoundDecision(state.currentRound);
-    
-    // Carry over previous expenses if round > 1
-    if (state.currentRound > 1) {
-      const prevDecision = state.rounds[state.currentRound - 2]?.decisions;
-      if (prevDecision && prevDecision.expenses) {
-        state.currentDecision.expenses = { ...prevDecision.expenses };
-      }
-    }
   }
 
   function rollRoundEvents(round) {
@@ -340,9 +332,9 @@ const GAME = (function() {
       if (prevOT > 0) {
         let triggerProb = 0;
         if (prevOT === 10) triggerProb = 0.20;
-        else if (prevOT === 20) triggerProb = 0.40;
-        else if (prevOT === 30) triggerProb = 0.60;
-        else if (prevOT === 40) triggerProb = 0.80;
+        else if (prevOT === 20) triggerProb = 0.50;
+        else if (prevOT === 30) triggerProb = 0.80;
+        else if (prevOT === 40) triggerProb = 1.0;
 
         if (Math.random() <= triggerProb) {
           let tier = 'minor';
@@ -367,40 +359,84 @@ const GAME = (function() {
     }
 
     // 2. Random Events
-    const N = Math.random() < 0.5 ? 3 : 4;
-    const numRandomToRoll = jobRewardEvent ? N - 1 : N;
+
+    // Lưu ID random event đã xuất hiện trong toàn bộ lượt chơi.
+    // Thuộc state nên tự động được lưu qua localStorage.
+    if (!Array.isArray(state.usedRandomEventIds)) {
+      state.usedRandomEventIds = [];
+    }
+
+    const usedRandomEventIds = new Set(state.usedRandomEventIds);
+
+    // Mỗi round chỉ có 2 hoặc 3 RANDOM events.
+    // Job reward không chiếm slot random event.
+    const requestedRandomCount = Math.random() < 0.5 ? 2 : 3;
+
+    // Nếu gần hết event thì chỉ roll số event còn lại.
+    const remainingRandomCount = GAME_DATA.RANDOM_EVENTS.filter(
+      e => !usedRandomEventIds.has(e.id)
+    ).length;
+
+    const numRandomToRoll = Math.min(
+      requestedRandomCount,
+      remainingRandomCount
+    );
 
     let rolledRandomCount = 0;
     let attempts = 0;
+
     while (rolledRandomCount < numRandomToRoll && attempts < 100) {
       attempts++;
-      const tag = Math.random() <= 0.45 ? 'positive' : 'negative';
+
+      // 45% positive, 55% negative
+      const tag = Math.random() <= 0.45
+        ? 'positive'
+        : 'negative';
+
+      // Chọn rarity
       const rarityRoll = Math.random();
       let rarity = 'common';
+
       if (rarityRoll <= 0.50) rarity = 'common';
       else if (rarityRoll <= 0.75) rarity = 'uncommon';
       else if (rarityRoll <= 0.90) rarity = 'rare';
       else if (rarityRoll <= 0.98) rarity = 'very_rare';
       else rarity = 'ultra_rare';
 
-      const matches = GAME_DATA.RANDOM_EVENTS.filter(e => e.tag === tag && e.rarity === rarity);
-      if (matches.length > 0) {
-        const totalWeight = matches.reduce((sum, e) => sum + e.weight, 0);
-        let rWeight = Math.random() * totalWeight;
-        let selectedEvent = matches[0];
-        for (const e of matches) {
-          rWeight -= e.weight;
-          if (rWeight <= 0) {
-            selectedEvent = e;
-            break;
-          }
-        }
+      // Loại toàn bộ event đã xuất hiện ở các round trước
+      const matches = GAME_DATA.RANDOM_EVENTS.filter(e =>
+        e.tag === tag &&
+        e.rarity === rarity &&
+        !usedRandomEventIds.has(e.id)
+      );
 
-        if (!rolled.some(e => e.id === selectedEvent.id)) {
-          rolled.push(selectedEvent);
-          rolledRandomCount++;
+      if (matches.length === 0) continue;
+
+      // Weighted random
+      const totalWeight = matches.reduce(
+        (sum, e) => sum + e.weight,
+        0
+      );
+
+      let randomWeight = Math.random() * totalWeight;
+      let selectedEvent = matches[0];
+
+      for (const event of matches) {
+        randomWeight -= event.weight;
+
+        if (randomWeight <= 0) {
+          selectedEvent = event;
+          break;
         }
       }
+
+      rolled.push(selectedEvent);
+      rolledRandomCount++;
+
+      // Đánh dấu ngay để không trùng trong round hiện tại
+      // và trong những round tiếp theo.
+      usedRandomEventIds.add(selectedEvent.id);
+      state.usedRandomEventIds.push(selectedEvent.id);
     }
 
     // 3. Expense Penalty Events
@@ -879,7 +915,6 @@ const GAME = (function() {
       insuranceFeeLabel.textContent = `Fee: ${UI.formatVND(GAME_DATA.getInsuranceFee(round))} / year`;
     }
 
-
     // 5. Build Stock table
     buildStockMarketTable();
 
@@ -1015,18 +1050,12 @@ const GAME = (function() {
     categories.forEach(cat => {
       const meta = EXPENSE_METADATA[cat];
       
-      // Get base cost: previous round's actual chosen expense, or default BASE_EXPENSES * monthlySalary
-      let baseCost = Math.round(GAME_DATA.BASE_EXPENSES[cat] * metaRound.monthlySalary);
-      if (round > 1) {
-        const prevDec = state.rounds[round - 2]?.decisions;
-        if (prevDec && prevDec.expenses && prevDec.expenses[cat] !== undefined) {
-          baseCost = prevDec.expenses[cat];
-        }
-      }
+      // Get base cost from new round-by-round base costs
+      const baseCost = GAME_DATA.getBaseExpense(cat, round);
 
-      // If player already entered a budget for this round, show it in the Base Cost column as confirmed
+      // Base Cost stays constant as a reference baseline
       const currentVal = state.currentDecision.expenses[cat];
-      const displayedBaseCost = (currentVal !== undefined && currentVal !== 0) ? currentVal : baseCost;
+      const displayedBaseCost = baseCost;
       const displayVal = currentVal !== undefined ? currentVal.toLocaleString('vi-VN') : '';
       const minCost = GAME_DATA.MIN_EXPENSES[cat] || 0;
 
@@ -1187,35 +1216,30 @@ const GAME = (function() {
   function attachExpenseListeners() {
     const inputs = document.querySelectorAll('.expense-input');
     inputs.forEach(input => {
+      // 1. Format text formatting live as the user types (no state update, no preview jump)
       input.addEventListener('input', () => {
         let valStr = input.value.replace(/[^\d]/g, '');
         let val = parseInt(valStr) || 0;
         input.value = val > 0 ? val.toLocaleString('vi-VN') : '';
-        
-        const cat = input.dataset.category;
-        const minCost = GAME_DATA.MIN_EXPENSES[cat] || 0;
-        state.currentDecision.expenses[cat] = Math.max(val, minCost);
-        updateLivePreview();
       });
 
+      // 2. Click away (blur) reverts the input text to the last committed budget in the state
       input.addEventListener('blur', () => {
-        const cat = input.dataset.category;
-        let valStr = input.value.replace(/[^\d]/g, '');
-        let val = parseInt(valStr) || 0;
-        
-        const minCost = GAME_DATA.MIN_EXPENSES[cat] || 0;
-        if (val < minCost) {
-          const EXPENSE_NAMES = {
-            housing: 'Housing', utility: 'Utility', food: 'Food',
-            transport: 'Transport', healthcare: 'Healthcare', entertainment: 'Entertainment'
-          };
-          UI.toast.warning(`Budget for ${EXPENSE_NAMES[cat]} cannot be lower than the Minimum Cost (${UI.formatVND(minCost)}).`);
-          val = minCost;
-          input.value = val > 0 ? val.toLocaleString('vi-VN') : '';
-        }
+        setTimeout(() => {
+          const cat = input.dataset.category;
+          const committedVal = state.currentDecision.expenses[cat] || GAME_DATA.MIN_EXPENSES[cat] || 0;
+          input.value = committedVal > 0 ? committedVal.toLocaleString('vi-VN') : '';
+        }, 150);
+      });
 
-        state.currentDecision.expenses[cat] = val;
-        updateLivePreview();
+      // 3. Pressing Enter key on the keyboard triggers the row's Enter button click
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const cat = input.dataset.category;
+          const btn = document.querySelector(`.expense-enter-btn[data-category="${cat}"]`);
+          if (btn) btn.click();
+        }
       });
     });
 
@@ -1243,15 +1267,6 @@ const GAME = (function() {
           }
 
           state.currentDecision.expenses[cat] = val;
-
-          // Update the Base Cost column cell in this row immediately
-          const row = btn.closest('tr');
-          if (row) {
-            const baseCostCell = row.querySelector('.cell-base');
-            if (baseCostCell) {
-              baseCostCell.textContent = UI.formatVND(val);
-            }
-          }
 
           UI.toast.success(`Set budget for ${EXPENSE_NAMES[cat]} to ${UI.formatVND(val)}`);
           updateLivePreview();
@@ -1372,7 +1387,8 @@ const GAME = (function() {
     const barCash = document.getElementById('bar-cash-val');
     if (barCash) {
       const prev = state.stats.cash;
-      const proj = newState.stats.cash;
+      const closingBalance = state.savingsBalance + result.income.savingsInterest;
+      const proj = newState.stats.cash - closingBalance;
       barCash.textContent = UI.formatVND(proj);
       updatePreviewLabelClass(barCash, proj, prev);
     }
@@ -1447,7 +1463,7 @@ const GAME = (function() {
       const categories = ['housing', 'utility', 'food', 'transport', 'healthcare', 'entertainment'];
       const EXPENSE_NAMES = {
         housing: 'Housing', utility: 'Utility', food: 'Food',
-        transport: 'Transportation', healthcare: 'Healthcare', entertainment: 'Entertainment'
+        transport: 'Transport', healthcare: 'Healthcare', entertainment: 'Entertainment'
       };
 
       categories.forEach(cat => {
@@ -1456,8 +1472,8 @@ const GAME = (function() {
         const baseRatio = GAME_DATA.BASE_RATIOS[cat];
         const coeff = GAME_DATA.MH_EXPENSE_COEFF[cat];
         
-        // MH impact: 15 * coeff * (baseRatio - actualRatio)
-        const mhImpact = 15 * coeff * (baseRatio - actualRatio);
+        // MH impact: 10.57 * coeff * (baseRatio - actualRatio)
+        const mhImpact = 10.57 * coeff * (baseRatio - actualRatio);
         // PH impact: healthcare recovery for healthcare, 0 otherwise
         const phImpact = (cat === 'healthcare') ? healthcareRecovery : 0;
 
@@ -1511,7 +1527,7 @@ const GAME = (function() {
     const phDelta = outcome.phDelta;
     const endStats = outcome.endStats;
 
-      // Use saved portfolio and stock prices if available (historical), fallback to live
+    // Use saved portfolio and stock prices if available (historical), fallback to live
     const portfolio = outcome.portfolio || state.portfolio;
     const prices = outcome.prices || state.currentPrices;
     const savingsBalance = outcome.savingsBalance !== undefined ? outcome.savingsBalance : state.savingsBalance;
@@ -1531,106 +1547,106 @@ const GAME = (function() {
     }
 
     // 2. Investment Portfolio Calculations
-   let totalCapital = 0;
-   let totalMarketValue = 0;
+    let totalCapital = 0;
+    let totalMarketValue = 0;
 
-   const codes = ['BNK-V', 'TEC-F', 'CSM-M', 'REA-V', 'ENE-G'];
-   codes.forEach(code => {
-     const pos = portfolio[code] || { quantity: 0, avgCost: 0 };
-     totalCapital += pos.quantity * pos.avgCost;
-     totalMarketValue += pos.quantity * prices[code];
-   });
+    const codes = ['BNK-V', 'TEC-F', 'CSM-M', 'REA-V', 'ENE-G'];
+    codes.forEach(code => {
+      const pos = portfolio[code] || { quantity: 0, avgCost: 0 };
+      totalCapital += pos.quantity * pos.avgCost;
+      totalMarketValue += pos.quantity * prices[code];
+    });
 
-   const roundReturn = totalMarketValue - totalCapital;
+    const roundReturn = totalMarketValue - totalCapital;
 
-   // Calculate Cumulative capital invested
-   const cumulativeCapital = totalCapital;
+    // Calculate Cumulative capital invested
+    const cumulativeCapital = totalCapital;
 
-   const realizedPnL = outcome.realizedPnL || 0;
-   const cumulativeReturnPct = cumulativeCapital > 0
-     ? ((realizedPnL + (totalMarketValue - totalCapital)) / cumulativeCapital) * 100
-     : 0;
+    const realizedPnL = outcome.realizedPnL || 0;
+    const cumulativeReturnPct = cumulativeCapital > 0
+      ? ((realizedPnL + (totalMarketValue - totalCapital)) / cumulativeCapital) * 100
+      : 0;
 
-   // Set portfolio header stats
-   const capEl = document.getElementById('result-portfolio-capital');
-   if (capEl) capEl.textContent = UI.formatVND(totalCapital);
+    // Set portfolio header stats
+    const capEl = document.getElementById('result-portfolio-capital');
+    if (capEl) capEl.textContent = UI.formatVND(totalCapital);
 
-   const mktEl = document.getElementById('result-portfolio-market');
-   if (mktEl) mktEl.textContent = UI.formatVND(totalMarketValue);
+    const mktEl = document.getElementById('result-portfolio-market');
+    if (mktEl) mktEl.textContent = UI.formatVND(totalMarketValue);
 
-   const rndRetEl = document.getElementById('result-portfolio-round-return');
-   if (rndRetEl) {
-     rndRetEl.textContent = (roundReturn >= 0 ? '+' : '') + UI.formatVND(roundReturn);
-     rndRetEl.className = roundReturn > 0 ? 'num-gain' : (roundReturn < 0 ? 'num-loss' : 'num-neutral');
-   }
+    const rndRetEl = document.getElementById('result-portfolio-round-return');
+    if (rndRetEl) {
+      rndRetEl.textContent = (roundReturn >= 0 ? '+' : '') + UI.formatVND(roundReturn);
+      rndRetEl.className = roundReturn > 0 ? 'num-gain' : (roundReturn < 0 ? 'num-loss' : 'num-neutral');
+    }
 
-   const cumRetEl = document.getElementById('result-portfolio-cumulative-return');
-   if (cumRetEl) {
-     cumRetEl.textContent = (cumulativeReturnPct >= 0 ? '+' : '') + cumulativeReturnPct.toFixed(2) + '%';
-     cumRetEl.className = cumulativeReturnPct > 0 ? 'num-gain' : (cumulativeReturnPct < 0 ? 'num-loss' : 'num-neutral');
-   }
+    const cumRetEl = document.getElementById('result-portfolio-cumulative-return');
+    if (cumRetEl) {
+      cumRetEl.textContent = (cumulativeReturnPct >= 0 ? '+' : '') + cumulativeReturnPct.toFixed(2) + '%';
+      cumRetEl.className = cumulativeReturnPct > 0 ? 'num-gain' : (cumulativeReturnPct < 0 ? 'num-loss' : 'num-neutral');
+    }
 
-   // Update stock table cost header dynamically
-   const costHeaderEl = document.getElementById('result-stock-cost-header');
-   if (costHeaderEl) {
-     costHeaderEl.textContent = roundNumber === 1 ? 'Cost/Share' : 'Avg Cost';
-   }
+    // Update stock table cost header dynamically
+    const costHeaderEl = document.getElementById('result-stock-cost-header');
+    if (costHeaderEl) {
+      costHeaderEl.textContent = roundNumber === 1 ? 'Cost/Share' : 'Avg Cost';
+    }
 
-   // 3. Stock Portfolio Table
-   const tbody = document.getElementById('result-stock-tbody');
-   if (tbody) {
-     let html = '';
-     const iconMap = {
-       'BNK-V': 'Bank.svg',
-       'TEC-F': 'Tech.svg',
-       'CSM-M': 'Consumer.svg',
-       'REA-V': 'Real estate.svg',
-       'ENE-G': 'Energy.svg'
-     };
+    // 3. Stock Portfolio Table
+    const tbody = document.getElementById('result-stock-tbody');
+    if (tbody) {
+      let html = '';
+      const iconMap = {
+        'BNK-V': 'Bank.svg',
+        'TEC-F': 'Tech.svg',
+        'CSM-M': 'Consumer.svg',
+        'REA-V': 'Real estate.svg',
+        'ENE-G': 'Energy.svg'
+      };
 
-     codes.forEach(code => {
-       const pos = portfolio[code] || { quantity: 0, avgCost: 0 };
-       const price = prices[code];
-       const gain = pos.quantity * (price - pos.avgCost);
-       const gainPct = pos.avgCost > 0 ? (gain / (pos.quantity * pos.avgCost)) * 100 : 0;
+      codes.forEach(code => {
+        const pos = portfolio[code] || { quantity: 0, avgCost: 0 };
+        const price = prices[code];
+        const gain = pos.quantity * (price - pos.avgCost);
+        const gainPct = pos.avgCost > 0 ? (gain / (pos.quantity * pos.avgCost)) * 100 : 0;
 
-       const gainText = pos.quantity > 0
-         ? `${gain >= 0 ? '+' : ''}${UI.formatVND(gain)} (${gainPct >= 0 ? '+' : ''}${gainPct.toFixed(1)}%)`
-         : '-';
-       const gainClass = pos.quantity > 0
-         ? (gain > 0 ? 'num-gain' : (gain < 0 ? 'num-loss' : 'num-neutral'))
-         : 'num-neutral';
+        const gainText = pos.quantity > 0
+          ? `${gain >= 0 ? '+' : ''}${UI.formatVND(gain)} (${gainPct >= 0 ? '+' : ''}${gainPct.toFixed(1)}%)`
+          : '-';
+        const gainClass = pos.quantity > 0
+          ? (gain > 0 ? 'num-gain' : (gain < 0 ? 'num-loss' : 'num-neutral'))
+          : 'num-neutral';
 
-       // Calculate Cost/Share (Buy Cost for round 1, Avg Cost for round 2+)
-       let costDisplay = '';
-       if (pos.quantity > 0) {
-         costDisplay = UI.formatVND(pos.avgCost);
-       } else if (roundNumber === 1) {
-         costDisplay = UI.formatVND(price * (1 + GAME_DATA.STOCK_TRADING_FEE));
-       } else {
-         costDisplay = '-';
-       }
+        // Calculate Cost/Share (Buy Cost for round 1, Avg Cost for round 2+)
+        let costDisplay = '';
+        if (pos.quantity > 0) {
+          costDisplay = UI.formatVND(pos.avgCost);
+        } else if (roundNumber === 1) {
+          costDisplay = UI.formatVND(price * (1 + GAME_DATA.STOCK_TRADING_FEE));
+        } else {
+          costDisplay = '-';
+        }
 
-       html += `
-         <tr>
-           <td>
-             <div style="display: flex; align-items: center; gap: var(--space-2);">
-               <img src="assets/icons/${iconMap[code]}" alt="${code} icon" style="width: 20px; height: 20px;">
-               <strong>${code}</strong>
-             </div>
-           </td>
-           <td class="text-right">${pos.quantity}</td>
-           <td class="text-right">${costDisplay}</td>
-           <td class="text-right">${UI.formatVND(price)}</td>
-           <td class="text-right ${gainClass}">${gainText}</td>
-         </tr>
-       `;
-     });
-     tbody.innerHTML = html;
-   }
+        html += `
+          <tr>
+            <td>
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <img src="assets/icons/${iconMap[code]}" alt="${code} icon" style="width: 20px; height: 20px;">
+                <strong>${code}</strong>
+              </div>
+            </td>
+            <td class="text-right">${pos.quantity}</td>
+            <td class="text-right">${costDisplay}</td>
+            <td class="text-right">${UI.formatVND(price)}</td>
+            <td class="text-right ${gainClass}">${gainText}</td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
 
     // 4. Savings Account Table
-     const savingsOpening = outcome.savingsOpening || 0;
+    const savingsOpening = outcome.savingsOpening || 0;
     const additionalDeposit = savingsBalance - savingsOpening;
     const principal = savingsBalance;
     const interest = income.savingsInterest;
@@ -2125,7 +2141,7 @@ const GAME = (function() {
     expandedBody.innerHTML = cardsHtml;
     expandedView.classList.add('active');
   }
-  
+
   // ----------------------------------------------------
   // INITIALIZATION
   // ----------------------------------------------------
@@ -2328,73 +2344,73 @@ const GAME = (function() {
     }
 
     // Savings deposit listener registration
-   const savingsInput = document.getElementById('invest-savings-input');
-   const savingsBtn = document.getElementById('invest-savings-btn');
-   if (savingsInput && savingsBtn) {
-     savingsInput.addEventListener('blur', () => {
-       const rawVal = savingsInput.value.trim();
-       if (rawVal === '') return;
+    const savingsInput = document.getElementById('invest-savings-input');
+    const savingsBtn = document.getElementById('invest-savings-btn');
+    if (savingsInput && savingsBtn) {
+      savingsInput.addEventListener('blur', () => {
+        const rawVal = savingsInput.value.trim();
+        if (rawVal === '') return;
 
-       // Reject negative input or non-numeric characters (except separators)
-       if (rawVal.includes('-')) {
-         UI.toast.warning("Error: deposit amount must be a positive integer greater than 1,000,000 VND.");
-         savingsInput.value = '';
-         return;
-       }
+        // Reject negative input or non-numeric characters (except separators)
+        if (rawVal.includes('-')) {
+          UI.toast.warning("Error: deposit amount must be a positive integer greater than 1,000,000 VND.");
+          savingsInput.value = '';
+          return;
+        }
 
-       const val = parseInt(rawVal.replace(/[^\d]/g, '')) || 0;
-       if (val < 1000000) {
-         UI.toast.warning("Error: deposit amount must be greater than 1,000,000 VND.");
-         savingsInput.value = '';
-         return;
-       }
-       savingsInput.value = val !== 0 ? val.toLocaleString('vi-VN') : '';
-     });
+        const val = parseInt(rawVal.replace(/[^\d]/g, '')) || 0;
+        if (val < 1000000) {
+          UI.toast.warning("Error: deposit amount must be greater than 1,000,000 VND.");
+          savingsInput.value = '';
+          return;
+        }
+        savingsInput.value = val !== 0 ? val.toLocaleString('vi-VN') : '';
+      });
 
-     savingsBtn.addEventListener('click', () => {
-       const rawText = savingsInput.value.trim();
-       if (rawText === '') {
-         UI.toast.warning("Please enter a valid deposit amount.");
-         return;
-       }
+      savingsBtn.addEventListener('click', () => {
+        const rawText = savingsInput.value.trim();
+        if (rawText === '') {
+          UI.toast.warning("Please enter a valid deposit amount.");
+          return;
+        }
 
-       // Reject negative input
-       if (rawText.includes('-')) {
-         UI.toast.warning("Error: deposit amount must be a positive integer greater than 1,000,000 VND.");
-         savingsInput.value = '';
-         return;
-       }
+        // Reject negative input
+        if (rawText.includes('-')) {
+          UI.toast.warning("Error: deposit amount must be a positive integer greater than 1,000,000 VND.");
+          savingsInput.value = '';
+          return;
+        }
 
-       const amount = parseInt(rawText.replace(/[^\d]/g, '')) || 0;
-       if (amount < 1000000) {
-         UI.toast.warning("Error: deposit amount must be greater than 1,000,000 VND.");
-         savingsInput.value = '';
-         return;
-       }
+        const amount = parseInt(rawText.replace(/[^\d]/g, '')) || 0;
+        if (amount < 1000000) {
+          UI.toast.warning("Error: deposit amount must be greater than 1,000,000 VND.");
+          savingsInput.value = '';
+          return;
+        }
 
-       if (state.stats.cash < amount) {
-         UI.toast.warning("Not enough cash to deposit this amount.");
-         return;
-       }
-       state.stats.cash -= amount;
-       state.savingsBalance += amount;
-       UI.toast.success(`Deposited ${UI.formatVND(amount)} to savings account.`);
+        if (state.stats.cash < amount) {
+          UI.toast.warning("Not enough cash to deposit this amount.");
+          return;
+        }
+        state.stats.cash -= amount;
+        state.savingsBalance += amount;
+        UI.toast.success(`Deposited ${UI.formatVND(amount)} to savings account.`);
 
-       state.stats.investment = HEALTH.calcPortfolioValue(state.portfolio, state.currentPrices) + state.savingsBalance;
-       savingsInput.value = '';
-       renderDecisionsTab();
-     });
-   }
+        state.stats.investment = HEALTH.calcPortfolioValue(state.portfolio, state.currentPrices) + state.savingsBalance;
+        savingsInput.value = '';
+        renderDecisionsTab();
+      });
+    }
 
-   // Health Insurance purchase listener registration
-   const insuranceCheck = document.getElementById('invest-insurance-check');
-   if (insuranceCheck) {
-     insuranceCheck.addEventListener('change', () => {
-       state.hasInsurance = insuranceCheck.checked;
-       updateLivePreview();
-     });
-   }
-    
+    // Health Insurance purchase listener registration
+    const insuranceCheck = document.getElementById('invest-insurance-check');
+    if (insuranceCheck) {
+      insuranceCheck.addEventListener('change', () => {
+        state.hasInsurance = insuranceCheck.checked;
+        updateLivePreview();
+      });
+    }
+
     // Final confirm button listener registration
     const confirmBtn = document.getElementById('btn-confirm-decisions');
     if (confirmBtn) {

@@ -146,7 +146,7 @@ const HEALTH = (() => {
       const coeff       = coeffMap[key];
       expenseSum += coeff * (baseRatio - actualRatio);
     }
-    const expenseEffect = 15 * expenseSum;
+    const expenseEffect = 10.57 * expenseSum;
 
     // 4. Total delta (positive = health increases, negative = decreases)
     const totalDelta = -incomePenalty - extraworkPenalty + expenseEffect + eventEffect;
@@ -422,7 +422,7 @@ const HEALTH = (() => {
     const gainLossPct = costBasis > 0 ? (gainLoss / costBasis) * 100 : 0;
     return { gainLoss, gainLossPct };
   }
-  
+
   /* ──────────────────────────────────────────────────────────
      END-GAME SCORING
      ────────────────────────────────────────────────────────── */
