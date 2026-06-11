@@ -343,6 +343,8 @@ const HEALTH = (() => {
    */
   function updateStockPrices(currentPrices, round, marketBranch) {
     const data = (marketBranch && GAME_DATA.MARKET_EVENT_TREE[marketBranch]);
+    const bounds = GAME_DATA.MARKET_PRICE_BOUNDS ? GAME_DATA.MARKET_PRICE_BOUNDS[marketBranch] : null;
+
     if (!data || !data.stockParams) {
       // Fallback to static changes if params are missing for some reason
       const changes = (data && data.stockPriceChanges)
@@ -351,7 +353,12 @@ const HEALTH = (() => {
       const newPrices = { ...currentPrices };
       const stockPriceChanges = {};
       for (const [code, changePct] of Object.entries(changes)) {
-        newPrices[code] = Math.round(newPrices[code] * (1 + changePct));
+        let nextPrice = Math.round(newPrices[code] * (1 + changePct));
+        if (bounds && bounds[code]) {
+          const { min, max } = bounds[code];
+          nextPrice = Math.max(min, Math.min(max, nextPrice));
+        }
+        newPrices[code] = nextPrice;
         stockPriceChanges[code] = changePct;
       }
       return { newPrices, stockPriceChanges };
@@ -374,7 +381,12 @@ const HEALTH = (() => {
       const epsilon = (Math.random() * 2 - 1) * sigma;
       const r_i = rMarket + gamma * rSector + epsilon;
 
-      newPrices[code] = Math.round(price * (1 + r_i));
+      let nextPrice = Math.round(price * (1 + r_i));
+      if (bounds && bounds[code]) {
+        const { min, max } = bounds[code];
+        nextPrice = Math.max(min, Math.min(max, nextPrice));
+      }
+      newPrices[code] = nextPrice;
       stockPriceChanges[code] = r_i;
     }
 
@@ -391,7 +403,7 @@ const HEALTH = (() => {
   function calcPortfolioValue(portfolio, prices) {
     let total = 0;
     for (const [code, pos] of Object.entries(portfolio)) {
-      total += pos.quantity * (prices[code] || 0);
+      total += pos.quantity * (prices[code] || 0) * (1 + GAME_DATA.STOCK_TRADING_FEE);
     }
     return total;
   }
@@ -410,7 +422,7 @@ const HEALTH = (() => {
     const gainLossPct = costBasis > 0 ? (gainLoss / costBasis) * 100 : 0;
     return { gainLoss, gainLossPct };
   }
-
+  
   /* ──────────────────────────────────────────────────────────
      END-GAME SCORING
      ────────────────────────────────────────────────────────── */
